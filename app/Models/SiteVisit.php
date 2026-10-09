@@ -16,8 +16,8 @@ class SiteVisit extends Model
     use HasCompanyScope, HasDocuments, HasFactory, LogsActivity, SoftDeletes;
 
     protected $fillable = [
-        'company_id', 'sv_no', 'client_id', 'site_address', 'visit_date',
-        'assigned_to', 'purpose', 'requirements', 'notes',
+        'company_id', 'sv_no', 'client_id', 'project_id', 'site_address',
+        'visit_date', 'assigned_to', 'purpose', 'requirements', 'notes',
     ];
 
     protected function casts(): array
@@ -35,6 +35,11 @@ class SiteVisit extends Model
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function project(): BelongsTo
+    {
+        return $this->belongsTo(Project::class);
     }
 
     public function assignee(): BelongsTo

@@ -11,6 +11,9 @@ use App\Livewire\Dashboard\Index as DashboardIndex;
 use App\Livewire\Leads\Form as LeadForm;
 use App\Livewire\Leads\Index as LeadIndex;
 use App\Livewire\Leads\Show as LeadShow;
+use App\Livewire\Projects\Form as ProjectForm;
+use App\Livewire\Projects\Index as ProjectIndex;
+use App\Livewire\Projects\Show as ProjectShow;
 use App\Livewire\Settings\Index as SettingsIndex;
 use App\Livewire\SiteVisits\Form as SiteVisitForm;
 use App\Livewire\SiteVisits\Index as SiteVisitIndex;
@@ -65,5 +68,13 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
         Route::get('/create', SiteVisitForm::class)->name('create')->middleware('can:create_site_visits');
         Route::get('/{siteVisit}/edit', SiteVisitForm::class)->name('edit')->middleware('can:edit_site_visits');
         Route::get('/{siteVisit}', SiteVisitShow::class)->name('show')->middleware('can:view_site_visits');
+    });
+
+    // Phase 3: Projects, Milestones, Tasks (ARCHITECTURE.md §6.3).
+    Route::prefix('projects')->name('projects.')->group(function () {
+        Route::get('/', ProjectIndex::class)->name('index')->middleware('can:view_projects');
+        Route::get('/create', ProjectForm::class)->name('create')->middleware('can:create_projects');
+        Route::get('/{project}/edit', ProjectForm::class)->name('edit')->middleware('can:edit_projects');
+        Route::get('/{project}', ProjectShow::class)->name('show')->middleware('can:view_projects');
     });
 });

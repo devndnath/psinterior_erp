@@ -59,13 +59,18 @@ class Client extends Model
         return $this->hasMany(SiteVisit::class);
     }
 
+    public function projects(): HasMany
+    {
+        return $this->hasMany(Project::class);
+    }
+
     public function primaryContact(): ?ClientContact
     {
         return $this->contacts->firstWhere('is_primary', true) ?? $this->contacts->first();
     }
 
-    // Projects, quotations, contracts, invoices, payments, meetings and
-    // complaints relations are added to this model as each module ships
+    // Quotations, contracts, invoices, payments, meetings and complaints
+    // relations are added to this model as each module ships
     // (ARCHITECTURE.md §6 — Client 360 view assembles all of them, spec
     // §6). Intentionally not stubbed here to avoid referencing models that
     // don't exist yet.

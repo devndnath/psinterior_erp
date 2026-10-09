@@ -7,6 +7,9 @@
             <p class="mt-1 text-sm text-gray-500">
                 <a href="{{ route('clients.show', $siteVisit->client) }}" wire:navigate class="text-brand-600 hover:underline">{{ $siteVisit->client?->name }}</a>
                 — {{ $siteVisit->visit_date?->format('d M, Y') }}
+                @if ($siteVisit->project)
+                    — <a href="{{ route('projects.show', $siteVisit->project) }}" wire:navigate class="text-brand-600 hover:underline">{{ $siteVisit->project->project_code }}</a>
+                @endif
             </p>
         </div>
         @can('update', $siteVisit)

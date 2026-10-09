@@ -23,6 +23,7 @@ class Lead extends Model
         'address', 'project_type', 'estimated_budget', 'interested_service',
         'lead_source_id', 'assigned_to', 'priority', 'status',
         'expected_closing_date', 'notes', 'converted_client_id', 'converted_at',
+        'converted_project_id',
     ];
 
     protected function casts(): array
@@ -62,9 +63,19 @@ class Lead extends Model
         return $this->belongsTo(Client::class, 'converted_client_id');
     }
 
+    public function convertedProject(): BelongsTo
+    {
+        return $this->belongsTo(Project::class, 'converted_project_id');
+    }
+
     public function isConverted(): bool
     {
         return ! is_null($this->converted_client_id);
+    }
+
+    public function hasProject(): bool
+    {
+        return ! is_null($this->converted_project_id);
     }
 
     public function nextFollowup(): ?LeadFollowup

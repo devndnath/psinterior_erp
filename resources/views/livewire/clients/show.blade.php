@@ -64,8 +64,29 @@
                 @endif
             </div>
 
+            <div class="card p-6">
+                <div class="mb-4 flex items-center justify-between">
+                    <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500">Projects</h2>
+                    @can('create', \App\Models\Project::class)
+                        <a href="{{ route('projects.create', ['client' => $client->id]) }}" wire:navigate class="text-sm text-brand-600 hover:underline">+ New Project</a>
+                    @endcan
+                </div>
+                @if ($projects->isEmpty())
+                    <p class="text-sm text-gray-500">No projects opened for this client yet.</p>
+                @else
+                    <ul class="divide-y divide-gray-100">
+                        @foreach ($projects as $project)
+                            <li class="flex items-center justify-between py-2 text-sm">
+                                <a href="{{ route('projects.show', $project) }}" wire:navigate class="font-medium text-brand-600 hover:underline">{{ $project->project_code }} — {{ $project->name }}</a>
+                                <x-status-badge :label="$project->status->label()" :color="$project->status->color()" />
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+            </div>
+
             <div class="card p-6 text-sm text-gray-400">
-                Projects, quotations, contracts, invoices, payments and meetings will appear here once those modules ship (Phases 3+).
+                Quotations, contracts, invoices, payments and meetings will appear here once those modules ship (Phases 4+).
             </div>
         </div>
 

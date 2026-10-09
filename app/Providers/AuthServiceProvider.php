@@ -6,6 +6,7 @@ use App\Auth\ScopedEloquentUserProvider;
 use App\Models\ActivityLog;
 use App\Models\Client;
 use App\Models\Lead;
+use App\Models\Project;
 use App\Models\SiteVisit;
 use App\Policies\ActivityLogPolicy;
 use App\Policies\ClientPolicy;
@@ -29,8 +30,7 @@ class AuthServiceProvider extends ServiceProvider
         Lead::class => LeadPolicy::class,
         Client::class => ClientPolicy::class,
         SiteVisit::class => SiteVisitPolicy::class,
-        // Project model ships in Phase 3; ProjectPolicy exists now as the
-        // reference pattern later policies copy (ARCHITECTURE.md §7).
+        Project::class => ProjectPolicy::class,
     ];
 
     public function register(): void {}

@@ -18,6 +18,16 @@
                 @error('client_id') <p class="form-error">{{ $message }}</p> @enderror
             </div>
             <div>
+                <label class="form-label">Project (optional)</label>
+                <select wire:model="project_id" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                    <option value="">No project yet</option>
+                    @foreach ($projects as $proj)
+                        <option value="{{ $proj->id }}">{{ $proj->project_code }} — {{ $proj->name }}</option>
+                    @endforeach
+                </select>
+                @error('project_id') <p class="form-error">{{ $message }}</p> @enderror
+            </div>
+            <div>
                 <label class="form-label">Visit date *</label>
                 <input wire:model="visit_date" type="date" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
                 @error('visit_date') <p class="form-error">{{ $message }}</p> @enderror

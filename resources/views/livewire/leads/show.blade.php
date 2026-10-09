@@ -14,6 +14,11 @@
             @endcan
             @if ($lead->isConverted())
                 <a href="{{ route('clients.show', $lead->convertedClient) }}" wire:navigate class="btn-secondary">View client {{ $lead->convertedClient?->client_no }}</a>
+                @if ($lead->hasProject())
+                    <a href="{{ route('projects.show', $lead->converted_project_id) }}" wire:navigate class="btn-secondary">View project</a>
+                @elseif (\Illuminate\Support\Facades\Gate::check('create', \App\Models\Project::class))
+                    <a href="{{ route('projects.create', ['client' => $lead->converted_client_id, 'lead' => $lead->id]) }}" wire:navigate class="btn-primary">Create Project</a>
+                @endif
             @elseif ($lead->status->value === \App\Enums\LeadStatus::Won->value)
                 @can('convert', $lead)
                     <x-confirm-dialog

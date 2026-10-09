@@ -3,6 +3,7 @@
 namespace App\Livewire\SiteVisits;
 
 use App\Models\Client;
+use App\Models\Project;
 use App\Models\SiteVisit;
 use App\Models\User;
 use App\Services\FileService;
@@ -27,6 +28,7 @@ class Form extends Component
     public ?SiteVisit $siteVisit = null;
 
     public string $client_id = '';
+    public string $project_id = '';
     public string $site_address = '';
     public string $visit_date = '';
     public string $assigned_to = '';
@@ -49,6 +51,7 @@ class Form extends Component
         if ($this->siteVisit) {
             $this->fill([
                 'client_id' => (string) $this->siteVisit->client_id,
+                'project_id' => (string) $this->siteVisit->project_id,
                 'site_address' => $this->siteVisit->site_address,
                 'visit_date' => $this->siteVisit->visit_date?->format('Y-m-d') ?? '',
                 'assigned_to' => (string) $this->siteVisit->assigned_to,
@@ -64,6 +67,14 @@ class Form extends Component
                 'height' => (string) $item->height,
                 'notes' => (string) $item->notes,
             ])->all();
+        } else {
+            // Pre-fill from a "Log Site Visit" link on a Project page.
+            $projectId = request()->query('project');
+
+            if ($projectId && ($project = Project::find($projectId))) {
+                $this->project_id = (string) $project->id;
+                $this->client_id = (string) $project->client_id;
+            }
         }
 
         if (empty($this->rooms)) {
@@ -90,6 +101,7 @@ class Form extends Component
     {
         return [
             'client_id' => ['required', 'exists:clients,id'],
+            'project_id' => ['nullable', 'exists:projects,id'],
             'site_address' => ['nullable', 'string', 'max:500'],
             'visit_date' => ['required', 'date'],
             'assigned_to' => ['nullable', 'exists:users,id'],
@@ -111,6 +123,7 @@ class Form extends Component
 
         $visitData = [
             'client_id' => $data['client_id'],
+            'project_id' => $data['project_id'] ?: null,
             'site_address' => $data['site_address'] ?: null,
             'visit_date' => $data['visit_date'],
             'assigned_to' => $data['assigned_to'] !== '' ? $data['assigned_to'] : null,
@@ -148,6 +161,7 @@ class Form extends Component
     {
         return view('livewire.site-visits.form', [
             'clients' => Client::orderBy('name')->get(['id', 'name', 'client_no']),
+            'projects' => Project::orderBy('name')->get(['id', 'name', 'project_code', 'client_id']),
             'assignees' => User::staff()->orderBy('name')->get(['id', 'name']),
         ]);
     }
