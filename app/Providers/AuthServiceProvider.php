@@ -5,11 +5,13 @@ namespace App\Providers;
 use App\Auth\ScopedEloquentUserProvider;
 use App\Models\ActivityLog;
 use App\Models\Client;
+use App\Models\Design;
 use App\Models\Lead;
 use App\Models\Project;
 use App\Models\SiteVisit;
 use App\Policies\ActivityLogPolicy;
 use App\Policies\ClientPolicy;
+use App\Policies\DesignPolicy;
 use App\Policies\LeadPolicy;
 use App\Policies\ProjectPolicy;
 use App\Policies\SiteVisitPolicy;
@@ -31,6 +33,7 @@ class AuthServiceProvider extends ServiceProvider
         Client::class => ClientPolicy::class,
         SiteVisit::class => SiteVisitPolicy::class,
         Project::class => ProjectPolicy::class,
+        Design::class => DesignPolicy::class,
     ];
 
     public function register(): void {}

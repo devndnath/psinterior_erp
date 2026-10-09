@@ -8,6 +8,9 @@ use App\Livewire\Clients\Form as ClientForm;
 use App\Livewire\Clients\Index as ClientIndex;
 use App\Livewire\Clients\Show as ClientShow;
 use App\Livewire\Dashboard\Index as DashboardIndex;
+use App\Livewire\Designs\Form as DesignForm;
+use App\Livewire\Designs\Index as DesignIndex;
+use App\Livewire\Designs\Show as DesignShow;
 use App\Livewire\Leads\Form as LeadForm;
 use App\Livewire\Leads\Index as LeadIndex;
 use App\Livewire\Leads\Show as LeadShow;
@@ -76,5 +79,13 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
         Route::get('/create', ProjectForm::class)->name('create')->middleware('can:create_projects');
         Route::get('/{project}/edit', ProjectForm::class)->name('edit')->middleware('can:edit_projects');
         Route::get('/{project}', ProjectShow::class)->name('show')->middleware('can:view_projects');
+    });
+
+    // Phase 4: Design — revisions and client approvals (ARCHITECTURE.md §3.5).
+    Route::prefix('designs')->name('designs.')->group(function () {
+        Route::get('/', DesignIndex::class)->name('index')->middleware('can:view_designs');
+        Route::get('/create', DesignForm::class)->name('create')->middleware('can:create_designs');
+        Route::get('/{design}/edit', DesignForm::class)->name('edit')->middleware('can:edit_designs');
+        Route::get('/{design}', DesignShow::class)->name('show')->middleware('can:view_designs');
     });
 });

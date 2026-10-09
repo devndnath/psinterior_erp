@@ -8,6 +8,7 @@ use App\Enums\TaskStatus;
 use App\Models\Project;
 use App\Models\User;
 use App\Services\ProjectService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -171,6 +172,9 @@ class Show extends Component
             'milestones' => $this->project->milestones()->orderBy('due_date')->get(),
             'tasks' => $this->project->tasks()->with('milestone')->orderBy('due_date')->get(),
             'siteVisits' => $this->project->siteVisits()->latest('visit_date')->get(),
+            'designs' => Auth::user()->can('view_designs')
+                ? $this->project->designs()->with('revisions')->latest()->get()
+                : collect(),
             'members' => $this->project->members,
             'staff' => User::staff()->orderBy('name')->get(['id', 'name']),
             'milestoneStatuses' => MilestoneStatus::options(),

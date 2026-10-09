@@ -107,8 +107,13 @@ class Project extends Model
         return $this->hasMany(Lead::class, 'converted_project_id');
     }
 
-    // Designs, BOQs, Quotations, Contracts, Change Orders, Invoices,
-    // Payments, Expenses, Meetings, Inspections, Snags, Handovers and
-    // Warranties relations are added to this model as each of those
-    // modules ships (ARCHITECTURE.md §2) — intentionally not stubbed here.
+    public function designs(): HasMany
+    {
+        return $this->hasMany(Design::class);
+    }
+
+    // BOQs, Quotations, Contracts, Change Orders, Invoices, Payments,
+    // Expenses, Meetings, Inspections, Snags, Handovers and Warranties
+    // relations are added to this model as each of those modules ships
+    // (ARCHITECTURE.md §2) — intentionally not stubbed here.
 }

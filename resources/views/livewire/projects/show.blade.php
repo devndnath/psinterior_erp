@@ -208,8 +208,34 @@
                 @endif
             </div>
 
+            @can('view_designs')
+                <div class="card p-6">
+                    <div class="mb-4 flex items-center justify-between">
+                        <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500">Designs</h2>
+                        @can('create', \App\Models\Design::class)
+                            <a href="{{ route('designs.create', ['project' => $project->id]) }}" wire:navigate class="text-sm text-brand-600 hover:underline">+ Upload design</a>
+                        @endcan
+                    </div>
+                    @if ($designs->isEmpty())
+                        <p class="text-sm text-gray-500">No designs uploaded for this project yet.</p>
+                    @else
+                        <ul class="divide-y divide-gray-100">
+                            @foreach ($designs as $design)
+                                <li class="flex items-center justify-between py-2 text-sm">
+                                    <div>
+                                        <a href="{{ route('designs.show', $design) }}" wire:navigate class="font-medium text-brand-600 hover:underline">{{ $design->design_no }}</a>
+                                        <span class="text-gray-500">— {{ $design->title }}</span>
+                                    </div>
+                                    <x-status-badge :label="$design->status->label()" :color="$design->status->color()" />
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            @endcan
+
             <div class="card p-6 text-sm text-gray-400">
-                Designs, BOQ, Quotations, Contracts, Change Orders, Invoices, Payments, Expenses, Meetings, Inspections, Snags and Handover will appear here as those modules ship (Phases 4+).
+                BOQ, Quotations, Contracts, Change Orders, Invoices, Payments, Expenses, Meetings, Inspections, Snags and Handover will appear here as those modules ship (Phases 5+).
             </div>
         </div>
 

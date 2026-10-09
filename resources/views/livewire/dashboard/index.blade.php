@@ -1,5 +1,5 @@
 <div>
-    @if ($totalLeads === null && $totalClients === null && $upcomingSiteVisits === null && $activeProjects === null)
+    @if ($totalLeads === null && $totalClients === null && $upcomingSiteVisits === null && $activeProjects === null && $designsAwaitingDecision === null)
         <x-empty-state
             title="Welcome to {{ config('app.name') }}"
             description="Your account doesn't have access to any CRM modules yet. Ask an administrator to assign you a role."
@@ -43,6 +43,13 @@
                 <a href="{{ route('projects.index', ['status' => 'on_hold']) }}" wire:navigate class="card p-5 transition hover:shadow-md">
                     <p class="text-sm font-medium text-gray-500">Projects On Hold</p>
                     <p class="mt-2 text-3xl font-semibold text-gray-900">{{ $projectsOnHold }}</p>
+                </a>
+            @endif
+
+            @if ($designsAwaitingDecision !== null)
+                <a href="{{ route('designs.index', ['status' => 'under_review']) }}" wire:navigate class="card p-5 transition hover:shadow-md">
+                    <p class="text-sm font-medium text-gray-500">Designs Awaiting Decision</p>
+                    <p class="mt-2 text-3xl font-semibold text-gray-900">{{ $designsAwaitingDecision }}</p>
                 </a>
             @endif
         </div>
