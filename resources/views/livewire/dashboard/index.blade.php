@@ -1,0 +1,43 @@
+<div>
+    @if ($totalLeads === null && $totalClients === null && $upcomingSiteVisits === null)
+        <x-empty-state
+            title="Welcome to {{ config('app.name') }}"
+            description="Your account doesn't have access to any CRM modules yet. Ask an administrator to assign you a role."
+        />
+    @else
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            @if ($totalLeads !== null)
+                <a href="{{ route('leads.index') }}" wire:navigate class="card p-5 transition hover:shadow-md">
+                    <p class="text-sm font-medium text-gray-500">Total Leads</p>
+                    <p class="mt-2 text-3xl font-semibold text-gray-900">{{ $totalLeads }}</p>
+                </a>
+                <a href="{{ route('leads.index', ['status' => 'new']) }}" wire:navigate class="card p-5 transition hover:shadow-md">
+                    <p class="text-sm font-medium text-gray-500">New Leads</p>
+                    <p class="mt-2 text-3xl font-semibold text-gray-900">{{ $newLeads }}</p>
+                </a>
+                <div class="card p-5">
+                    <p class="text-sm font-medium text-gray-500">Open Leads</p>
+                    <p class="mt-2 text-3xl font-semibold text-gray-900">{{ $openLeads }}</p>
+                </div>
+            @endif
+
+            @if ($totalClients !== null)
+                <a href="{{ route('clients.index') }}" wire:navigate class="card p-5 transition hover:shadow-md">
+                    <p class="text-sm font-medium text-gray-500">Total Clients</p>
+                    <p class="mt-2 text-3xl font-semibold text-gray-900">{{ $totalClients }}</p>
+                </a>
+            @endif
+
+            @if ($upcomingSiteVisits !== null)
+                <a href="{{ route('site-visits.index') }}" wire:navigate class="card p-5 transition hover:shadow-md">
+                    <p class="text-sm font-medium text-gray-500">Upcoming Site Visits</p>
+                    <p class="mt-2 text-3xl font-semibold text-gray-900">{{ $upcomingSiteVisits }}</p>
+                </a>
+            @endif
+        </div>
+
+        <p class="mt-6 text-sm text-gray-400">
+            Project, finance and inventory KPIs and charts will appear here as each module ships in later phases.
+        </p>
+    @endif
+</div>
