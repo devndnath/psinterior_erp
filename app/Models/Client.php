@@ -64,14 +64,23 @@ class Client extends Model
         return $this->hasMany(Project::class);
     }
 
+    public function quotations(): HasMany
+    {
+        return $this->hasMany(Quotation::class);
+    }
+
+    public function contracts(): HasMany
+    {
+        return $this->hasMany(Contract::class);
+    }
+
     public function primaryContact(): ?ClientContact
     {
         return $this->contacts->firstWhere('is_primary', true) ?? $this->contacts->first();
     }
 
-    // Quotations, contracts, invoices, payments, meetings and complaints
-    // relations are added to this model as each module ships
-    // (ARCHITECTURE.md §6 — Client 360 view assembles all of them, spec
-    // §6). Intentionally not stubbed here to avoid referencing models that
-    // don't exist yet.
+    // Invoices, payments, meetings and complaints relations are added to
+    // this model as each module ships (ARCHITECTURE.md §6 — Client 360
+    // view assembles all of them, spec §6). Intentionally not stubbed
+    // here to avoid referencing models that don't exist yet.
 }

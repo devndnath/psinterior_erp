@@ -2,13 +2,17 @@
 
 namespace App\Livewire\Dashboard;
 
+use App\Enums\ChangeOrderStatus;
 use App\Enums\DesignStatus;
 use App\Enums\LeadStatus;
 use App\Enums\ProjectStatus;
+use App\Enums\QuotationStatus;
+use App\Models\ChangeOrder;
 use App\Models\Client;
 use App\Models\Design;
 use App\Models\Lead;
 use App\Models\Project;
+use App\Models\Quotation;
 use App\Models\SiteVisit;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -17,11 +21,12 @@ use Livewire\Component;
 
 /**
  * Role-aware dashboard. Phase 1 shipped an empty shell; Phase 2 added the
- * CRM KPI cards; Phase 3 added Projects; Phase 4 adds Designs awaiting a
- * client decision (spec §4), each card gated by the same permission its
- * own module uses so a user without `view_leads` simply doesn't see that
- * card. Finance/inventory KPIs and charts are added as those modules ship
- * in later phases.
+ * CRM KPI cards; Phase 3 added Projects; Phase 4 added Designs awaiting a
+ * client decision; Phase 5 adds Quotations awaiting a decision and
+ * pending Change Orders (spec §4), each card gated by the same
+ * permission its own module uses so a user without `view_leads` simply
+ * doesn't see that card. Finance/inventory KPIs and charts are added as
+ * those modules ship in later phases.
  */
 #[Layout('layouts.admin', ['title' => 'Dashboard'])]
 #[Title('Dashboard')]
@@ -51,6 +56,12 @@ class Index extends Component
                 DesignStatus::Submitted->value,
                 DesignStatus::UnderReview->value,
             ])->count() : null,
+            'quotationsAwaitingDecision' => $user->can('view_quotations') ? Quotation::whereIn('status', [
+                QuotationStatus::Sent->value,
+                QuotationStatus::Viewed->value,
+                QuotationStatus::Negotiation->value,
+            ])->count() : null,
+            'changeOrdersPending' => $user->can('view_change_orders') ? ChangeOrder::where('status', ChangeOrderStatus::Pending->value)->count() : null,
         ]);
     }
 }

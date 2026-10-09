@@ -85,8 +85,44 @@
                 @endif
             </div>
 
+            @can('view_quotations')
+                <div class="card p-6">
+                    <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Quotations</h2>
+                    @if ($quotations->isEmpty())
+                        <p class="text-sm text-gray-500">No quotations sent to this client yet.</p>
+                    @else
+                        <ul class="divide-y divide-gray-100">
+                            @foreach ($quotations as $quotation)
+                                <li class="flex items-center justify-between py-2 text-sm">
+                                    <a href="{{ route('quotations.show', $quotation) }}" wire:navigate class="font-medium text-brand-600 hover:underline">{{ $quotation->quotation_no }}</a>
+                                    <x-status-badge :label="$quotation->status->label()" :color="$quotation->status->color()" />
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            @endcan
+
+            @can('view_contracts')
+                <div class="card p-6">
+                    <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Contracts</h2>
+                    @if ($contracts->isEmpty())
+                        <p class="text-sm text-gray-500">No contracts with this client yet.</p>
+                    @else
+                        <ul class="divide-y divide-gray-100">
+                            @foreach ($contracts as $contract)
+                                <li class="flex items-center justify-between py-2 text-sm">
+                                    <a href="{{ route('contracts.show', $contract) }}" wire:navigate class="font-medium text-brand-600 hover:underline">{{ $contract->contract_no }}</a>
+                                    <x-status-badge :label="$contract->status->label()" :color="$contract->status->color()" />
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            @endcan
+
             <div class="card p-6 text-sm text-gray-400">
-                Quotations, contracts, invoices, payments and meetings will appear here once those modules ship (Phases 4+).
+                Invoices, payments and meetings will appear here once those modules ship (Phases 6+).
             </div>
         </div>
 

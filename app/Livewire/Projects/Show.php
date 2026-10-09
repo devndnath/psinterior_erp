@@ -175,6 +175,18 @@ class Show extends Component
             'designs' => Auth::user()->can('view_designs')
                 ? $this->project->designs()->with('revisions')->latest()->get()
                 : collect(),
+            'boqs' => Auth::user()->can('view_boqs')
+                ? $this->project->boqs()->latest('version')->get()
+                : collect(),
+            'quotations' => Auth::user()->can('view_quotations')
+                ? $this->project->quotations()->latest()->get()
+                : collect(),
+            'contracts' => Auth::user()->can('view_contracts')
+                ? $this->project->contracts()->latest()->get()
+                : collect(),
+            'changeOrders' => Auth::user()->can('view_change_orders')
+                ? $this->project->changeOrders()->latest()->get()
+                : collect(),
             'members' => $this->project->members,
             'staff' => User::staff()->orderBy('name')->get(['id', 'name']),
             'milestoneStatuses' => MilestoneStatus::options(),

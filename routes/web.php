@@ -4,9 +4,18 @@ use App\Http\Controllers\Auth\LogoutController;
 use App\Livewire\Auth\ForgotPassword;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\ResetPassword;
+use App\Livewire\Boqs\Form as BoqForm;
+use App\Livewire\Boqs\Index as BoqIndex;
+use App\Livewire\Boqs\Show as BoqShow;
+use App\Livewire\ChangeOrders\Form as ChangeOrderForm;
+use App\Livewire\ChangeOrders\Index as ChangeOrderIndex;
+use App\Livewire\ChangeOrders\Show as ChangeOrderShow;
 use App\Livewire\Clients\Form as ClientForm;
 use App\Livewire\Clients\Index as ClientIndex;
 use App\Livewire\Clients\Show as ClientShow;
+use App\Livewire\Contracts\Form as ContractForm;
+use App\Livewire\Contracts\Index as ContractIndex;
+use App\Livewire\Contracts\Show as ContractShow;
 use App\Livewire\Dashboard\Index as DashboardIndex;
 use App\Livewire\Designs\Form as DesignForm;
 use App\Livewire\Designs\Index as DesignIndex;
@@ -17,6 +26,9 @@ use App\Livewire\Leads\Show as LeadShow;
 use App\Livewire\Projects\Form as ProjectForm;
 use App\Livewire\Projects\Index as ProjectIndex;
 use App\Livewire\Projects\Show as ProjectShow;
+use App\Livewire\Quotations\Form as QuotationForm;
+use App\Livewire\Quotations\Index as QuotationIndex;
+use App\Livewire\Quotations\Show as QuotationShow;
 use App\Livewire\Settings\Index as SettingsIndex;
 use App\Livewire\SiteVisits\Form as SiteVisitForm;
 use App\Livewire\SiteVisits\Index as SiteVisitIndex;
@@ -87,5 +99,34 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
         Route::get('/create', DesignForm::class)->name('create')->middleware('can:create_designs');
         Route::get('/{design}/edit', DesignForm::class)->name('edit')->middleware('can:edit_designs');
         Route::get('/{design}', DesignShow::class)->name('show')->middleware('can:view_designs');
+    });
+
+    // Phase 5: BOQ -> Quotation -> Contract -> Change Order (ARCHITECTURE.md §3.6).
+    Route::prefix('boqs')->name('boqs.')->group(function () {
+        Route::get('/', BoqIndex::class)->name('index')->middleware('can:view_boqs');
+        Route::get('/create', BoqForm::class)->name('create')->middleware('can:create_boqs');
+        Route::get('/{boq}/edit', BoqForm::class)->name('edit')->middleware('can:edit_boqs');
+        Route::get('/{boq}', BoqShow::class)->name('show')->middleware('can:view_boqs');
+    });
+
+    Route::prefix('quotations')->name('quotations.')->group(function () {
+        Route::get('/', QuotationIndex::class)->name('index')->middleware('can:view_quotations');
+        Route::get('/create', QuotationForm::class)->name('create')->middleware('can:create_quotations');
+        Route::get('/{quotation}/edit', QuotationForm::class)->name('edit')->middleware('can:edit_quotations');
+        Route::get('/{quotation}', QuotationShow::class)->name('show')->middleware('can:view_quotations');
+    });
+
+    Route::prefix('contracts')->name('contracts.')->group(function () {
+        Route::get('/', ContractIndex::class)->name('index')->middleware('can:view_contracts');
+        Route::get('/create', ContractForm::class)->name('create')->middleware('can:create_contracts');
+        Route::get('/{contract}/edit', ContractForm::class)->name('edit')->middleware('can:edit_contracts');
+        Route::get('/{contract}', ContractShow::class)->name('show')->middleware('can:view_contracts');
+    });
+
+    Route::prefix('change-orders')->name('change-orders.')->group(function () {
+        Route::get('/', ChangeOrderIndex::class)->name('index')->middleware('can:view_change_orders');
+        Route::get('/create', ChangeOrderForm::class)->name('create')->middleware('can:create_change_orders');
+        Route::get('/{changeOrder}/edit', ChangeOrderForm::class)->name('edit')->middleware('can:edit_change_orders');
+        Route::get('/{changeOrder}', ChangeOrderShow::class)->name('show')->middleware('can:view_change_orders');
     });
 });

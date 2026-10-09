@@ -4,16 +4,24 @@ namespace App\Providers;
 
 use App\Auth\ScopedEloquentUserProvider;
 use App\Models\ActivityLog;
+use App\Models\Boq;
+use App\Models\ChangeOrder;
 use App\Models\Client;
+use App\Models\Contract;
 use App\Models\Design;
 use App\Models\Lead;
 use App\Models\Project;
+use App\Models\Quotation;
 use App\Models\SiteVisit;
 use App\Policies\ActivityLogPolicy;
+use App\Policies\BoqPolicy;
+use App\Policies\ChangeOrderPolicy;
 use App\Policies\ClientPolicy;
+use App\Policies\ContractPolicy;
 use App\Policies\DesignPolicy;
 use App\Policies\LeadPolicy;
 use App\Policies\ProjectPolicy;
+use App\Policies\QuotationPolicy;
 use App\Policies\SiteVisitPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Auth;
@@ -34,6 +42,10 @@ class AuthServiceProvider extends ServiceProvider
         SiteVisit::class => SiteVisitPolicy::class,
         Project::class => ProjectPolicy::class,
         Design::class => DesignPolicy::class,
+        Boq::class => BoqPolicy::class,
+        Quotation::class => QuotationPolicy::class,
+        Contract::class => ContractPolicy::class,
+        ChangeOrder::class => ChangeOrderPolicy::class,
     ];
 
     public function register(): void {}

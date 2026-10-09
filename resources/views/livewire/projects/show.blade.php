@@ -234,8 +234,112 @@
                 </div>
             @endcan
 
+            @can('view_boqs')
+                <div class="card p-6">
+                    <div class="mb-4 flex items-center justify-between">
+                        <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500">BOQs</h2>
+                        @can('create', \App\Models\Boq::class)
+                            <a href="{{ route('boqs.create', ['project' => $project->id]) }}" wire:navigate class="text-sm text-brand-600 hover:underline">+ New BOQ</a>
+                        @endcan
+                    </div>
+                    @if ($boqs->isEmpty())
+                        <p class="text-sm text-gray-500">No BOQs created for this project yet.</p>
+                    @else
+                        <ul class="divide-y divide-gray-100">
+                            @foreach ($boqs as $boq)
+                                <li class="flex items-center justify-between py-2 text-sm">
+                                    <div>
+                                        <a href="{{ route('boqs.show', $boq) }}" wire:navigate class="font-medium text-brand-600 hover:underline">{{ $boq->boq_no }}</a>
+                                        <span class="text-gray-500">v{{ $boq->version }} — {{ number_format($boq->grand_total, 2) }}</span>
+                                    </div>
+                                    <x-status-badge :label="$boq->status->label()" :color="$boq->status->color()" />
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            @endcan
+
+            @can('view_quotations')
+                <div class="card p-6">
+                    <div class="mb-4 flex items-center justify-between">
+                        <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500">Quotations</h2>
+                        @can('create', \App\Models\Quotation::class)
+                            <a href="{{ route('quotations.create', ['project' => $project->id]) }}" wire:navigate class="text-sm text-brand-600 hover:underline">+ New Quotation</a>
+                        @endcan
+                    </div>
+                    @if ($quotations->isEmpty())
+                        <p class="text-sm text-gray-500">No quotations created for this project yet.</p>
+                    @else
+                        <ul class="divide-y divide-gray-100">
+                            @foreach ($quotations as $quotation)
+                                <li class="flex items-center justify-between py-2 text-sm">
+                                    <div>
+                                        <a href="{{ route('quotations.show', $quotation) }}" wire:navigate class="font-medium text-brand-600 hover:underline">{{ $quotation->quotation_no }}</a>
+                                        <span class="text-gray-500">v{{ $quotation->version }} — {{ number_format($quotation->grand_total, 2) }}</span>
+                                    </div>
+                                    <x-status-badge :label="$quotation->status->label()" :color="$quotation->status->color()" />
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            @endcan
+
+            @can('view_contracts')
+                <div class="card p-6">
+                    <div class="mb-4 flex items-center justify-between">
+                        <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500">Contracts</h2>
+                        @can('create', \App\Models\Contract::class)
+                            <a href="{{ route('contracts.create', ['project' => $project->id]) }}" wire:navigate class="text-sm text-brand-600 hover:underline">+ New Contract</a>
+                        @endcan
+                    </div>
+                    @if ($contracts->isEmpty())
+                        <p class="text-sm text-gray-500">No contracts created for this project yet.</p>
+                    @else
+                        <ul class="divide-y divide-gray-100">
+                            @foreach ($contracts as $contract)
+                                <li class="flex items-center justify-between py-2 text-sm">
+                                    <div>
+                                        <a href="{{ route('contracts.show', $contract) }}" wire:navigate class="font-medium text-brand-600 hover:underline">{{ $contract->contract_no }}</a>
+                                        <span class="text-gray-500">{{ number_format($contract->amount, 2) }}</span>
+                                    </div>
+                                    <x-status-badge :label="$contract->status->label()" :color="$contract->status->color()" />
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            @endcan
+
+            @can('view_change_orders')
+                <div class="card p-6">
+                    <div class="mb-4 flex items-center justify-between">
+                        <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500">Change Orders</h2>
+                        @can('create', \App\Models\ChangeOrder::class)
+                            <a href="{{ route('change-orders.create', ['project' => $project->id]) }}" wire:navigate class="text-sm text-brand-600 hover:underline">+ New Change Order</a>
+                        @endcan
+                    </div>
+                    @if ($changeOrders->isEmpty())
+                        <p class="text-sm text-gray-500">No change orders recorded for this project yet.</p>
+                    @else
+                        <ul class="divide-y divide-gray-100">
+                            @foreach ($changeOrders as $changeOrder)
+                                <li class="flex items-center justify-between py-2 text-sm">
+                                    <div>
+                                        <a href="{{ route('change-orders.show', $changeOrder) }}" wire:navigate class="font-medium text-brand-600 hover:underline">{{ $changeOrder->co_no }}</a>
+                                        <span class="text-gray-500">{{ number_format($changeOrder->cost, 2) }}</span>
+                                    </div>
+                                    <x-status-badge :label="$changeOrder->status->label()" :color="$changeOrder->status->color()" />
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            @endcan
+
             <div class="card p-6 text-sm text-gray-400">
-                BOQ, Quotations, Contracts, Change Orders, Invoices, Payments, Expenses, Meetings, Inspections, Snags and Handover will appear here as those modules ship (Phases 5+).
+                Invoices, Payments, Expenses, Meetings, Inspections, Snags and Handover will appear here as those modules ship (Phases 6+).
             </div>
         </div>
 

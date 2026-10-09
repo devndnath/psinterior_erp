@@ -112,8 +112,44 @@ class Project extends Model
         return $this->hasMany(Design::class);
     }
 
-    // BOQs, Quotations, Contracts, Change Orders, Invoices, Payments,
-    // Expenses, Meetings, Inspections, Snags, Handovers and Warranties
-    // relations are added to this model as each of those modules ships
-    // (ARCHITECTURE.md §2) — intentionally not stubbed here.
+    public function boqs(): HasMany
+    {
+        return $this->hasMany(Boq::class);
+    }
+
+    public function activeBoq(): ?Boq
+    {
+        return $this->boqs()->where('status', \App\Enums\BoqStatus::Active->value)->first();
+    }
+
+    public function quotations(): HasMany
+    {
+        return $this->hasMany(Quotation::class);
+    }
+
+    public function contracts(): HasMany
+    {
+        return $this->hasMany(Contract::class);
+    }
+
+    /**
+     * A project typically has one active contract at a time
+     * (ARCHITECTURE.md §2: "projects 1-1 contracts"), though history is
+     * kept — older contracts are simply Completed/Terminated, never
+     * deleted.
+     */
+    public function activeContract(): ?Contract
+    {
+        return $this->contracts()->where('status', \App\Enums\ContractStatus::Active->value)->first();
+    }
+
+    public function changeOrders(): HasMany
+    {
+        return $this->hasMany(ChangeOrder::class);
+    }
+
+    // Invoices, Payments, Expenses, Meetings, Inspections, Snags,
+    // Handovers and Warranties relations are added to this model as each
+    // of those modules ships (ARCHITECTURE.md §2) — intentionally not
+    // stubbed here.
 }

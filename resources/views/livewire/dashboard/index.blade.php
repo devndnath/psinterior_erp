@@ -1,5 +1,5 @@
 <div>
-    @if ($totalLeads === null && $totalClients === null && $upcomingSiteVisits === null && $activeProjects === null && $designsAwaitingDecision === null)
+    @if ($totalLeads === null && $totalClients === null && $upcomingSiteVisits === null && $activeProjects === null && $designsAwaitingDecision === null && $quotationsAwaitingDecision === null && $changeOrdersPending === null)
         <x-empty-state
             title="Welcome to {{ config('app.name') }}"
             description="Your account doesn't have access to any CRM modules yet. Ask an administrator to assign you a role."
@@ -50,6 +50,20 @@
                 <a href="{{ route('designs.index', ['status' => 'under_review']) }}" wire:navigate class="card p-5 transition hover:shadow-md">
                     <p class="text-sm font-medium text-gray-500">Designs Awaiting Decision</p>
                     <p class="mt-2 text-3xl font-semibold text-gray-900">{{ $designsAwaitingDecision }}</p>
+                </a>
+            @endif
+
+            @if ($quotationsAwaitingDecision !== null)
+                <a href="{{ route('quotations.index', ['status' => 'sent']) }}" wire:navigate class="card p-5 transition hover:shadow-md">
+                    <p class="text-sm font-medium text-gray-500">Quotations Awaiting Decision</p>
+                    <p class="mt-2 text-3xl font-semibold text-gray-900">{{ $quotationsAwaitingDecision }}</p>
+                </a>
+            @endif
+
+            @if ($changeOrdersPending !== null)
+                <a href="{{ route('change-orders.index', ['status' => 'pending']) }}" wire:navigate class="card p-5 transition hover:shadow-md">
+                    <p class="text-sm font-medium text-gray-500">Change Orders Pending</p>
+                    <p class="mt-2 text-3xl font-semibold text-gray-900">{{ $changeOrdersPending }}</p>
                 </a>
             @endif
         </div>
