@@ -7,6 +7,7 @@ use App\Models\Concerns\HasDocuments;
 use App\Models\Concerns\LogsActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -61,6 +62,27 @@ class User extends Authenticatable
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+
+    /**
+     * Inverse of `clients.user_id` (nullable FK back to this table, built
+     * in Phase 2/8) — resolves "which Client am I" for a logged-in
+     * `client`-guard user. Every Client Portal component starts with
+     * `auth()->user()->client` and `abort_unless($client, 403, ...)`
+     * (Phase 11 — see ClientPortal in PHASE11_SUMMARY.md).
+     */
+    public function client(): HasOne
+    {
+        return $this->hasOne(Client::class, 'user_id');
+    }
+
+    /**
+     * Inverse of `vendors.user_id`, same reasoning as client() above,
+     * for a logged-in `vendor`-guard user.
+     */
+    public function vendor(): HasOne
+    {
+        return $this->hasOne(Vendor::class, 'user_id');
     }
 
     public function isStaff(): bool

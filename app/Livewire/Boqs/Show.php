@@ -4,6 +4,7 @@ namespace App\Livewire\Boqs;
 
 use App\Models\Boq;
 use App\Services\BoqService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -58,6 +59,16 @@ class Show extends Component
 
         $this->dispatch('toast', message: "New BOQ version {$newBoq->boq_no} created.", type: 'success');
         $this->redirectRoute('boqs.edit', ['boq' => $newBoq->id], navigate: true);
+    }
+
+    public function downloadPdf()
+    {
+        Gate::authorize('view', $this->boq);
+
+        $this->boq->load(['project.client', 'items']);
+
+        return Pdf::loadView('pdf.boq', ['boq' => $this->boq])
+            ->download("{$this->boq->boq_no}.pdf");
     }
 
     public function deleteBoq(): void

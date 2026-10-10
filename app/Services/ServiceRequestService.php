@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Enums\ServiceRequestStatus;
 use App\Models\ServiceRequest;
+use App\Models\User;
 use App\Models\Warranty;
+use App\Notifications\ServiceRequestCreatedNotification;
 
 /**
  * Owns the Service Request status chain: Open -> TechnicianAssigned ->
@@ -18,12 +20,24 @@ class ServiceRequestService
 
     public function create(Warranty $warranty, array $data): ServiceRequest
     {
-        return $warranty->serviceRequests()->create([
+        $serviceRequest = $warranty->serviceRequests()->create([
             'sr_no' => $this->numbering->next('SR'),
             'client_id' => $data['client_id'],
             'complaint' => $data['complaint'],
             'status' => ServiceRequestStatus::Open->value,
         ]);
+
+        // Database-channel notification only (Phase 11). There is no
+        // single "warranty desk" role/recipient in this codebase, so
+        // every user holding `edit_warranties` — the same permission
+        // ServiceRequestPolicy already gates every status transition
+        // on — is notified, rather than inventing a new recipient
+        // concept.
+        User::permission('edit_warranties')->get()->each(
+            fn (User $user) => $user->notify(new ServiceRequestCreatedNotification($serviceRequest))
+        );
+
+        return $serviceRequest;
     }
 
     public function assignTechnician(ServiceRequest $sr, int $userId): ServiceRequest

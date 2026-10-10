@@ -16,6 +16,7 @@
             </p>
         </div>
         <div class="flex items-center gap-3">
+            <button type="button" wire:click="downloadPdf" class="btn-secondary">Download PDF</button>
             @can('create', \App\Models\Quotation::class)
                 <a href="{{ route('quotations.create', ['project' => $boq->project_id, 'boq' => $boq->id]) }}" wire:navigate class="btn-secondary">Create Quotation</a>
             @endcan

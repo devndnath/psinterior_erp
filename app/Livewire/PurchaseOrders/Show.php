@@ -4,6 +4,7 @@ namespace App\Livewire\PurchaseOrders;
 
 use App\Models\PurchaseOrder;
 use App\Services\PurchaseOrderService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -43,6 +44,16 @@ class Show extends Component
         } catch (\RuntimeException $e) {
             $this->dispatch('toast', message: $e->getMessage(), type: 'error');
         }
+    }
+
+    public function downloadPdf()
+    {
+        Gate::authorize('view', $this->purchaseOrder);
+
+        $this->purchaseOrder->load(['vendor', 'project', 'warehouse', 'items.product']);
+
+        return Pdf::loadView('pdf.purchase-order', ['purchaseOrder' => $this->purchaseOrder])
+            ->download("{$this->purchaseOrder->po_no}.pdf");
     }
 
     public function deletePurchaseOrder(): void

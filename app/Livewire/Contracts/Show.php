@@ -4,6 +4,7 @@ namespace App\Livewire\Contracts;
 
 use App\Models\Contract;
 use App\Services\ContractService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -28,6 +29,16 @@ class Show extends Component
         $this->contract = $service->activate($this->contract);
 
         $this->dispatch('toast', message: "Contract {$this->contract->contract_no} is now Active — project contract value updated.", type: 'success');
+    }
+
+    public function downloadPdf()
+    {
+        Gate::authorize('view', $this->contract);
+
+        $this->contract->load(['project', 'client', 'items']);
+
+        return Pdf::loadView('pdf.contract', ['contract' => $this->contract])
+            ->download("{$this->contract->contract_no}.pdf");
     }
 
     public function deleteContract(): void

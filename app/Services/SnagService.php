@@ -6,6 +6,8 @@ use App\Enums\SnagStatus;
 use App\Models\Inspection;
 use App\Models\Project;
 use App\Models\Snag;
+use App\Models\User;
+use App\Notifications\SnagAssignedNotification;
 
 /**
  * Owns the Snag status chain: Pending -> Assigned -> InProgress -> Fixed
@@ -46,6 +48,9 @@ class SnagService
         $this->assertStatus($snag, SnagStatus::Pending);
 
         $snag->update(['assigned_to' => $userId, 'status' => SnagStatus::Assigned->value]);
+
+        // Database-channel notification only (Phase 11).
+        User::find($userId)?->notify(new SnagAssignedNotification($snag));
 
         return $snag->fresh();
     }

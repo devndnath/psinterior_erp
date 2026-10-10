@@ -6,6 +6,7 @@ use App\Enums\LeadStatus;
 use App\Models\Client;
 use App\Models\Lead;
 use App\Models\LeadFollowup;
+use App\Notifications\LeadConvertedNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -82,6 +83,11 @@ class LeadService
                 'converted_client_id' => $client->id,
                 'converted_at' => now(),
             ]);
+
+            // Database-channel notification only (Phase 11) — the lead's
+            // own assignee is the one person who already has the context
+            // to act on this conversion (e.g. kick off a Project next).
+            $lead->assignee?->notify(new LeadConvertedNotification($lead, $client));
 
             return $client;
         });

@@ -2,12 +2,19 @@
 
 use App\Http\Controllers\Auth\LogoutController;
 use App\Livewire\Auth\VendorLogin;
+use App\Livewire\Vendor\Dashboard as VendorDashboard;
+use App\Livewire\Vendor\Ledger\Index as VendorLedgerIndex;
+use App\Livewire\Vendor\PurchaseOrders\Index as VendorPurchaseOrderIndex;
+use App\Livewire\Vendor\PurchaseOrders\Show as VendorPurchaseOrderShow;
 use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Vendor portal routes — mirrors routes/client.php. Full screens (POs,
-| goods receiving, invoices, payment status — spec §44) are Phase 11 work.
+| Vendor portal routes — mirrors routes/client.php. Every screen below
+| enforces ownership ("is this MY record") inside its own Livewire
+| component via a plain comparison against auth()->user()->vendor,
+| never via Gate::authorize/->can() against a staff Policy — see
+| "Portal authorization model" in PHASE11_SUMMARY.md.
 |--------------------------------------------------------------------------
 */
 
@@ -19,5 +26,12 @@ Route::post('/logout', LogoutController::class)->name('logout')->defaults('guard
 
 Route::middleware(['auth:vendor', 'user_type:vendor'])->group(function () {
     Route::get('/', fn () => redirect()->route('vendor.dashboard'));
-    Route::get('/dashboard', fn () => view('vendor.dashboard-placeholder'))->name('dashboard');
+    Route::get('/dashboard', VendorDashboard::class)->name('dashboard');
+
+    Route::prefix('purchase-orders')->name('purchase-orders.')->group(function () {
+        Route::get('/', VendorPurchaseOrderIndex::class)->name('index');
+        Route::get('/{purchaseOrder}', VendorPurchaseOrderShow::class)->name('show');
+    });
+
+    Route::get('/ledger', VendorLedgerIndex::class)->name('ledger.index');
 });

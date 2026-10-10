@@ -18,6 +18,7 @@
             </p>
         </div>
         <div class="flex items-center gap-3">
+            <button type="button" wire:click="downloadPdf" class="btn-secondary">Download PDF</button>
             @can('update', $contract)
                 @if ($contract->status->value !== 'active')
                     <button type="button" wire:click="activate" wire:confirm="Activate this contract? This will update the project's contract value." class="btn-secondary">Activate</button>

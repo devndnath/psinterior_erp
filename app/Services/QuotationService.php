@@ -7,6 +7,7 @@ use App\Models\Boq;
 use App\Models\Project;
 use App\Models\Quotation;
 use App\Models\User;
+use App\Notifications\QuotationApprovedNotification;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -131,6 +132,14 @@ class QuotationService
         }
 
         $quotation->update($data);
+
+        // Database-channel notification only (Phase 11) — the project's
+        // own project manager is who acts next once a quotation is
+        // approved (e.g. raising a Contract), so no new recipient
+        // concept is needed here.
+        if ($status === QuotationStatus::Approved->value) {
+            $quotation->project?->projectManager?->notify(new QuotationApprovedNotification($quotation));
+        }
 
         return $quotation->fresh();
     }

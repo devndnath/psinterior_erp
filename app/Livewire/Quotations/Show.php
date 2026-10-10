@@ -6,6 +6,7 @@ use App\Enums\ApprovalDecision;
 use App\Enums\QuotationStatus;
 use App\Models\Quotation;
 use App\Services\QuotationService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -68,6 +69,16 @@ class Show extends Component
         $this->showDecisionForm = false;
 
         $this->dispatch('toast', message: 'Client decision recorded.', type: 'success');
+    }
+
+    public function downloadPdf()
+    {
+        Gate::authorize('view', $this->quotation);
+
+        $this->quotation->load(['project', 'client', 'items']);
+
+        return Pdf::loadView('pdf.quotation', ['quotation' => $this->quotation])
+            ->download("{$this->quotation->quotation_no}.pdf");
     }
 
     public function deleteQuotation(): void

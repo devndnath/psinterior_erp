@@ -4,6 +4,7 @@ namespace App\Livewire\Invoices;
 
 use App\Models\Invoice;
 use App\Services\InvoiceService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -40,6 +41,16 @@ class Show extends Component
         } catch (\RuntimeException $e) {
             $this->dispatch('toast', message: $e->getMessage(), type: 'error');
         }
+    }
+
+    public function downloadPdf()
+    {
+        Gate::authorize('view', $this->invoice);
+
+        $this->invoice->load(['project', 'client', 'items']);
+
+        return Pdf::loadView('pdf.invoice', ['invoice' => $this->invoice])
+            ->download("{$this->invoice->invoice_no}.pdf");
     }
 
     public function deleteInvoice(): void

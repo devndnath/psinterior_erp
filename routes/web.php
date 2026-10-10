@@ -38,6 +38,12 @@ use App\Livewire\Invoices\Show as InvoiceShow;
 use App\Livewire\Leads\Form as LeadForm;
 use App\Livewire\Leads\Index as LeadIndex;
 use App\Livewire\Leads\Show as LeadShow;
+use App\Livewire\Reports\FinancialSummary as ReportFinancialSummary;
+use App\Livewire\Reports\Hr as ReportHr;
+use App\Livewire\Reports\Index as ReportIndex;
+use App\Livewire\Reports\Inventory as ReportInventory;
+use App\Livewire\Reports\ProjectStatus as ReportProjectStatus;
+use App\Livewire\Reports\SalesFunnel as ReportSalesFunnel;
 use App\Livewire\MaterialRequisitions\Form as MaterialRequisitionForm;
 use App\Livewire\MaterialRequisitions\Index as MaterialRequisitionIndex;
 use App\Livewire\MaterialRequisitions\Show as MaterialRequisitionShow;
@@ -403,4 +409,18 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
     // on `*_warranties`, not an invented `service_requests` permission.
     Route::get('/service-requests/create', ServiceRequestForm::class)->name('service-requests.create')->middleware('can:create_warranties');
     Route::get('/service-requests/{serviceRequest}', ServiceRequestShow::class)->name('service-requests.show')->middleware('can:view_warranties');
+
+    // Phase 11: Reports hub + 5 sub-reports (ARCHITECTURE.md §6 point 11),
+    // gated on the existing `view_reports` standalone ability — never an
+    // invented permission — the same pattern Profitability/Index uses
+    // for `view_finance`, since there's no model to key a Policy off a
+    // report page.
+    Route::prefix('reports')->name('reports.')->middleware('can:view_reports')->group(function () {
+        Route::get('/', ReportIndex::class)->name('index');
+        Route::get('/project-status', ReportProjectStatus::class)->name('project-status');
+        Route::get('/sales-funnel', ReportSalesFunnel::class)->name('sales-funnel');
+        Route::get('/financial-summary', ReportFinancialSummary::class)->name('financial-summary');
+        Route::get('/inventory', ReportInventory::class)->name('inventory');
+        Route::get('/hr', ReportHr::class)->name('hr');
+    });
 });

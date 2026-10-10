@@ -19,6 +19,7 @@
             </p>
         </div>
         <div class="flex items-center gap-3">
+            <button type="button" wire:click="downloadPdf" class="btn-secondary">Download PDF</button>
             @if ($quotation->status->value === 'approved' && $quotation->contracts->isEmpty())
                 @can('create', \App\Models\Contract::class)
                     <a href="{{ route('contracts.create', ['quotation' => $quotation->id]) }}" wire:navigate class="btn-secondary">Create Contract</a>

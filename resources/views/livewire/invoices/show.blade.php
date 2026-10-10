@@ -18,6 +18,7 @@
             </p>
         </div>
         <div class="flex items-center gap-3">
+            <button type="button" wire:click="downloadPdf" class="btn-secondary">Download PDF</button>
             @can('issue', $invoice)
                 @if ($invoice->status->value === 'draft')
                     <button type="button" wire:click="issueInvoice" class="btn-secondary">Issue Invoice</button>

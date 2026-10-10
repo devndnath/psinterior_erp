@@ -16,7 +16,6 @@ Artisan::command('inspire', function () {
 | Nothing to schedule yet in Phase 1 — these are registered here, one line
 | each, as the module that needs them ships:
 |
-|   Schedule::command('invoices:flag-overdue')->dailyAt('07:00');        // Phase 6
 |   Schedule::command('tasks:deadline-reminders')->dailyAt('08:00');      // Phase 3
 |   Schedule::command('leads:followup-reminders')->hourly();              // Phase 2
 |   Schedule::command('warranties:expiry-reminders')->dailyAt('07:30');   // Phase 10
@@ -27,3 +26,9 @@ Artisan::command('inspire', function () {
 | — documented in README.md.
 |
 */
+
+// Phase 11: closes the "nothing flips an overdue invoice" known issue
+// from Phase 6's summary. Won't actually run in the sandbox (no
+// scheduler/cron here), but the command and its registration are both
+// correct.
+Schedule::command('invoices:flag-overdue')->dailyAt('07:00');

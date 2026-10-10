@@ -6,6 +6,7 @@ use App\Enums\ApprovalDecision;
 use App\Enums\ChangeOrderStatus;
 use App\Models\ChangeOrder;
 use App\Models\Project;
+use App\Notifications\ChangeOrderApprovedNotification;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -82,6 +83,9 @@ class ChangeOrderService
                 $project->update([
                     'contract_value' => (float) ($project->contract_value ?? 0) + (float) $changeOrder->cost,
                 ]);
+
+                // Database-channel notification only (Phase 11).
+                $project->projectManager?->notify(new ChangeOrderApprovedNotification($changeOrder));
             }
 
             return $changeOrder->fresh();

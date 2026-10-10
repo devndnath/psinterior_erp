@@ -59,7 +59,12 @@
         ['label' => 'Inspections', 'route' => 'inspections.index', 'active' => 'inspections.*', 'icon' => 'clipboard-check', 'permission' => 'view_inspections'],
         ['label' => 'Snags', 'route' => 'snags.index', 'active' => 'snags.*', 'icon' => 'alert-triangle', 'permission' => 'view_snags'],
         ['label' => 'Warranties', 'route' => 'warranties.index', 'active' => 'warranties.*', 'icon' => 'shield-check', 'permission' => 'view_warranties'],
-        // Phase 11+: Reports, Notifications, Client Portal, Vendor Portal...
+        // Phase 11: Reports hub (ARCHITECTURE.md §6 point 11), gated on
+        // the existing `view_reports` standalone ability. Notifications
+        // live in the topbar bell, not the sidebar; Client/Vendor
+        // portals are separate guards/layouts entirely, reached only
+        // via /client and /vendor, never from this staff sidebar.
+        ['label' => 'Reports', 'route' => 'reports.index', 'active' => 'reports.*', 'icon' => 'bar-chart', 'permission' => 'view_reports'],
         ['label' => 'Settings', 'route' => 'settings.index', 'icon' => 'settings', 'permission' => 'manage_settings'],
     ];
 @endphp
