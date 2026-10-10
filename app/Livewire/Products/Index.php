@@ -66,7 +66,14 @@ class Index extends Component
                 ->orWhere('name', 'like', "%{$this->search}%")
             ))
             ->when($this->category, fn ($q) => $q->where('category_id', $this->category))
-            ->when($this->lowStock, fn ($q) => $q->havingRaw('COALESCE(total_stock, 0) < min_stock'))
+            // A plain WHERE subquery comparison, not HAVING on the
+            // withSum() alias — HAVING a non-aggregated column (min_stock)
+            // without GROUP BY fails under MySQL's default
+            // ONLY_FULL_GROUP_BY mode (error 1463). This subquery form
+            // works under any SQL mode and needs no GROUP BY at all.
+            ->when($this->lowStock, fn ($q) => $q->whereRaw(
+                '(select coalesce(sum(ws.quantity), 0) from warehouse_stocks ws where ws.product_id = products.id) < products.min_stock'
+            ))
             ->orderBy('name')
             ->paginate(15);
 

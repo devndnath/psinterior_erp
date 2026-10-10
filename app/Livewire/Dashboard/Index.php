@@ -84,10 +84,13 @@ class Index extends Component
                 now()->startOfMonth()->toDateString(),
                 now()->endOfMonth()->toDateString(),
             ])->sum('amount') : null,
+            // Subquery WHERE, not HAVING on a withSum() alias without
+            // GROUP BY — that fails under MySQL's default
+            // ONLY_FULL_GROUP_BY mode (error 1463, hit in production).
             'lowStockProducts' => $user->can('view_inventory') ? Product::query()
-                ->withSum('warehouseStocks as total_stock', 'quantity')
-                ->havingRaw('COALESCE(total_stock, 0) < min_stock')
-                ->get()
+                ->whereRaw(
+                    '(select coalesce(sum(ws.quantity), 0) from warehouse_stocks ws where ws.product_id = products.id) < products.min_stock'
+                )
                 ->count() : null,
             'pendingRequisitions' => $user->can('view_material_requisitions') ? MaterialRequisition::whereIn('status', [
                 MaterialRequisitionStatus::Pending->value,
