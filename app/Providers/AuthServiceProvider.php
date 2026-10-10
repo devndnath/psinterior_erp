@@ -13,10 +13,16 @@ use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\Invoice;
 use App\Models\Lead;
+use App\Models\MaterialRequisition;
 use App\Models\Payment;
+use App\Models\Product;
+use App\Models\ProductCategory;
 use App\Models\Project;
 use App\Models\Quotation;
 use App\Models\SiteVisit;
+use App\Models\StockTransfer;
+use App\Models\Unit;
+use App\Models\Warehouse;
 use App\Policies\ActivityLogPolicy;
 use App\Policies\BoqPolicy;
 use App\Policies\ChangeOrderPolicy;
@@ -27,10 +33,16 @@ use App\Policies\ExpenseCategoryPolicy;
 use App\Policies\ExpensePolicy;
 use App\Policies\InvoicePolicy;
 use App\Policies\LeadPolicy;
+use App\Policies\MaterialRequisitionPolicy;
 use App\Policies\PaymentPolicy;
+use App\Policies\ProductCategoryPolicy;
+use App\Policies\ProductPolicy;
 use App\Policies\ProjectPolicy;
 use App\Policies\QuotationPolicy;
 use App\Policies\SiteVisitPolicy;
+use App\Policies\StockTransferPolicy;
+use App\Policies\UnitPolicy;
+use App\Policies\WarehousePolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -58,6 +70,12 @@ class AuthServiceProvider extends ServiceProvider
         Invoice::class => InvoicePolicy::class,
         Payment::class => PaymentPolicy::class,
         Expense::class => ExpensePolicy::class,
+        ProductCategory::class => ProductCategoryPolicy::class,
+        Unit::class => UnitPolicy::class,
+        Product::class => ProductPolicy::class,
+        Warehouse::class => WarehousePolicy::class,
+        StockTransfer::class => StockTransferPolicy::class,
+        MaterialRequisition::class => MaterialRequisitionPolicy::class,
     ];
 
     public function register(): void {}

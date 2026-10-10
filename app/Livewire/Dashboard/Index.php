@@ -6,6 +6,7 @@ use App\Enums\ChangeOrderStatus;
 use App\Enums\DesignStatus;
 use App\Enums\InvoiceStatus;
 use App\Enums\LeadStatus;
+use App\Enums\MaterialRequisitionStatus;
 use App\Enums\ProjectStatus;
 use App\Enums\QuotationStatus;
 use App\Models\ChangeOrder;
@@ -14,6 +15,8 @@ use App\Models\Design;
 use App\Models\Expense;
 use App\Models\Invoice;
 use App\Models\Lead;
+use App\Models\MaterialRequisition;
+use App\Models\Product;
 use App\Models\Project;
 use App\Models\Quotation;
 use App\Models\SiteVisit;
@@ -27,9 +30,10 @@ use Livewire\Component;
  * CRM KPI cards; Phase 3 added Projects; Phase 4 added Designs awaiting a
  * client decision; Phase 5 adds Quotations awaiting a decision and
  * pending Change Orders (spec §4); Phase 6 adds Outstanding Invoices and
- * This Month's Expenses. Each card gated by the same permission its own
+ * This Month's Expenses; Phase 7 adds Low Stock Products and Pending
+ * Material Requisitions. Each card gated by the same permission its own
  * module uses so a user without `view_leads` simply doesn't see that
- * card. Inventory KPIs and charts are added as those modules ship in
+ * card. Procurement KPIs and charts are added as those modules ship in
  * later phases.
  */
 #[Layout('layouts.admin', ['title' => 'Dashboard'])]
@@ -80,6 +84,16 @@ class Index extends Component
                 now()->startOfMonth()->toDateString(),
                 now()->endOfMonth()->toDateString(),
             ])->sum('amount') : null,
+            'lowStockProducts' => $user->can('view_inventory') ? Product::query()
+                ->withSum('warehouseStocks as total_stock', 'quantity')
+                ->havingRaw('COALESCE(total_stock, 0) < min_stock')
+                ->get()
+                ->count() : null,
+            'pendingRequisitions' => $user->can('view_material_requisitions') ? MaterialRequisition::whereIn('status', [
+                MaterialRequisitionStatus::Pending->value,
+                MaterialRequisitionStatus::ManagerApproved->value,
+                MaterialRequisitionStatus::StoreApproved->value,
+            ])->count() : null,
         ]);
     }
 }

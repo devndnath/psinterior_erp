@@ -197,6 +197,9 @@ class Show extends Component
             'expenses' => Auth::user()->can('view_expenses')
                 ? $this->project->expenses()->latest('date')->get()
                 : collect(),
+            'materialRequisitions' => Auth::user()->can('view_material_requisitions')
+                ? $this->project->materialRequisitions()->latest('date')->get()
+                : collect(),
             'profitability' => Auth::user()->can('view_finance')
                 ? $profitability->forProject($this->project)
                 : null,

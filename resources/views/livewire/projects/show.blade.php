@@ -410,8 +410,31 @@
                 </div>
             @endcan
 
+            @can('view_material_requisitions')
+                <div class="card p-6">
+                    <div class="mb-4 flex items-center justify-between">
+                        <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500">Material Requisitions</h2>
+                        @can('create', \App\Models\MaterialRequisition::class)
+                            <a href="{{ route('material-requisitions.create', ['project' => $project->id]) }}" wire:navigate class="text-sm text-brand-600 hover:underline">+ New Requisition</a>
+                        @endcan
+                    </div>
+                    @if ($materialRequisitions->isEmpty())
+                        <p class="text-sm text-gray-500">No material requisitions raised for this project yet.</p>
+                    @else
+                        <ul class="divide-y divide-gray-100">
+                            @foreach ($materialRequisitions as $mr)
+                                <li class="flex items-center justify-between py-2 text-sm">
+                                    <a href="{{ route('material-requisitions.show', $mr) }}" wire:navigate class="font-medium text-brand-600 hover:underline">{{ $mr->mr_no }}</a>
+                                    <x-status-badge :label="$mr->status->label()" :color="$mr->status->color()" />
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            @endcan
+
             <div class="card p-6 text-sm text-gray-400">
-                Meetings, Inspections, Snags and Handover will appear here as those modules ship (Phases 7+).
+                Meetings, Inspections, Snags and Handover will appear here as those modules ship (Phase 9+).
             </div>
         </div>
 

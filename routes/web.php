@@ -31,9 +31,17 @@ use App\Livewire\Invoices\Show as InvoiceShow;
 use App\Livewire\Leads\Form as LeadForm;
 use App\Livewire\Leads\Index as LeadIndex;
 use App\Livewire\Leads\Show as LeadShow;
+use App\Livewire\MaterialRequisitions\Form as MaterialRequisitionForm;
+use App\Livewire\MaterialRequisitions\Index as MaterialRequisitionIndex;
+use App\Livewire\MaterialRequisitions\Show as MaterialRequisitionShow;
 use App\Livewire\Payments\Form as PaymentForm;
 use App\Livewire\Payments\Index as PaymentIndex;
 use App\Livewire\Payments\Show as PaymentShow;
+use App\Livewire\ProductCategories\Form as ProductCategoryForm;
+use App\Livewire\ProductCategories\Index as ProductCategoryIndex;
+use App\Livewire\Products\Form as ProductForm;
+use App\Livewire\Products\Index as ProductIndex;
+use App\Livewire\Products\Show as ProductShow;
 use App\Livewire\Profitability\Index as ProfitabilityIndex;
 use App\Livewire\Projects\Form as ProjectForm;
 use App\Livewire\Projects\Index as ProjectIndex;
@@ -45,6 +53,15 @@ use App\Livewire\Settings\Index as SettingsIndex;
 use App\Livewire\SiteVisits\Form as SiteVisitForm;
 use App\Livewire\SiteVisits\Index as SiteVisitIndex;
 use App\Livewire\SiteVisits\Show as SiteVisitShow;
+use App\Livewire\StockMovements\Index as StockMovementIndex;
+use App\Livewire\StockTransfers\Form as StockTransferForm;
+use App\Livewire\StockTransfers\Index as StockTransferIndex;
+use App\Livewire\StockTransfers\Show as StockTransferShow;
+use App\Livewire\Units\Form as UnitForm;
+use App\Livewire\Units\Index as UnitIndex;
+use App\Livewire\Warehouses\Form as WarehouseForm;
+use App\Livewire\Warehouses\Index as WarehouseIndex;
+use App\Livewire\Warehouses\Show as WarehouseShow;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -170,4 +187,51 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
     });
 
     Route::get('/profitability', ProfitabilityIndex::class)->name('profitability.index')->middleware('can:view_finance');
+
+    // Phase 7: Inventory, Warehouses, Stock, Material Requisitions
+    // (ARCHITECTURE.md §3.8, scoped to Inventory/Warehouse/MR only —
+    // Vendors/PO/GRN are Phase 8).
+    Route::prefix('product-categories')->name('product-categories.')->group(function () {
+        Route::get('/', ProductCategoryIndex::class)->name('index')->middleware('can:manage_settings');
+        Route::get('/create', ProductCategoryForm::class)->name('create')->middleware('can:manage_settings');
+        Route::get('/{productCategory}/edit', ProductCategoryForm::class)->name('edit')->middleware('can:manage_settings');
+    });
+
+    Route::prefix('units')->name('units.')->group(function () {
+        Route::get('/', UnitIndex::class)->name('index')->middleware('can:manage_settings');
+        Route::get('/create', UnitForm::class)->name('create')->middleware('can:manage_settings');
+        Route::get('/{unit}/edit', UnitForm::class)->name('edit')->middleware('can:manage_settings');
+    });
+
+    Route::prefix('products')->name('products.')->group(function () {
+        Route::get('/', ProductIndex::class)->name('index')->middleware('can:view_inventory');
+        Route::get('/create', ProductForm::class)->name('create')->middleware('can:create_inventory');
+        Route::get('/{product}/edit', ProductForm::class)->name('edit')->middleware('can:edit_inventory');
+        Route::get('/{product}', ProductShow::class)->name('show')->middleware('can:view_inventory');
+    });
+
+    Route::prefix('warehouses')->name('warehouses.')->group(function () {
+        Route::get('/', WarehouseIndex::class)->name('index')->middleware('can:view_warehouses');
+        Route::get('/create', WarehouseForm::class)->name('create')->middleware('can:create_warehouses');
+        Route::get('/{warehouse}/edit', WarehouseForm::class)->name('edit')->middleware('can:edit_warehouses');
+        Route::get('/{warehouse}', WarehouseShow::class)->name('show')->middleware('can:view_warehouses');
+    });
+
+    Route::get('/stock-movements', StockMovementIndex::class)->name('stock-movements.index')->middleware('can:view_inventory');
+
+    // No edit route — a transfer is never edited once created, only
+    // shipped/completed/cancelled via Livewire component methods on its
+    // Show page (no delete either — see StockTransferPolicy).
+    Route::prefix('stock-transfers')->name('stock-transfers.')->group(function () {
+        Route::get('/', StockTransferIndex::class)->name('index')->middleware('can:view_warehouses');
+        Route::get('/create', StockTransferForm::class)->name('create')->middleware('can:create_warehouses');
+        Route::get('/{stockTransfer}', StockTransferShow::class)->name('show')->middleware('can:view_warehouses');
+    });
+
+    Route::prefix('material-requisitions')->name('material-requisitions.')->group(function () {
+        Route::get('/', MaterialRequisitionIndex::class)->name('index')->middleware('can:view_material_requisitions');
+        Route::get('/create', MaterialRequisitionForm::class)->name('create')->middleware('can:create_material_requisitions');
+        Route::get('/{materialRequisition}/edit', MaterialRequisitionForm::class)->name('edit')->middleware('can:edit_material_requisitions');
+        Route::get('/{materialRequisition}', MaterialRequisitionShow::class)->name('show')->middleware('can:view_material_requisitions');
+    });
 });
