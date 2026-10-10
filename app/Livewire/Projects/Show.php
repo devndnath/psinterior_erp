@@ -206,6 +206,21 @@ class Show extends Component
             'subcontractorAssignments' => Auth::user()->can('view_subcontractors')
                 ? $this->project->subcontractorAssignments()->with('subcontractor')->latest()->get()
                 : collect(),
+            'meetings' => Auth::user()->can('view_meetings')
+                ? $this->project->meetings()->latest('date')->get()
+                : collect(),
+            'inspections' => Auth::user()->can('view_inspections')
+                ? $this->project->inspections()->latest('inspection_date')->get()
+                : collect(),
+            'snags' => Auth::user()->can('view_snags')
+                ? $this->project->snags()->latest()->get()
+                : collect(),
+            'handover' => Auth::user()->can('view_handovers')
+                ? $this->project->handover
+                : null,
+            'warranties' => Auth::user()->can('view_warranties')
+                ? $this->project->warranties()->latest('end_date')->get()
+                : collect(),
             'profitability' => Auth::user()->can('view_finance')
                 ? $profitability->forProject($this->project)
                 : null,

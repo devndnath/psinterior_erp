@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Project extends Model
@@ -183,7 +184,29 @@ class Project extends Model
         return $this->hasMany(SubcontractorAssignment::class);
     }
 
-    // Meetings, Inspections, Snags, Handovers and Warranties relations are
-    // added to this model as each of those modules ships
-    // (ARCHITECTURE.md §2) — intentionally not stubbed here.
+    public function meetings(): HasMany
+    {
+        return $this->hasMany(Meeting::class);
+    }
+
+    public function inspections(): HasMany
+    {
+        return $this->hasMany(Inspection::class);
+    }
+
+    public function snags(): HasMany
+    {
+        return $this->hasMany(Snag::class);
+    }
+
+    /** One handover per project (ARCHITECTURE.md's ERD: "projects 1-1 handovers"). */
+    public function handover(): HasOne
+    {
+        return $this->hasOne(Handover::class);
+    }
+
+    public function warranties(): HasMany
+    {
+        return $this->hasMany(Warranty::class);
+    }
 }

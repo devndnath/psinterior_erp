@@ -89,8 +89,9 @@ class Client extends Model
         return $this->contacts->firstWhere('is_primary', true) ?? $this->contacts->first();
     }
 
-    // Meetings and complaints relations are added to this model as each
-    // module ships (ARCHITECTURE.md §6 — Client 360 view assembles all of
-    // them, spec §6). Intentionally not stubbed here to avoid referencing
-    // models that don't exist yet.
+    /** Optional nice-to-have for the Client 360 view (ARCHITECTURE.md §6). */
+    public function serviceRequests(): HasMany
+    {
+        return $this->hasMany(ServiceRequest::class);
+    }
 }

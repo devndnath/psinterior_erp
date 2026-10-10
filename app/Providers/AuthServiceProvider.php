@@ -14,10 +14,13 @@ use App\Models\Employee;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\GoodsReceive;
+use App\Models\Handover;
+use App\Models\Inspection;
 use App\Models\Invoice;
 use App\Models\Lead;
 use App\Models\Leave;
 use App\Models\MaterialRequisition;
+use App\Models\Meeting;
 use App\Models\Payment;
 use App\Models\Payroll;
 use App\Models\Product;
@@ -26,7 +29,9 @@ use App\Models\Project;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseRequest;
 use App\Models\Quotation;
+use App\Models\ServiceRequest;
 use App\Models\SiteVisit;
+use App\Models\Snag;
 use App\Models\StockTransfer;
 use App\Models\Subcontractor;
 use App\Models\SubcontractorAssignment;
@@ -35,6 +40,7 @@ use App\Models\Unit;
 use App\Models\Vendor;
 use App\Models\VendorQuotation;
 use App\Models\Warehouse;
+use App\Models\Warranty;
 use App\Policies\ActivityLogPolicy;
 use App\Policies\AttendancePolicy;
 use App\Policies\BoqPolicy;
@@ -46,10 +52,13 @@ use App\Policies\EmployeePolicy;
 use App\Policies\ExpenseCategoryPolicy;
 use App\Policies\ExpensePolicy;
 use App\Policies\GoodsReceivePolicy;
+use App\Policies\HandoverPolicy;
+use App\Policies\InspectionPolicy;
 use App\Policies\InvoicePolicy;
 use App\Policies\LeadPolicy;
 use App\Policies\LeavePolicy;
 use App\Policies\MaterialRequisitionPolicy;
+use App\Policies\MeetingPolicy;
 use App\Policies\PaymentPolicy;
 use App\Policies\PayrollPolicy;
 use App\Policies\ProductCategoryPolicy;
@@ -58,7 +67,9 @@ use App\Policies\ProjectPolicy;
 use App\Policies\PurchaseOrderPolicy;
 use App\Policies\PurchaseRequestPolicy;
 use App\Policies\QuotationPolicy;
+use App\Policies\ServiceRequestPolicy;
 use App\Policies\SiteVisitPolicy;
+use App\Policies\SnagPolicy;
 use App\Policies\StockTransferPolicy;
 use App\Policies\SubcontractorAssignmentPolicy;
 use App\Policies\SubcontractorPaymentPolicy;
@@ -67,6 +78,7 @@ use App\Policies\UnitPolicy;
 use App\Policies\VendorPolicy;
 use App\Policies\VendorQuotationPolicy;
 use App\Policies\WarehousePolicy;
+use App\Policies\WarrantyPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -112,6 +124,12 @@ class AuthServiceProvider extends ServiceProvider
         Subcontractor::class => SubcontractorPolicy::class,
         SubcontractorAssignment::class => SubcontractorAssignmentPolicy::class,
         SubcontractorPayment::class => SubcontractorPaymentPolicy::class,
+        Meeting::class => MeetingPolicy::class,
+        Inspection::class => InspectionPolicy::class,
+        Snag::class => SnagPolicy::class,
+        Handover::class => HandoverPolicy::class,
+        Warranty::class => WarrantyPolicy::class,
+        ServiceRequest::class => ServiceRequestPolicy::class,
     ];
 
     public function register(): void {}

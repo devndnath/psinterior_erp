@@ -12,6 +12,8 @@ use App\Enums\PayrollStatus;
 use App\Enums\ProjectStatus;
 use App\Enums\PurchaseOrderStatus;
 use App\Enums\QuotationStatus;
+use App\Enums\ServiceRequestStatus;
+use App\Enums\SnagStatus;
 use App\Models\ChangeOrder;
 use App\Models\Client;
 use App\Models\Design;
@@ -25,7 +27,9 @@ use App\Models\Product;
 use App\Models\Project;
 use App\Models\PurchaseOrder;
 use App\Models\Quotation;
+use App\Models\ServiceRequest;
 use App\Models\SiteVisit;
+use App\Models\Snag;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -38,7 +42,10 @@ use Livewire\Component;
  * pending Change Orders (spec §4); Phase 6 adds Outstanding Invoices and
  * This Month's Expenses; Phase 7 adds Low Stock Products and Pending
  * Material Requisitions; Phase 8 adds Pending Purchase Orders; Phase 9
- * adds Pending Leave Requests and Payroll Due. Each card
+ * adds Pending Leave Requests and Payroll Due; Phase 10 adds Open Snags
+ * and Open Service Requests (the latter gated on `view_warranties` per
+ * ServiceRequestPolicy's permission-reuse decision, not an invented
+ * `view_service_requests`). Each card
  * gated by the same permission its own module uses so a user without
  * `view_leads` simply doesn't see that card.
  */
@@ -118,6 +125,10 @@ class Index extends Component
             'payrollDue' => $user->can('view_payroll') ? Payroll::where('month', now()->format('Y-m'))
                 ->whereIn('status', [PayrollStatus::Draft->value, PayrollStatus::Finalized->value])
                 ->count() : null,
+            'openSnags' => $user->can('view_snags') ? Snag::where('status', '!=', SnagStatus::Closed->value)->count() : null,
+            // Gated on view_warranties, not an invented
+            // view_service_requests — see ServiceRequestPolicy.
+            'openServiceRequests' => $user->can('view_warranties') ? ServiceRequest::where('status', '!=', ServiceRequestStatus::Closed->value)->count() : null,
         ]);
     }
 }

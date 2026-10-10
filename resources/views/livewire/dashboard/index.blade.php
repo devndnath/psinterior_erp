@@ -1,5 +1,5 @@
 <div>
-    @if ($totalLeads === null && $totalClients === null && $upcomingSiteVisits === null && $activeProjects === null && $designsAwaitingDecision === null && $quotationsAwaitingDecision === null && $changeOrdersPending === null && $outstandingInvoicesCount === null && $expensesThisMonth === null && $lowStockProducts === null && $pendingRequisitions === null && $pendingPurchaseOrders === null && $pendingLeaveRequests === null && $payrollDue === null)
+    @if ($totalLeads === null && $totalClients === null && $upcomingSiteVisits === null && $activeProjects === null && $designsAwaitingDecision === null && $quotationsAwaitingDecision === null && $changeOrdersPending === null && $outstandingInvoicesCount === null && $expensesThisMonth === null && $lowStockProducts === null && $pendingRequisitions === null && $pendingPurchaseOrders === null && $pendingLeaveRequests === null && $payrollDue === null && $openSnags === null && $openServiceRequests === null)
         <x-empty-state
             title="Welcome to {{ config('app.name') }}"
             description="Your account doesn't have access to any CRM modules yet. Ask an administrator to assign you a role."
@@ -116,10 +116,24 @@
                     <p class="mt-2 text-3xl font-semibold text-gray-900">{{ $payrollDue }}</p>
                 </a>
             @endif
+
+            @if ($openSnags !== null)
+                <a href="{{ route('snags.index') }}" wire:navigate class="card p-5 transition hover:shadow-md">
+                    <p class="text-sm font-medium text-gray-500">Open Snags</p>
+                    <p class="mt-2 text-3xl font-semibold text-gray-900">{{ $openSnags }}</p>
+                </a>
+            @endif
+
+            @if ($openServiceRequests !== null)
+                <a href="{{ route('warranties.index') }}" wire:navigate class="card p-5 transition hover:shadow-md">
+                    <p class="text-sm font-medium text-gray-500">Open Service Requests</p>
+                    <p class="mt-2 text-3xl font-semibold text-gray-900">{{ $openServiceRequests }}</p>
+                </a>
+            @endif
         </div>
 
         <p class="mt-6 text-sm text-gray-400">
-            Meetings, QC/Inspections, Snags, Handover and Warranty KPIs will appear here as those modules ship in later phases.
+            Reports, Notifications, Client Portal and Vendor Portal will appear here as those modules ship in later phases.
         </p>
     @endif
 </div>

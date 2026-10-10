@@ -27,6 +27,11 @@ use App\Livewire\Expenses\Index as ExpenseIndex;
 use App\Livewire\Expenses\Show as ExpenseShow;
 use App\Livewire\GoodsReceives\Form as GoodsReceiveForm;
 use App\Livewire\GoodsReceives\Show as GoodsReceiveShow;
+use App\Livewire\Handovers\Form as HandoverForm;
+use App\Livewire\Handovers\Show as HandoverShow;
+use App\Livewire\Inspections\Form as InspectionForm;
+use App\Livewire\Inspections\Index as InspectionIndex;
+use App\Livewire\Inspections\Show as InspectionShow;
 use App\Livewire\Invoices\Form as InvoiceForm;
 use App\Livewire\Invoices\Index as InvoiceIndex;
 use App\Livewire\Invoices\Show as InvoiceShow;
@@ -36,6 +41,9 @@ use App\Livewire\Leads\Show as LeadShow;
 use App\Livewire\MaterialRequisitions\Form as MaterialRequisitionForm;
 use App\Livewire\MaterialRequisitions\Index as MaterialRequisitionIndex;
 use App\Livewire\MaterialRequisitions\Show as MaterialRequisitionShow;
+use App\Livewire\Meetings\Form as MeetingForm;
+use App\Livewire\Meetings\Index as MeetingIndex;
+use App\Livewire\Meetings\Show as MeetingShow;
 use App\Livewire\Payments\Form as PaymentForm;
 use App\Livewire\Payments\Index as PaymentIndex;
 use App\Livewire\Payments\Show as PaymentShow;
@@ -57,6 +65,14 @@ use App\Livewire\PurchaseRequests\Show as PurchaseRequestShow;
 use App\Livewire\Quotations\Form as QuotationForm;
 use App\Livewire\Quotations\Index as QuotationIndex;
 use App\Livewire\Quotations\Show as QuotationShow;
+use App\Livewire\ServiceRequests\Form as ServiceRequestForm;
+use App\Livewire\ServiceRequests\Show as ServiceRequestShow;
+use App\Livewire\Snags\Form as SnagForm;
+use App\Livewire\Snags\Index as SnagIndex;
+use App\Livewire\Snags\Show as SnagShow;
+use App\Livewire\Warranties\Form as WarrantyForm;
+use App\Livewire\Warranties\Index as WarrantyIndex;
+use App\Livewire\Warranties\Show as WarrantyShow;
 use App\Livewire\Attendance\Form as AttendanceForm;
 use App\Livewire\Attendance\Index as AttendanceIndex;
 use App\Livewire\Employees\Form as EmployeeForm;
@@ -342,4 +358,49 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
     // Subcontractor's or Project's Show page.
     Route::get('/subcontractor-assignments/create', SubcontractorAssignmentForm::class)->name('subcontractor-assignments.create')->middleware('can:create_subcontractors');
     Route::get('/subcontractor-assignments/{subcontractorAssignment}', SubcontractorAssignmentShow::class)->name('subcontractor-assignments.show')->middleware('can:view_subcontractors');
+
+    // Phase 10: Meetings, QC/Inspections, Snags, Handover, Warranty and
+    // Service Requests (ARCHITECTURE.md §3.10). Handovers have no
+    // index/edit — one per project, reached from a Project's Show page.
+    // Service Requests have no index/edit either — reached from a
+    // Warranty's Show page — and are gated on the existing
+    // `*_warranties` abilities, never an invented `service_requests`
+    // permission string (see ServiceRequestPolicy).
+    Route::prefix('meetings')->name('meetings.')->group(function () {
+        Route::get('/', MeetingIndex::class)->name('index')->middleware('can:view_meetings');
+        Route::get('/create', MeetingForm::class)->name('create')->middleware('can:create_meetings');
+        Route::get('/{meeting}/edit', MeetingForm::class)->name('edit')->middleware('can:edit_meetings');
+        Route::get('/{meeting}', MeetingShow::class)->name('show')->middleware('can:view_meetings');
+    });
+
+    Route::prefix('inspections')->name('inspections.')->group(function () {
+        Route::get('/', InspectionIndex::class)->name('index')->middleware('can:view_inspections');
+        Route::get('/create', InspectionForm::class)->name('create')->middleware('can:create_inspections');
+        Route::get('/{inspection}/edit', InspectionForm::class)->name('edit')->middleware('can:edit_inspections');
+        Route::get('/{inspection}', InspectionShow::class)->name('show')->middleware('can:view_inspections');
+    });
+
+    Route::prefix('snags')->name('snags.')->group(function () {
+        Route::get('/', SnagIndex::class)->name('index')->middleware('can:view_snags');
+        Route::get('/create', SnagForm::class)->name('create')->middleware('can:create_snags');
+        Route::get('/{snag}/edit', SnagForm::class)->name('edit')->middleware('can:edit_snags');
+        Route::get('/{snag}', SnagShow::class)->name('show')->middleware('can:view_snags');
+    });
+
+    // No index/edit — one handover per project, always reached from the
+    // Project's Show page.
+    Route::get('/handovers/create', HandoverForm::class)->name('handovers.create')->middleware('can:create_handovers');
+    Route::get('/handovers/{handover}', HandoverShow::class)->name('handovers.show')->middleware('can:view_handovers');
+
+    Route::prefix('warranties')->name('warranties.')->group(function () {
+        Route::get('/', WarrantyIndex::class)->name('index')->middleware('can:view_warranties');
+        Route::get('/create', WarrantyForm::class)->name('create')->middleware('can:create_warranties');
+        Route::get('/{warranty}/edit', WarrantyForm::class)->name('edit')->middleware('can:edit_warranties');
+        Route::get('/{warranty}', WarrantyShow::class)->name('show')->middleware('can:view_warranties');
+    });
+
+    // No index/edit — always reached from a Warranty's Show page. Gated
+    // on `*_warranties`, not an invented `service_requests` permission.
+    Route::get('/service-requests/create', ServiceRequestForm::class)->name('service-requests.create')->middleware('can:create_warranties');
+    Route::get('/service-requests/{serviceRequest}', ServiceRequestShow::class)->name('service-requests.show')->middleware('can:view_warranties');
 });

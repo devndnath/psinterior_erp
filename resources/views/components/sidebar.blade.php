@@ -49,7 +49,17 @@
         ['label' => 'Leaves', 'route' => 'leaves.index', 'active' => 'leaves.*', 'icon' => 'calendar-off', 'permission' => 'view_leaves'],
         ['label' => 'Payroll', 'route' => 'payroll.index', 'active' => 'payroll.*', 'icon' => 'banknote', 'permission' => 'view_payroll'],
         ['label' => 'Subcontractors', 'route' => 'subcontractors.index', 'active' => 'subcontractors.*', 'icon' => 'hard-hat', 'permission' => 'view_subcontractors'],
-        // Phase 10+: Meetings, QC/Inspections, Snags, Handover, Warranty...
+        // Phase 10: Meetings, QC/Inspections, Snags, Handover, Warranty
+        // and Service Requests (ARCHITECTURE.md §3.10). Handovers and
+        // Service Requests are reached from a Project's / Warranty's
+        // Show page rather than getting their own top-level entry, same
+        // off-nav pattern as Phase 7's Stock Movements and Phase 8's
+        // Goods Receives.
+        ['label' => 'Meetings', 'route' => 'meetings.index', 'active' => 'meetings.*', 'icon' => 'calendar', 'permission' => 'view_meetings'],
+        ['label' => 'Inspections', 'route' => 'inspections.index', 'active' => 'inspections.*', 'icon' => 'clipboard-check', 'permission' => 'view_inspections'],
+        ['label' => 'Snags', 'route' => 'snags.index', 'active' => 'snags.*', 'icon' => 'alert-triangle', 'permission' => 'view_snags'],
+        ['label' => 'Warranties', 'route' => 'warranties.index', 'active' => 'warranties.*', 'icon' => 'shield-check', 'permission' => 'view_warranties'],
+        // Phase 11+: Reports, Notifications, Client Portal, Vendor Portal...
         ['label' => 'Settings', 'route' => 'settings.index', 'icon' => 'settings', 'permission' => 'manage_settings'],
     ];
 @endphp

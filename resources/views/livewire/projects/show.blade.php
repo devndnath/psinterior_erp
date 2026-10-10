@@ -487,9 +487,123 @@
                 </div>
             @endcan
 
-            <div class="card p-6 text-sm text-gray-400">
-                Meetings, Inspections, Snags and Handover will appear here as those modules ship (Phase 10+).
-            </div>
+            @can('view_meetings')
+                <div class="card p-6">
+                    <div class="mb-4 flex items-center justify-between">
+                        <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500">Meetings</h2>
+                        @can('create', \App\Models\Meeting::class)
+                            <a href="{{ route('meetings.create', ['project' => $project->id]) }}" wire:navigate class="text-sm text-brand-600 hover:underline">+ New Meeting</a>
+                        @endcan
+                    </div>
+                    @if ($meetings->isEmpty())
+                        <p class="text-sm text-gray-500">No meetings recorded for this project yet.</p>
+                    @else
+                        <ul class="divide-y divide-gray-100">
+                            @foreach ($meetings as $meeting)
+                                <li class="flex items-center justify-between py-2 text-sm">
+                                    <a href="{{ route('meetings.show', $meeting) }}" wire:navigate class="font-medium text-brand-600 hover:underline">{{ $meeting->date->format('d M, Y') }} — {{ $meeting->type->label() }}</a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            @endcan
+
+            @can('view_inspections')
+                <div class="card p-6">
+                    <div class="mb-4 flex items-center justify-between">
+                        <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500">Inspections</h2>
+                        @can('create', \App\Models\Inspection::class)
+                            <a href="{{ route('inspections.create', ['project' => $project->id]) }}" wire:navigate class="text-sm text-brand-600 hover:underline">+ New Inspection</a>
+                        @endcan
+                    </div>
+                    @if ($inspections->isEmpty())
+                        <p class="text-sm text-gray-500">No inspections recorded for this project yet.</p>
+                    @else
+                        <ul class="divide-y divide-gray-100">
+                            @foreach ($inspections as $inspection)
+                                <li class="flex items-center justify-between py-2 text-sm">
+                                    <a href="{{ route('inspections.show', $inspection) }}" wire:navigate class="font-medium text-brand-600 hover:underline">{{ $inspection->inspection_date->format('d M, Y') }} — {{ $inspection->area ?: 'General' }}</a>
+                                    <x-status-badge :label="$inspection->result->label()" :color="$inspection->result->color()" />
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            @endcan
+
+            @can('view_snags')
+                <div class="card p-6">
+                    <div class="mb-4 flex items-center justify-between">
+                        <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500">Snags</h2>
+                        @can('create', \App\Models\Snag::class)
+                            <a href="{{ route('snags.create', ['project' => $project->id]) }}" wire:navigate class="text-sm text-brand-600 hover:underline">+ New Snag</a>
+                        @endcan
+                    </div>
+                    @if ($snags->isEmpty())
+                        <p class="text-sm text-gray-500">No snags raised for this project yet.</p>
+                    @else
+                        <ul class="divide-y divide-gray-100">
+                            @foreach ($snags as $snag)
+                                <li class="flex items-center justify-between py-2 text-sm">
+                                    <a href="{{ route('snags.show', $snag) }}" wire:navigate class="font-medium text-brand-600 hover:underline">{{ $snag->snag_no }}</a>
+                                    <x-status-badge :label="$snag->status->label()" :color="$snag->status->color()" />
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            @endcan
+
+            @can('view_handovers')
+                <div class="card p-6">
+                    <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Handover</h2>
+                    @if ($handover)
+                        <div class="flex items-center justify-between text-sm">
+                            <a href="{{ route('handovers.show', $handover) }}" wire:navigate class="font-medium text-brand-600 hover:underline">{{ $handover->handover_date->format('d M, Y') }}</a>
+                            @if ($handover->isConfirmed())
+                                <x-status-badge label="Client Confirmed" color="green" />
+                            @else
+                                <x-status-badge label="Pending Confirmation" color="yellow" />
+                            @endif
+                        </div>
+                    @else
+                        <p class="text-sm text-gray-500">
+                            No handover yet.
+                            @can('create', \App\Models\Handover::class)
+                                <a href="{{ route('handovers.create', ['project' => $project->id]) }}" wire:navigate class="text-brand-600 hover:underline">Record Handover</a>
+                            @endcan
+                        </p>
+                    @endif
+                </div>
+            @endcan
+
+            @can('view_warranties')
+                <div class="card p-6">
+                    <div class="mb-4 flex items-center justify-between">
+                        <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500">Warranties</h2>
+                        @can('create', \App\Models\Warranty::class)
+                            <a href="{{ route('warranties.create', ['project' => $project->id]) }}" wire:navigate class="text-sm text-brand-600 hover:underline">+ New Warranty</a>
+                        @endcan
+                    </div>
+                    @if ($warranties->isEmpty())
+                        <p class="text-sm text-gray-500">No warranties recorded for this project yet.</p>
+                    @else
+                        <ul class="divide-y divide-gray-100">
+                            @foreach ($warranties as $warranty)
+                                <li class="flex items-center justify-between py-2 text-sm">
+                                    <a href="{{ route('warranties.show', $warranty) }}" wire:navigate class="font-medium text-brand-600 hover:underline">{{ $warranty->start_date->format('d M, Y') }} – {{ $warranty->end_date->format('d M, Y') }}</a>
+                                    @if ($warranty->isActive())
+                                        <x-status-badge label="Active" color="green" />
+                                    @else
+                                        <x-status-badge label="Expired" color="gray" />
+                                    @endif
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            @endcan
         </div>
 
         <div>
