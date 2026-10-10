@@ -53,18 +53,29 @@ class FinancialSummary extends Component
     }
 
     /**
-     * Buckets every currently-unpaid invoice by days past its due date.
-     * PHP-side over this bounded set — never a HAVING on an
-     * aggregate alias without GROUP BY (the MySQL ONLY_FULL_GROUP_BY
-     * pitfall this phase's brief calls out explicitly).
+     * Buckets every currently-unpaid invoice (within the selected date
+     * range) by days past its due date. PHP-side over this bounded set —
+     * never a HAVING on an aggregate alias without GROUP BY (the MySQL
+     * ONLY_FULL_GROUP_BY pitfall this phase's brief calls out explicitly).
+     *
+     * Phase 12 hardening: this used to ignore dateFrom/dateTo entirely
+     * and pull EVERY unpaid invoice the company has ever issued — the
+     * same filter totals() already applies is now enforced here too, so
+     * the bucket query stays bounded by the chosen range (and the
+     * report is internally consistent) instead of growing unbounded
+     * with the company's full invoice history. Only the columns the
+     * bucketing loop actually needs are selected to keep each row small.
      */
     protected function ageingBuckets(): array
     {
         $buckets = ['0-30' => 0.0, '31-60' => 0.0, '61-90' => 0.0, '90+' => 0.0];
 
         Invoice::query()
+            ->select(['id', 'due_date', 'grand_total', 'paid_amount'])
             ->whereIn('status', [InvoiceStatus::Issued->value, InvoiceStatus::PartiallyPaid->value, InvoiceStatus::Overdue->value])
             ->whereNotNull('due_date')
+            ->when($this->dateFrom, fn ($q) => $q->whereDate('invoice_date', '>=', $this->dateFrom))
+            ->when($this->dateTo, fn ($q) => $q->whereDate('invoice_date', '<=', $this->dateTo))
             ->get()
             ->each(function (Invoice $invoice) use (&$buckets) {
                 // Carbon's diffInDays() is absolute (always >= 0); the

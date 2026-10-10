@@ -4,7 +4,7 @@ A production-oriented ERP for interior design and architecture firms — lead to
 
 See **`ARCHITECTURE.md`** for the full system design: ERD, table list, folder architecture, module dependency order, and the phase-by-phase roadmap. This README only covers getting the application running.
 
-**Status:** Phase 1 (Foundation) — authentication, roles & permissions, settings, base layout, numbering, document storage, audit log. Every other module in `ARCHITECTURE.md` ships in its own later phase.
+**Status:** All 12 phases complete — CRM (leads/clients/site visits) through Projects, Design, BOQ/Quotation/Contract, Invoicing/Payments/Expenses, Inventory/Procurement, HR/Payroll/Subcontractors, QC/Handover/Warranty, and Reports/Notifications/Client+Vendor Portals. Every phase so far was written and verified statically only — see **`TESTING.md`** for the exact commands to validate the whole system against a real MySQL database for the first time, including a manual smoke-test checklist that walks one transaction through every module.
 
 ---
 
@@ -126,6 +126,8 @@ php artisan test
 Tests run against an in-memory SQLite database (`phpunit.xml`) so no separate test database setup is needed. Covers: guard separation (a client's correct password never authenticates on the staff guard, and vice versa), permission gating and the Super Admin bypass, the 11-role seed, atomic document numbering, Settings CRUD, and activity-log write/no-delete behavior.
 
 > Note on numbering concurrency: SQLite's `lockForUpdate()` is a no-op on a single connection, so true concurrent-process safety (spec §54) is only conclusively proven against MySQL — run the suite with `DB_CONNECTION=mysql` in a staging environment, or exercise `NumberingService::next()` from two parallel `artisan tinker` processes, to confirm no collision under real contention.
+
+See **`TESTING.md`** for the full first-run validation sequence (this is the single most important next step for anyone running this build for the first time — every phase was built and verified in a sandbox that could never actually execute a migration or a test) and a manual smoke-test checklist covering every module.
 
 ## 11. Production Deployment
 
