@@ -21,7 +21,7 @@
             @can('delete', $changeOrder)
                 <x-confirm-dialog
                     title="Delete this change order?"
-                    :message="\"This will remove {$changeOrder->co_no} and its items. This cannot be undone.\""
+                    :message='"This will remove {$changeOrder->co_no} and its items. This cannot be undone."'
                     action="deleteChangeOrder"
                 >
                     <x-slot:trigger>

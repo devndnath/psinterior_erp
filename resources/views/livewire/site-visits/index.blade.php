@@ -62,7 +62,7 @@
                                     <span class="ml-3 inline-block">
                                         <x-confirm-dialog
                                             title="Delete this site visit?"
-                                            :message="\"This will remove visit {$visit->sv_no}. This cannot be undone.\""
+                                            :message='"This will remove visit {$visit->sv_no}. This cannot be undone."'
                                             action="deleteSiteVisit"
                                             :params="[$visit->id]"
                                         >

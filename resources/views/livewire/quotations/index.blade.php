@@ -81,7 +81,7 @@
                                     <span class="ml-3 inline-block">
                                         <x-confirm-dialog
                                             title="Delete this quotation?"
-                                            :message="\"This will remove {$quotation->quotation_no} and its items. This cannot be undone.\""
+                                            :message='"This will remove {$quotation->quotation_no} and its items. This cannot be undone."'
                                             action="deleteQuotation"
                                             :params="[$quotation->id]"
                                         >

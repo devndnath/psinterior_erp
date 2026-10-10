@@ -31,7 +31,7 @@
             @can('delete', $boq)
                 <x-confirm-dialog
                     title="Delete this BOQ?"
-                    :message="\"This will remove {$boq->boq_no} and its items. This cannot be undone.\""
+                    :message='"This will remove {$boq->boq_no} and its items. This cannot be undone."'
                     action="deleteBoq"
                 >
                     <x-slot:trigger>

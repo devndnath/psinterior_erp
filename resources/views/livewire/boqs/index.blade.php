@@ -79,7 +79,7 @@
                                     <span class="ml-3 inline-block">
                                         <x-confirm-dialog
                                             title="Delete this BOQ?"
-                                            :message="\"This will remove {$boq->boq_no} and its items. This cannot be undone.\""
+                                            :message='"This will remove {$boq->boq_no} and its items. This cannot be undone."'
                                             action="deleteBoq"
                                             :params="[$boq->id]"
                                         >

@@ -79,7 +79,7 @@
                                     <span class="ml-3 inline-block">
                                         <x-confirm-dialog
                                             title="Delete this change order?"
-                                            :message="\"This will remove {$changeOrder->co_no} and its items. This cannot be undone.\""
+                                            :message='"This will remove {$changeOrder->co_no} and its items. This cannot be undone."'
                                             action="deleteChangeOrder"
                                             :params="[$changeOrder->id]"
                                         >

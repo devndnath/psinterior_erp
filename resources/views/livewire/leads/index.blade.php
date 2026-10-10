@@ -88,7 +88,7 @@
                                     <span class="ml-3 inline-block">
                                         <x-confirm-dialog
                                             title="Delete this lead?"
-                                            :message="\"This will remove {$lead->name} ({$lead->lead_no}). This cannot be undone.\""
+                                            :message='"This will remove {$lead->name} ({$lead->lead_no}). This cannot be undone."'
                                             action="deleteLead"
                                             :params="[$lead->id]"
                                         >

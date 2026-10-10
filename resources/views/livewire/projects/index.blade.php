@@ -77,7 +77,7 @@
                                     <span class="ml-3 inline-block">
                                         <x-confirm-dialog
                                             title="Delete this project?"
-                                            :message="\"This will remove {$project->name} ({$project->project_code}) and its milestones/tasks. This cannot be undone.\""
+                                            :message='"This will remove {$project->name} ({$project->project_code}) and its milestones/tasks. This cannot be undone."'
                                             action="deleteProject"
                                             :params="[$project->id]"
                                         >

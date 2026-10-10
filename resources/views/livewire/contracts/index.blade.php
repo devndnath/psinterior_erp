@@ -79,7 +79,7 @@
                                     <span class="ml-3 inline-block">
                                         <x-confirm-dialog
                                             title="Delete this contract?"
-                                            :message="\"This will remove {$contract->contract_no} and its items. This cannot be undone.\""
+                                            :message='"This will remove {$contract->contract_no} and its items. This cannot be undone."'
                                             action="deleteContract"
                                             :params="[$contract->id]"
                                         >

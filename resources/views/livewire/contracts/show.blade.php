@@ -27,7 +27,7 @@
             @can('delete', $contract)
                 <x-confirm-dialog
                     title="Delete this contract?"
-                    :message="\"This will remove {$contract->contract_no} and its items. This cannot be undone.\""
+                    :message='"This will remove {$contract->contract_no} and its items. This cannot be undone."'
                     action="deleteContract"
                 >
                     <x-slot:trigger>

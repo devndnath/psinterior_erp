@@ -71,7 +71,7 @@
                                     <span class="ml-3 inline-block">
                                         <x-confirm-dialog
                                             title="Delete this client?"
-                                            :message="\"This will remove {$client->name} ({$client->client_no}). This cannot be undone.\""
+                                            :message='"This will remove {$client->name} ({$client->client_no}). This cannot be undone."'
                                             action="deleteClient"
                                             :params="[$client->id]"
                                         >

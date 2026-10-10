@@ -24,7 +24,7 @@
             @can('delete', $design)
                 <x-confirm-dialog
                     title="Delete this design?"
-                    :message="\"This will remove {$design->design_no} and its revisions. This cannot be undone.\""
+                    :message='"This will remove {$design->design_no} and its revisions. This cannot be undone."'
                     action="deleteDesign"
                 >
                     <x-slot:trigger>
