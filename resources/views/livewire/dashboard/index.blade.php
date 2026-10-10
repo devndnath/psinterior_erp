@@ -1,5 +1,5 @@
 <div>
-    @if ($totalLeads === null && $totalClients === null && $upcomingSiteVisits === null && $activeProjects === null && $designsAwaitingDecision === null && $quotationsAwaitingDecision === null && $changeOrdersPending === null && $outstandingInvoicesCount === null && $expensesThisMonth === null && $lowStockProducts === null && $pendingRequisitions === null)
+    @if ($totalLeads === null && $totalClients === null && $upcomingSiteVisits === null && $activeProjects === null && $designsAwaitingDecision === null && $quotationsAwaitingDecision === null && $changeOrdersPending === null && $outstandingInvoicesCount === null && $expensesThisMonth === null && $lowStockProducts === null && $pendingRequisitions === null && $pendingPurchaseOrders === null)
         <x-empty-state
             title="Welcome to {{ config('app.name') }}"
             description="Your account doesn't have access to any CRM modules yet. Ask an administrator to assign you a role."
@@ -93,6 +93,13 @@
                 <a href="{{ route('material-requisitions.index') }}" wire:navigate class="card p-5 transition hover:shadow-md">
                     <p class="text-sm font-medium text-gray-500">Pending Material Requisitions</p>
                     <p class="mt-2 text-3xl font-semibold text-gray-900">{{ $pendingRequisitions }}</p>
+                </a>
+            @endif
+
+            @if ($pendingPurchaseOrders !== null)
+                <a href="{{ route('purchase-orders.index') }}" wire:navigate class="card p-5 transition hover:shadow-md">
+                    <p class="text-sm font-medium text-gray-500">Pending Purchase Orders</p>
+                    <p class="mt-2 text-3xl font-semibold text-gray-900">{{ $pendingPurchaseOrders }}</p>
                 </a>
             @endif
         </div>

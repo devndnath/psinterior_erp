@@ -29,7 +29,17 @@
         ['label' => 'Warehouses', 'route' => 'warehouses.index', 'active' => 'warehouses.*', 'icon' => 'warehouse', 'permission' => 'view_warehouses'],
         ['label' => 'Stock Transfers', 'route' => 'stock-transfers.index', 'active' => 'stock-transfers.*', 'icon' => 'arrow-left-right', 'permission' => 'view_warehouses'],
         ['label' => 'Material Requisitions', 'route' => 'material-requisitions.index', 'active' => 'material-requisitions.*', 'icon' => 'clipboard-list', 'permission' => 'view_material_requisitions'],
-        // Phase 8+: Vendors, Procurement, PO, GRN...
+        // Phase 8: Vendors, Procurement (Purchase Requests -> Vendor
+        // Quotations -> Purchase Orders), Goods Receives. Purchase
+        // Requests/Vendor Quotations are gated on view_purchase_orders —
+        // see PurchaseRequestPolicy. Vendor Quotations and Goods
+        // Receives are reached from a Purchase Request's / Purchase
+        // Order's Show page rather than getting their own top-level
+        // entry, keeping this list from growing one item per sub-step.
+        ['label' => 'Vendors', 'route' => 'vendors.index', 'active' => 'vendors.*', 'icon' => 'truck', 'permission' => 'view_vendors'],
+        ['label' => 'Purchase Requests', 'route' => 'purchase-requests.index', 'active' => 'purchase-requests.*', 'icon' => 'file-plus', 'permission' => 'view_purchase_orders'],
+        ['label' => 'Purchase Orders', 'route' => 'purchase-orders.index', 'active' => 'purchase-orders.*', 'icon' => 'shopping-cart', 'permission' => 'view_purchase_orders'],
+        // Phase 9+: Employees, Attendance, Leave, Payroll, Subcontractors...
         ['label' => 'Settings', 'route' => 'settings.index', 'icon' => 'settings', 'permission' => 'manage_settings'],
     ];
 @endphp

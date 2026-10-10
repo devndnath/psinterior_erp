@@ -168,6 +168,16 @@ class Project extends Model
         return $this->hasMany(MaterialRequisition::class);
     }
 
+    public function purchaseRequests(): HasMany
+    {
+        return $this->hasMany(PurchaseRequest::class);
+    }
+
+    public function purchaseOrders(): HasMany
+    {
+        return $this->hasMany(PurchaseOrder::class);
+    }
+
     // Meetings, Inspections, Snags, Handovers and Warranties relations are
     // added to this model as each of those modules ships
     // (ARCHITECTURE.md §2) — intentionally not stubbed here.

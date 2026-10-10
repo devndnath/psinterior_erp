@@ -28,8 +28,18 @@
                 @error('category_id') <p class="form-error">{{ $message }}</p> @enderror
             </div>
             <div>
-                <label class="form-label">Vendor</label>
-                <input wire:model="vendor_name" type="text" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                <label class="form-label">Vendor (from directory)</label>
+                <select wire:model="vendor_id" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                    <option value="">None</option>
+                    @foreach ($vendors as $v)
+                        <option value="{{ $v->id }}">{{ $v->company_name }}</option>
+                    @endforeach
+                </select>
+                @error('vendor_id') <p class="form-error">{{ $message }}</p> @enderror
+            </div>
+            <div>
+                <label class="form-label">Vendor (free text, legacy)</label>
+                <input wire:model="vendor_name" type="text" placeholder="Used only when no directory vendor is selected" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
                 @error('vendor_name') <p class="form-error">{{ $message }}</p> @enderror
             </div>
             <div>

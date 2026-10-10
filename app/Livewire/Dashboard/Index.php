@@ -8,6 +8,7 @@ use App\Enums\InvoiceStatus;
 use App\Enums\LeadStatus;
 use App\Enums\MaterialRequisitionStatus;
 use App\Enums\ProjectStatus;
+use App\Enums\PurchaseOrderStatus;
 use App\Enums\QuotationStatus;
 use App\Models\ChangeOrder;
 use App\Models\Client;
@@ -18,6 +19,7 @@ use App\Models\Lead;
 use App\Models\MaterialRequisition;
 use App\Models\Product;
 use App\Models\Project;
+use App\Models\PurchaseOrder;
 use App\Models\Quotation;
 use App\Models\SiteVisit;
 use Illuminate\Support\Facades\Auth;
@@ -31,10 +33,9 @@ use Livewire\Component;
  * client decision; Phase 5 adds Quotations awaiting a decision and
  * pending Change Orders (spec §4); Phase 6 adds Outstanding Invoices and
  * This Month's Expenses; Phase 7 adds Low Stock Products and Pending
- * Material Requisitions. Each card gated by the same permission its own
- * module uses so a user without `view_leads` simply doesn't see that
- * card. Procurement KPIs and charts are added as those modules ship in
- * later phases.
+ * Material Requisitions; Phase 8 adds Pending Purchase Orders. Each card
+ * gated by the same permission its own module uses so a user without
+ * `view_leads` simply doesn't see that card.
  */
 #[Layout('layouts.admin', ['title' => 'Dashboard'])]
 #[Title('Dashboard')]
@@ -96,6 +97,11 @@ class Index extends Component
                 MaterialRequisitionStatus::Pending->value,
                 MaterialRequisitionStatus::ManagerApproved->value,
                 MaterialRequisitionStatus::StoreApproved->value,
+            ])->count() : null,
+            'pendingPurchaseOrders' => $user->can('view_purchase_orders') ? PurchaseOrder::whereIn('status', [
+                PurchaseOrderStatus::Draft->value,
+                PurchaseOrderStatus::Sent->value,
+                PurchaseOrderStatus::PartiallyReceived->value,
             ])->count() : null,
         ]);
     }

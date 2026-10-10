@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\DB;
 class NumberingService
 {
     /**
-     * @param  string  $key  e.g. LEAD, CLIENT, PRJ, SV, QUO, CON, INV, PAY, PO, GRN, EXP, MR, SNAG
+     * @param  string  $key  e.g. LEAD, CLIENT, PRJ, SV, QUO, CON, INV, PAY, PO, GRN, EXP, MR, SNAG, VEN, PR
      */
     public function next(string $key): string
     {

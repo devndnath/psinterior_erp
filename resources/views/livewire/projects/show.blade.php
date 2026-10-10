@@ -433,6 +433,32 @@
                 </div>
             @endcan
 
+            @can('view_purchase_orders')
+                <div class="card p-6">
+                    <div class="mb-4 flex items-center justify-between">
+                        <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500">Purchase Orders</h2>
+                        @can('create', \App\Models\PurchaseOrder::class)
+                            <a href="{{ route('purchase-orders.create', ['project' => $project->id]) }}" wire:navigate class="text-sm text-brand-600 hover:underline">+ New Purchase Order</a>
+                        @endcan
+                    </div>
+                    @if ($purchaseOrders->isEmpty())
+                        <p class="text-sm text-gray-500">No purchase orders raised for this project yet.</p>
+                    @else
+                        <ul class="divide-y divide-gray-100">
+                            @foreach ($purchaseOrders as $po)
+                                <li class="flex items-center justify-between py-2 text-sm">
+                                    <a href="{{ route('purchase-orders.show', $po) }}" wire:navigate class="font-medium text-brand-600 hover:underline">{{ $po->po_no }}</a>
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-gray-500">{{ number_format($po->total, 2) }}</span>
+                                        <x-status-badge :label="$po->status->label()" :color="$po->status->color()" />
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            @endcan
+
             <div class="card p-6 text-sm text-gray-400">
                 Meetings, Inspections, Snags and Handover will appear here as those modules ship (Phase 9+).
             </div>

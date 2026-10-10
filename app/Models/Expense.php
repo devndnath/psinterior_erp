@@ -14,7 +14,7 @@ class Expense extends Model
     use HasFactory, LogsActivity, SoftDeletes;
 
     protected $fillable = [
-        'expense_no', 'project_id', 'category_id', 'vendor_name', 'amount',
+        'expense_no', 'project_id', 'category_id', 'vendor_name', 'vendor_id', 'amount',
         'date', 'method', 'description', 'created_by',
     ];
 
@@ -45,5 +45,15 @@ class Expense extends Model
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * The preferred, directory-backed vendor link added in Phase 8.
+     * `vendor_name` remains as a legacy/fallback free-text field for
+     * expenses that don't (or didn't) have a matching vendor record.
+     */
+    public function vendor(): BelongsTo
+    {
+        return $this->belongsTo(Vendor::class);
     }
 }

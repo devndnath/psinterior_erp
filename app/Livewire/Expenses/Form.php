@@ -6,6 +6,7 @@ use App\Enums\PaymentMethod;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\Project;
+use App\Models\Vendor;
 use App\Services\ExpenseService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -21,6 +22,7 @@ class Form extends Component
     public string $project_id = '';
     public string $category_id = '';
     public string $vendor_name = '';
+    public string $vendor_id = '';
     public string $amount = '';
     public string $date = '';
     public string $method = 'cash';
@@ -37,6 +39,7 @@ class Form extends Component
                 'project_id' => (string) $this->expense->project_id,
                 'category_id' => (string) $this->expense->category_id,
                 'vendor_name' => (string) $this->expense->vendor_name,
+                'vendor_id' => (string) $this->expense->vendor_id,
                 'amount' => (string) $this->expense->amount,
                 'date' => $this->expense->date?->format('Y-m-d') ?? '',
                 'method' => $this->expense->method->value,
@@ -61,6 +64,7 @@ class Form extends Component
             'project_id' => ['required', 'exists:projects,id'],
             'category_id' => ['required', 'exists:expense_categories,id'],
             'vendor_name' => ['nullable', 'string', 'max:255'],
+            'vendor_id' => ['nullable', 'exists:vendors,id'],
             'amount' => ['required', 'numeric', 'min:0.01'],
             'date' => ['required', 'date'],
             'method' => ['required', 'string', 'in:'.implode(',', array_column(PaymentMethod::cases(), 'value'))],
@@ -72,6 +76,7 @@ class Form extends Component
     {
         $data = $this->validate();
         $data['vendor_name'] = $data['vendor_name'] ?: null;
+        $data['vendor_id'] = $data['vendor_id'] ?: null;
         $data['description'] = $data['description'] ?: null;
 
         if ($this->expense) {
@@ -93,6 +98,7 @@ class Form extends Component
         return view('livewire.expenses.form', [
             'projects' => Project::orderBy('name')->get(['id', 'name', 'project_code']),
             'categories' => ExpenseCategory::active()->orderBy('name')->get(),
+            'vendors' => Vendor::orderBy('company_name')->get(['id', 'company_name']),
             'methods' => PaymentMethod::options(),
         ]);
     }

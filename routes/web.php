@@ -25,6 +25,8 @@ use App\Livewire\ExpenseCategories\Index as ExpenseCategoryIndex;
 use App\Livewire\Expenses\Form as ExpenseForm;
 use App\Livewire\Expenses\Index as ExpenseIndex;
 use App\Livewire\Expenses\Show as ExpenseShow;
+use App\Livewire\GoodsReceives\Form as GoodsReceiveForm;
+use App\Livewire\GoodsReceives\Show as GoodsReceiveShow;
 use App\Livewire\Invoices\Form as InvoiceForm;
 use App\Livewire\Invoices\Index as InvoiceIndex;
 use App\Livewire\Invoices\Show as InvoiceShow;
@@ -46,6 +48,12 @@ use App\Livewire\Profitability\Index as ProfitabilityIndex;
 use App\Livewire\Projects\Form as ProjectForm;
 use App\Livewire\Projects\Index as ProjectIndex;
 use App\Livewire\Projects\Show as ProjectShow;
+use App\Livewire\PurchaseOrders\Form as PurchaseOrderForm;
+use App\Livewire\PurchaseOrders\Index as PurchaseOrderIndex;
+use App\Livewire\PurchaseOrders\Show as PurchaseOrderShow;
+use App\Livewire\PurchaseRequests\Form as PurchaseRequestForm;
+use App\Livewire\PurchaseRequests\Index as PurchaseRequestIndex;
+use App\Livewire\PurchaseRequests\Show as PurchaseRequestShow;
 use App\Livewire\Quotations\Form as QuotationForm;
 use App\Livewire\Quotations\Index as QuotationIndex;
 use App\Livewire\Quotations\Show as QuotationShow;
@@ -59,6 +67,10 @@ use App\Livewire\StockTransfers\Index as StockTransferIndex;
 use App\Livewire\StockTransfers\Show as StockTransferShow;
 use App\Livewire\Units\Form as UnitForm;
 use App\Livewire\Units\Index as UnitIndex;
+use App\Livewire\VendorQuotations\Form as VendorQuotationForm;
+use App\Livewire\Vendors\Form as VendorForm;
+use App\Livewire\Vendors\Index as VendorIndex;
+use App\Livewire\Vendors\Show as VendorShow;
 use App\Livewire\Warehouses\Form as WarehouseForm;
 use App\Livewire\Warehouses\Index as WarehouseIndex;
 use App\Livewire\Warehouses\Show as WarehouseShow;
@@ -234,4 +246,40 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
         Route::get('/{materialRequisition}/edit', MaterialRequisitionForm::class)->name('edit')->middleware('can:edit_material_requisitions');
         Route::get('/{materialRequisition}', MaterialRequisitionShow::class)->name('show')->middleware('can:view_material_requisitions');
     });
+
+    // Phase 8: Vendors, Procurement (Purchase Requests -> Vendor
+    // Quotations -> Purchase Orders), and Goods Receives
+    // (ARCHITECTURE.md §3.8). Purchase Requests and Vendor Quotations
+    // are gated on the existing `*_purchase_orders` abilities, NOT on
+    // invented `purchase_requests`/`vendor_quotations` permission
+    // strings — see PurchaseRequestPolicy's docblock for why.
+    Route::prefix('vendors')->name('vendors.')->group(function () {
+        Route::get('/', VendorIndex::class)->name('index')->middleware('can:view_vendors');
+        Route::get('/create', VendorForm::class)->name('create')->middleware('can:create_vendors');
+        Route::get('/{vendor}/edit', VendorForm::class)->name('edit')->middleware('can:edit_vendors');
+        Route::get('/{vendor}', VendorShow::class)->name('show')->middleware('can:view_vendors');
+    });
+
+    Route::prefix('purchase-requests')->name('purchase-requests.')->group(function () {
+        Route::get('/', PurchaseRequestIndex::class)->name('index')->middleware('can:view_purchase_orders');
+        Route::get('/create', PurchaseRequestForm::class)->name('create')->middleware('can:create_purchase_orders');
+        Route::get('/{purchaseRequest}/edit', PurchaseRequestForm::class)->name('edit')->middleware('can:edit_purchase_orders');
+        Route::get('/{purchaseRequest}', PurchaseRequestShow::class)->name('show')->middleware('can:view_purchase_orders');
+    });
+
+    // No Index/Show — a vendor quotation is always viewed in the
+    // context of its parent Purchase Request's Show page.
+    Route::get('/vendor-quotations/create', VendorQuotationForm::class)->name('vendor-quotations.create')->middleware('can:create_purchase_orders');
+
+    Route::prefix('purchase-orders')->name('purchase-orders.')->group(function () {
+        Route::get('/', PurchaseOrderIndex::class)->name('index')->middleware('can:view_purchase_orders');
+        Route::get('/create', PurchaseOrderForm::class)->name('create')->middleware('can:create_purchase_orders');
+        Route::get('/{purchaseOrder}/edit', PurchaseOrderForm::class)->name('edit')->middleware('can:edit_purchase_orders');
+        Route::get('/{purchaseOrder}', PurchaseOrderShow::class)->name('show')->middleware('can:view_purchase_orders');
+    });
+
+    // No Index — always reached from a PO's Show page. No edit/delete —
+    // a GRN is an immutable receiving record once created.
+    Route::get('/goods-receives/create', GoodsReceiveForm::class)->name('goods-receives.create')->middleware('can:create_goods_receives');
+    Route::get('/goods-receives/{goodsReceive}', GoodsReceiveShow::class)->name('goods-receives.show')->middleware('can:view_goods_receives');
 });
