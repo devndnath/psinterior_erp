@@ -20,9 +20,21 @@ use App\Livewire\Dashboard\Index as DashboardIndex;
 use App\Livewire\Designs\Form as DesignForm;
 use App\Livewire\Designs\Index as DesignIndex;
 use App\Livewire\Designs\Show as DesignShow;
+use App\Livewire\ExpenseCategories\Form as ExpenseCategoryForm;
+use App\Livewire\ExpenseCategories\Index as ExpenseCategoryIndex;
+use App\Livewire\Expenses\Form as ExpenseForm;
+use App\Livewire\Expenses\Index as ExpenseIndex;
+use App\Livewire\Expenses\Show as ExpenseShow;
+use App\Livewire\Invoices\Form as InvoiceForm;
+use App\Livewire\Invoices\Index as InvoiceIndex;
+use App\Livewire\Invoices\Show as InvoiceShow;
 use App\Livewire\Leads\Form as LeadForm;
 use App\Livewire\Leads\Index as LeadIndex;
 use App\Livewire\Leads\Show as LeadShow;
+use App\Livewire\Payments\Form as PaymentForm;
+use App\Livewire\Payments\Index as PaymentIndex;
+use App\Livewire\Payments\Show as PaymentShow;
+use App\Livewire\Profitability\Index as ProfitabilityIndex;
 use App\Livewire\Projects\Form as ProjectForm;
 use App\Livewire\Projects\Index as ProjectIndex;
 use App\Livewire\Projects\Show as ProjectShow;
@@ -129,4 +141,33 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
         Route::get('/{changeOrder}/edit', ChangeOrderForm::class)->name('edit')->middleware('can:edit_change_orders');
         Route::get('/{changeOrder}', ChangeOrderShow::class)->name('show')->middleware('can:view_change_orders');
     });
+
+    // Phase 6: Invoices, Payments, Expenses, Profitability (ARCHITECTURE.md §3.7).
+    Route::prefix('invoices')->name('invoices.')->group(function () {
+        Route::get('/', InvoiceIndex::class)->name('index')->middleware('can:view_invoices');
+        Route::get('/create', InvoiceForm::class)->name('create')->middleware('can:create_invoices');
+        Route::get('/{invoice}/edit', InvoiceForm::class)->name('edit')->middleware('can:edit_invoices');
+        Route::get('/{invoice}', InvoiceShow::class)->name('show')->middleware('can:view_invoices');
+    });
+
+    Route::prefix('payments')->name('payments.')->group(function () {
+        Route::get('/', PaymentIndex::class)->name('index')->middleware('can:view_payments');
+        Route::get('/create', PaymentForm::class)->name('create')->middleware('can:create_payments');
+        Route::get('/{payment}', PaymentShow::class)->name('show')->middleware('can:view_payments');
+    });
+
+    Route::prefix('expenses')->name('expenses.')->group(function () {
+        Route::get('/', ExpenseIndex::class)->name('index')->middleware('can:view_expenses');
+        Route::get('/create', ExpenseForm::class)->name('create')->middleware('can:create_expenses');
+        Route::get('/{expense}/edit', ExpenseForm::class)->name('edit')->middleware('can:edit_expenses');
+        Route::get('/{expense}', ExpenseShow::class)->name('show')->middleware('can:view_expenses');
+    });
+
+    Route::prefix('expense-categories')->name('expense-categories.')->group(function () {
+        Route::get('/', ExpenseCategoryIndex::class)->name('index')->middleware('can:manage_settings');
+        Route::get('/create', ExpenseCategoryForm::class)->name('create')->middleware('can:manage_settings');
+        Route::get('/{expenseCategory}/edit', ExpenseCategoryForm::class)->name('edit')->middleware('can:manage_settings');
+    });
+
+    Route::get('/profitability', ProfitabilityIndex::class)->name('profitability.index')->middleware('can:view_finance');
 });

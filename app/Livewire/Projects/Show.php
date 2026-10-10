@@ -7,6 +7,7 @@ use App\Enums\MilestoneStatus;
 use App\Enums\TaskStatus;
 use App\Models\Project;
 use App\Models\User;
+use App\Services\ProfitabilityService;
 use App\Services\ProjectService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -166,7 +167,7 @@ class Show extends Component
     }
 
     #[Title('Project')]
-    public function render()
+    public function render(ProfitabilityService $profitability)
     {
         return view('livewire.projects.show', [
             'milestones' => $this->project->milestones()->orderBy('due_date')->get(),
@@ -187,6 +188,18 @@ class Show extends Component
             'changeOrders' => Auth::user()->can('view_change_orders')
                 ? $this->project->changeOrders()->latest()->get()
                 : collect(),
+            'invoices' => Auth::user()->can('view_invoices')
+                ? $this->project->invoices()->latest()->get()
+                : collect(),
+            'payments' => Auth::user()->can('view_payments')
+                ? $this->project->payments()->latest('date')->get()
+                : collect(),
+            'expenses' => Auth::user()->can('view_expenses')
+                ? $this->project->expenses()->latest('date')->get()
+                : collect(),
+            'profitability' => Auth::user()->can('view_finance')
+                ? $profitability->forProject($this->project)
+                : null,
             'members' => $this->project->members,
             'staff' => User::staff()->orderBy('name')->get(['id', 'name']),
             'milestoneStatuses' => MilestoneStatus::options(),

@@ -1,5 +1,5 @@
 <div>
-    @if ($totalLeads === null && $totalClients === null && $upcomingSiteVisits === null && $activeProjects === null && $designsAwaitingDecision === null && $quotationsAwaitingDecision === null && $changeOrdersPending === null)
+    @if ($totalLeads === null && $totalClients === null && $upcomingSiteVisits === null && $activeProjects === null && $designsAwaitingDecision === null && $quotationsAwaitingDecision === null && $changeOrdersPending === null && $outstandingInvoicesCount === null && $expensesThisMonth === null)
         <x-empty-state
             title="Welcome to {{ config('app.name') }}"
             description="Your account doesn't have access to any CRM modules yet. Ask an administrator to assign you a role."
@@ -66,10 +66,25 @@
                     <p class="mt-2 text-3xl font-semibold text-gray-900">{{ $changeOrdersPending }}</p>
                 </a>
             @endif
+
+            @if ($outstandingInvoicesCount !== null)
+                <a href="{{ route('invoices.index', ['status' => 'issued']) }}" wire:navigate class="card p-5 transition hover:shadow-md">
+                    <p class="text-sm font-medium text-gray-500">Outstanding Invoices</p>
+                    <p class="mt-2 text-3xl font-semibold text-gray-900">{{ $outstandingInvoicesCount }}</p>
+                    <p class="mt-1 text-xs text-gray-400">{{ number_format($outstandingInvoicesTotal, 2) }} outstanding</p>
+                </a>
+            @endif
+
+            @if ($expensesThisMonth !== null)
+                <a href="{{ route('expenses.index') }}" wire:navigate class="card p-5 transition hover:shadow-md">
+                    <p class="text-sm font-medium text-gray-500">This Month's Expenses</p>
+                    <p class="mt-2 text-3xl font-semibold text-gray-900">{{ number_format($expensesThisMonth, 2) }}</p>
+                </a>
+            @endif
         </div>
 
         <p class="mt-6 text-sm text-gray-400">
-            Finance and inventory KPIs and charts will appear here as each module ships in later phases.
+            Inventory and procurement KPIs and charts will appear here as each module ships in later phases.
         </p>
     @endif
 </div>

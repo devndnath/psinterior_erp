@@ -338,12 +338,101 @@
                 </div>
             @endcan
 
+            @can('view_invoices')
+                <div class="card p-6">
+                    <div class="mb-4 flex items-center justify-between">
+                        <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500">Invoices</h2>
+                        @can('create', \App\Models\Invoice::class)
+                            <a href="{{ route('invoices.create', ['project' => $project->id]) }}" wire:navigate class="text-sm text-brand-600 hover:underline">+ New Invoice</a>
+                        @endcan
+                    </div>
+                    @if ($invoices->isEmpty())
+                        <p class="text-sm text-gray-500">No invoices raised for this project yet.</p>
+                    @else
+                        <ul class="divide-y divide-gray-100">
+                            @foreach ($invoices as $invoice)
+                                <li class="flex items-center justify-between py-2 text-sm">
+                                    <div>
+                                        <a href="{{ route('invoices.show', $invoice) }}" wire:navigate class="font-medium text-brand-600 hover:underline">{{ $invoice->invoice_no }}</a>
+                                        <span class="text-gray-500">{{ number_format($invoice->grand_total, 2) }}</span>
+                                    </div>
+                                    <x-status-badge :label="$invoice->status->label()" :color="$invoice->status->color()" />
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            @endcan
+
+            @can('view_payments')
+                <div class="card p-6">
+                    <div class="mb-4 flex items-center justify-between">
+                        <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500">Payments</h2>
+                        @can('create', \App\Models\Payment::class)
+                            <a href="{{ route('payments.create', ['project' => $project->id]) }}" wire:navigate class="text-sm text-brand-600 hover:underline">+ Record Payment</a>
+                        @endcan
+                    </div>
+                    @if ($payments->isEmpty())
+                        <p class="text-sm text-gray-500">No payments recorded for this project yet.</p>
+                    @else
+                        <ul class="divide-y divide-gray-100">
+                            @foreach ($payments as $payment)
+                                <li class="flex items-center justify-between py-2 text-sm">
+                                    <a href="{{ route('payments.show', $payment) }}" wire:navigate class="font-medium text-brand-600 hover:underline">{{ $payment->payment_no }}</a>
+                                    <span class="text-gray-500">{{ number_format($payment->amount, 2) }}</span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            @endcan
+
+            @can('view_expenses')
+                <div class="card p-6">
+                    <div class="mb-4 flex items-center justify-between">
+                        <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500">Expenses</h2>
+                        @can('create', \App\Models\Expense::class)
+                            <a href="{{ route('expenses.create', ['project' => $project->id]) }}" wire:navigate class="text-sm text-brand-600 hover:underline">+ New Expense</a>
+                        @endcan
+                    </div>
+                    @if ($expenses->isEmpty())
+                        <p class="text-sm text-gray-500">No expenses recorded for this project yet.</p>
+                    @else
+                        <ul class="divide-y divide-gray-100">
+                            @foreach ($expenses as $expense)
+                                <li class="flex items-center justify-between py-2 text-sm">
+                                    <a href="{{ route('expenses.show', $expense) }}" wire:navigate class="font-medium text-brand-600 hover:underline">{{ $expense->expense_no }}</a>
+                                    <span class="text-gray-500">{{ number_format($expense->amount, 2) }}</span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            @endcan
+
             <div class="card p-6 text-sm text-gray-400">
-                Invoices, Payments, Expenses, Meetings, Inspections, Snags and Handover will appear here as those modules ship (Phases 6+).
+                Meetings, Inspections, Snags and Handover will appear here as those modules ship (Phases 7+).
             </div>
         </div>
 
         <div>
+            @can('view_finance')
+                @if ($profitability)
+                    <div class="card mb-6 p-6">
+                        <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Profitability</h2>
+                        <dl class="space-y-2 text-sm">
+                            <div class="flex justify-between"><dt class="text-gray-500">Contract value</dt><dd class="font-medium text-gray-900">{{ number_format($profitability['contract_value'], 2) }}</dd></div>
+                            <div class="flex justify-between"><dt class="text-gray-500">Expenses</dt><dd class="font-medium text-gray-900">{{ number_format($profitability['total_expenses'], 2) }}</dd></div>
+                            <div class="flex justify-between border-t border-gray-100 pt-2">
+                                <dt class="font-medium text-gray-700">Profit</dt>
+                                <dd class="font-semibold {{ $profitability['profit'] >= 0 ? 'text-green-700' : 'text-red-600' }}">{{ number_format($profitability['profit'], 2) }}</dd>
+                            </div>
+                            <div class="flex justify-between"><dt class="text-gray-500">Margin</dt><dd class="font-medium text-gray-900">{{ $profitability['margin_percent'] === null ? '—' : number_format($profitability['margin_percent'], 2).'%' }}</dd></div>
+                        </dl>
+                    </div>
+                @endif
+            @endcan
+
             <div class="card p-6">
                 <div class="mb-4 flex items-center justify-between">
                     <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500">Team</h2>

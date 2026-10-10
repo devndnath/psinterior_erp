@@ -12,9 +12,9 @@ use Livewire\Component;
 
 /**
  * Client 360 — assembles everything the ERP knows about one client
- * (ARCHITECTURE.md §6 / spec §6). Invoices, payments and meetings
- * sections are added as their modules ship in later phases; Leads, Site
- * Visits, Projects, Contacts, Quotations and Contracts exist now.
+ * (ARCHITECTURE.md §6 / spec §6). Meetings sections are added as that
+ * module ships in a later phase; Leads, Site Visits, Projects, Contacts,
+ * Quotations, Contracts, Invoices and Payments exist now.
  */
 #[Layout('layouts.admin')]
 class Show extends Component
@@ -83,6 +83,12 @@ class Show extends Component
                 : collect(),
             'contracts' => Auth::user()->can('view_contracts')
                 ? $this->client->contracts()->latest()->get()
+                : collect(),
+            'invoices' => Auth::user()->can('view_invoices')
+                ? $this->client->invoices()->latest()->get()
+                : collect(),
+            'payments' => Auth::user()->can('view_payments')
+                ? $this->client->payments()->latest('date')->get()
                 : collect(),
         ]);
     }

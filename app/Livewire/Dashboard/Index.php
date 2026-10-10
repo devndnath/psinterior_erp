@@ -4,12 +4,15 @@ namespace App\Livewire\Dashboard;
 
 use App\Enums\ChangeOrderStatus;
 use App\Enums\DesignStatus;
+use App\Enums\InvoiceStatus;
 use App\Enums\LeadStatus;
 use App\Enums\ProjectStatus;
 use App\Enums\QuotationStatus;
 use App\Models\ChangeOrder;
 use App\Models\Client;
 use App\Models\Design;
+use App\Models\Expense;
+use App\Models\Invoice;
 use App\Models\Lead;
 use App\Models\Project;
 use App\Models\Quotation;
@@ -23,10 +26,11 @@ use Livewire\Component;
  * Role-aware dashboard. Phase 1 shipped an empty shell; Phase 2 added the
  * CRM KPI cards; Phase 3 added Projects; Phase 4 added Designs awaiting a
  * client decision; Phase 5 adds Quotations awaiting a decision and
- * pending Change Orders (spec §4), each card gated by the same
- * permission its own module uses so a user without `view_leads` simply
- * doesn't see that card. Finance/inventory KPIs and charts are added as
- * those modules ship in later phases.
+ * pending Change Orders (spec §4); Phase 6 adds Outstanding Invoices and
+ * This Month's Expenses. Each card gated by the same permission its own
+ * module uses so a user without `view_leads` simply doesn't see that
+ * card. Inventory KPIs and charts are added as those modules ship in
+ * later phases.
  */
 #[Layout('layouts.admin', ['title' => 'Dashboard'])]
 #[Title('Dashboard')]
@@ -62,6 +66,20 @@ class Index extends Component
                 QuotationStatus::Negotiation->value,
             ])->count() : null,
             'changeOrdersPending' => $user->can('view_change_orders') ? ChangeOrder::where('status', ChangeOrderStatus::Pending->value)->count() : null,
+            'outstandingInvoicesCount' => $user->can('view_invoices') ? Invoice::whereIn('status', [
+                InvoiceStatus::Issued->value,
+                InvoiceStatus::PartiallyPaid->value,
+                InvoiceStatus::Overdue->value,
+            ])->count() : null,
+            'outstandingInvoicesTotal' => $user->can('view_invoices') ? Invoice::whereIn('status', [
+                InvoiceStatus::Issued->value,
+                InvoiceStatus::PartiallyPaid->value,
+                InvoiceStatus::Overdue->value,
+            ])->get()->sum(fn (Invoice $invoice) => $invoice->outstandingAmount()) : null,
+            'expensesThisMonth' => $user->can('view_expenses') ? (float) Expense::whereBetween('date', [
+                now()->startOfMonth()->toDateString(),
+                now()->endOfMonth()->toDateString(),
+            ])->sum('amount') : null,
         ]);
     }
 }

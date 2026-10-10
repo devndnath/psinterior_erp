@@ -9,7 +9,11 @@ use App\Models\ChangeOrder;
 use App\Models\Client;
 use App\Models\Contract;
 use App\Models\Design;
+use App\Models\Expense;
+use App\Models\ExpenseCategory;
+use App\Models\Invoice;
 use App\Models\Lead;
+use App\Models\Payment;
 use App\Models\Project;
 use App\Models\Quotation;
 use App\Models\SiteVisit;
@@ -19,7 +23,11 @@ use App\Policies\ChangeOrderPolicy;
 use App\Policies\ClientPolicy;
 use App\Policies\ContractPolicy;
 use App\Policies\DesignPolicy;
+use App\Policies\ExpenseCategoryPolicy;
+use App\Policies\ExpensePolicy;
+use App\Policies\InvoicePolicy;
 use App\Policies\LeadPolicy;
+use App\Policies\PaymentPolicy;
 use App\Policies\ProjectPolicy;
 use App\Policies\QuotationPolicy;
 use App\Policies\SiteVisitPolicy;
@@ -46,6 +54,10 @@ class AuthServiceProvider extends ServiceProvider
         Quotation::class => QuotationPolicy::class,
         Contract::class => ContractPolicy::class,
         ChangeOrder::class => ChangeOrderPolicy::class,
+        ExpenseCategory::class => ExpenseCategoryPolicy::class,
+        Invoice::class => InvoicePolicy::class,
+        Payment::class => PaymentPolicy::class,
+        Expense::class => ExpensePolicy::class,
     ];
 
     public function register(): void {}

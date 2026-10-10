@@ -148,8 +148,22 @@ class Project extends Model
         return $this->hasMany(ChangeOrder::class);
     }
 
-    // Invoices, Payments, Expenses, Meetings, Inspections, Snags,
-    // Handovers and Warranties relations are added to this model as each
-    // of those modules ships (ARCHITECTURE.md §2) — intentionally not
-    // stubbed here.
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(Expense::class);
+    }
+
+    // Meetings, Inspections, Snags, Handovers and Warranties relations are
+    // added to this model as each of those modules ships
+    // (ARCHITECTURE.md §2) — intentionally not stubbed here.
 }

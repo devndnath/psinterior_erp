@@ -121,8 +121,44 @@
                 </div>
             @endcan
 
+            @can('view_invoices')
+                <div class="card p-6">
+                    <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Invoices</h2>
+                    @if ($invoices->isEmpty())
+                        <p class="text-sm text-gray-500">No invoices raised for this client yet.</p>
+                    @else
+                        <ul class="divide-y divide-gray-100">
+                            @foreach ($invoices as $invoice)
+                                <li class="flex items-center justify-between py-2 text-sm">
+                                    <a href="{{ route('invoices.show', $invoice) }}" wire:navigate class="font-medium text-brand-600 hover:underline">{{ $invoice->invoice_no }}</a>
+                                    <x-status-badge :label="$invoice->status->label()" :color="$invoice->status->color()" />
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            @endcan
+
+            @can('view_payments')
+                <div class="card p-6">
+                    <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Payments</h2>
+                    @if ($payments->isEmpty())
+                        <p class="text-sm text-gray-500">No payments received from this client yet.</p>
+                    @else
+                        <ul class="divide-y divide-gray-100">
+                            @foreach ($payments as $payment)
+                                <li class="flex items-center justify-between py-2 text-sm">
+                                    <a href="{{ route('payments.show', $payment) }}" wire:navigate class="font-medium text-brand-600 hover:underline">{{ $payment->payment_no }}</a>
+                                    <span class="text-gray-500">{{ number_format($payment->amount, 2) }}</span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            @endcan
+
             <div class="card p-6 text-sm text-gray-400">
-                Invoices, payments and meetings will appear here once those modules ship (Phases 6+).
+                Meetings will appear here once that module ships (Phase 7+).
             </div>
         </div>
 
