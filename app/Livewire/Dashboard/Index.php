@@ -6,7 +6,9 @@ use App\Enums\ChangeOrderStatus;
 use App\Enums\DesignStatus;
 use App\Enums\InvoiceStatus;
 use App\Enums\LeadStatus;
+use App\Enums\LeaveApprovalStatus;
 use App\Enums\MaterialRequisitionStatus;
+use App\Enums\PayrollStatus;
 use App\Enums\ProjectStatus;
 use App\Enums\PurchaseOrderStatus;
 use App\Enums\QuotationStatus;
@@ -16,7 +18,9 @@ use App\Models\Design;
 use App\Models\Expense;
 use App\Models\Invoice;
 use App\Models\Lead;
+use App\Models\Leave;
 use App\Models\MaterialRequisition;
+use App\Models\Payroll;
 use App\Models\Product;
 use App\Models\Project;
 use App\Models\PurchaseOrder;
@@ -33,7 +37,8 @@ use Livewire\Component;
  * client decision; Phase 5 adds Quotations awaiting a decision and
  * pending Change Orders (spec §4); Phase 6 adds Outstanding Invoices and
  * This Month's Expenses; Phase 7 adds Low Stock Products and Pending
- * Material Requisitions; Phase 8 adds Pending Purchase Orders. Each card
+ * Material Requisitions; Phase 8 adds Pending Purchase Orders; Phase 9
+ * adds Pending Leave Requests and Payroll Due. Each card
  * gated by the same permission its own module uses so a user without
  * `view_leads` simply doesn't see that card.
  */
@@ -103,6 +108,16 @@ class Index extends Component
                 PurchaseOrderStatus::Sent->value,
                 PurchaseOrderStatus::PartiallyReceived->value,
             ])->count() : null,
+            // Pending at either stage — a leave only drops off this
+            // count once BOTH manager_status and hr_status have moved
+            // past Pending (approved or rejected).
+            'pendingLeaveRequests' => $user->can('view_leaves') ? Leave::where(function ($q) {
+                $q->where('manager_status', LeaveApprovalStatus::Pending->value)
+                    ->orWhere('hr_status', LeaveApprovalStatus::Pending->value);
+            })->count() : null,
+            'payrollDue' => $user->can('view_payroll') ? Payroll::where('month', now()->format('Y-m'))
+                ->whereIn('status', [PayrollStatus::Draft->value, PayrollStatus::Finalized->value])
+                ->count() : null,
         ]);
     }
 }

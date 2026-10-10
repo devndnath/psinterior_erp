@@ -1,5 +1,5 @@
 <div>
-    @if ($totalLeads === null && $totalClients === null && $upcomingSiteVisits === null && $activeProjects === null && $designsAwaitingDecision === null && $quotationsAwaitingDecision === null && $changeOrdersPending === null && $outstandingInvoicesCount === null && $expensesThisMonth === null && $lowStockProducts === null && $pendingRequisitions === null && $pendingPurchaseOrders === null)
+    @if ($totalLeads === null && $totalClients === null && $upcomingSiteVisits === null && $activeProjects === null && $designsAwaitingDecision === null && $quotationsAwaitingDecision === null && $changeOrdersPending === null && $outstandingInvoicesCount === null && $expensesThisMonth === null && $lowStockProducts === null && $pendingRequisitions === null && $pendingPurchaseOrders === null && $pendingLeaveRequests === null && $payrollDue === null)
         <x-empty-state
             title="Welcome to {{ config('app.name') }}"
             description="Your account doesn't have access to any CRM modules yet. Ask an administrator to assign you a role."
@@ -102,10 +102,24 @@
                     <p class="mt-2 text-3xl font-semibold text-gray-900">{{ $pendingPurchaseOrders }}</p>
                 </a>
             @endif
+
+            @if ($pendingLeaveRequests !== null)
+                <a href="{{ route('leaves.index') }}" wire:navigate class="card p-5 transition hover:shadow-md">
+                    <p class="text-sm font-medium text-gray-500">Pending Leave Requests</p>
+                    <p class="mt-2 text-3xl font-semibold text-gray-900">{{ $pendingLeaveRequests }}</p>
+                </a>
+            @endif
+
+            @if ($payrollDue !== null)
+                <a href="{{ route('payroll.index') }}" wire:navigate class="card p-5 transition hover:shadow-md">
+                    <p class="text-sm font-medium text-gray-500">Payroll Due (this month)</p>
+                    <p class="mt-2 text-3xl font-semibold text-gray-900">{{ $payrollDue }}</p>
+                </a>
+            @endif
         </div>
 
         <p class="mt-6 text-sm text-gray-400">
-            Procurement KPIs and charts (Vendors, Purchase Orders, Goods Receives) will appear here as those modules ship in later phases.
+            Meetings, QC/Inspections, Snags, Handover and Warranty KPIs will appear here as those modules ship in later phases.
         </p>
     @endif
 </div>

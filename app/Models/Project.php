@@ -178,6 +178,11 @@ class Project extends Model
         return $this->hasMany(PurchaseOrder::class);
     }
 
+    public function subcontractorAssignments(): HasMany
+    {
+        return $this->hasMany(SubcontractorAssignment::class);
+    }
+
     // Meetings, Inspections, Snags, Handovers and Warranties relations are
     // added to this model as each of those modules ships
     // (ARCHITECTURE.md §2) — intentionally not stubbed here.

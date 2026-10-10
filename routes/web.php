@@ -57,6 +57,17 @@ use App\Livewire\PurchaseRequests\Show as PurchaseRequestShow;
 use App\Livewire\Quotations\Form as QuotationForm;
 use App\Livewire\Quotations\Index as QuotationIndex;
 use App\Livewire\Quotations\Show as QuotationShow;
+use App\Livewire\Attendance\Form as AttendanceForm;
+use App\Livewire\Attendance\Index as AttendanceIndex;
+use App\Livewire\Employees\Form as EmployeeForm;
+use App\Livewire\Employees\Index as EmployeeIndex;
+use App\Livewire\Employees\Show as EmployeeShow;
+use App\Livewire\Leaves\Form as LeaveForm;
+use App\Livewire\Leaves\Index as LeaveIndex;
+use App\Livewire\Leaves\Show as LeaveShow;
+use App\Livewire\Payroll\Form as PayrollForm;
+use App\Livewire\Payroll\Index as PayrollIndex;
+use App\Livewire\Payroll\Show as PayrollShow;
 use App\Livewire\Settings\Index as SettingsIndex;
 use App\Livewire\SiteVisits\Form as SiteVisitForm;
 use App\Livewire\SiteVisits\Index as SiteVisitIndex;
@@ -65,6 +76,11 @@ use App\Livewire\StockMovements\Index as StockMovementIndex;
 use App\Livewire\StockTransfers\Form as StockTransferForm;
 use App\Livewire\StockTransfers\Index as StockTransferIndex;
 use App\Livewire\StockTransfers\Show as StockTransferShow;
+use App\Livewire\SubcontractorAssignments\Form as SubcontractorAssignmentForm;
+use App\Livewire\SubcontractorAssignments\Show as SubcontractorAssignmentShow;
+use App\Livewire\Subcontractors\Form as SubcontractorForm;
+use App\Livewire\Subcontractors\Index as SubcontractorIndex;
+use App\Livewire\Subcontractors\Show as SubcontractorShow;
 use App\Livewire\Units\Form as UnitForm;
 use App\Livewire\Units\Index as UnitIndex;
 use App\Livewire\VendorQuotations\Form as VendorQuotationForm;
@@ -282,4 +298,48 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
     // a GRN is an immutable receiving record once created.
     Route::get('/goods-receives/create', GoodsReceiveForm::class)->name('goods-receives.create')->middleware('can:create_goods_receives');
     Route::get('/goods-receives/{goodsReceive}', GoodsReceiveShow::class)->name('goods-receives.show')->middleware('can:view_goods_receives');
+
+    // Phase 9: Employees, Attendance, Leave, Payroll, Subcontractors
+    // (ARCHITECTURE.md §3.9). `edit_leaves` gates both leave approval
+    // steps (see LeavePolicy); `manage_payroll` (not `edit_payroll`)
+    // gates finalize/markPaid (see PayrollPolicy); subcontractor
+    // assignments/payments reuse the parent `*_subcontractors`
+    // abilities rather than inventing their own module.
+    Route::prefix('employees')->name('employees.')->group(function () {
+        Route::get('/', EmployeeIndex::class)->name('index')->middleware('can:view_employees');
+        Route::get('/create', EmployeeForm::class)->name('create')->middleware('can:create_employees');
+        Route::get('/{employee}/edit', EmployeeForm::class)->name('edit')->middleware('can:edit_employees');
+        Route::get('/{employee}', EmployeeShow::class)->name('show')->middleware('can:view_employees');
+    });
+
+    Route::prefix('attendance')->name('attendance.')->group(function () {
+        Route::get('/', AttendanceIndex::class)->name('index')->middleware('can:view_attendance');
+        Route::get('/create', AttendanceForm::class)->name('create')->middleware('can:create_attendance');
+        Route::get('/{attendance}/edit', AttendanceForm::class)->name('edit')->middleware('can:edit_attendance');
+    });
+
+    Route::prefix('leaves')->name('leaves.')->group(function () {
+        Route::get('/', LeaveIndex::class)->name('index')->middleware('can:view_leaves');
+        Route::get('/create', LeaveForm::class)->name('create')->middleware('can:create_leaves');
+        Route::get('/{leave}', LeaveShow::class)->name('show')->middleware('can:view_leaves');
+    });
+
+    Route::prefix('payroll')->name('payroll.')->group(function () {
+        Route::get('/', PayrollIndex::class)->name('index')->middleware('can:view_payroll');
+        Route::get('/create', PayrollForm::class)->name('create')->middleware('can:create_payroll');
+        Route::get('/{payroll}/edit', PayrollForm::class)->name('edit')->middleware('can:edit_payroll');
+        Route::get('/{payroll}', PayrollShow::class)->name('show')->middleware('can:view_payroll');
+    });
+
+    Route::prefix('subcontractors')->name('subcontractors.')->group(function () {
+        Route::get('/', SubcontractorIndex::class)->name('index')->middleware('can:view_subcontractors');
+        Route::get('/create', SubcontractorForm::class)->name('create')->middleware('can:create_subcontractors');
+        Route::get('/{subcontractor}/edit', SubcontractorForm::class)->name('edit')->middleware('can:edit_subcontractors');
+        Route::get('/{subcontractor}', SubcontractorShow::class)->name('show')->middleware('can:view_subcontractors');
+    });
+
+    // No index/edit — an assignment is always reached from its
+    // Subcontractor's or Project's Show page.
+    Route::get('/subcontractor-assignments/create', SubcontractorAssignmentForm::class)->name('subcontractor-assignments.create')->middleware('can:create_subcontractors');
+    Route::get('/subcontractor-assignments/{subcontractorAssignment}', SubcontractorAssignmentShow::class)->name('subcontractor-assignments.show')->middleware('can:view_subcontractors');
 });

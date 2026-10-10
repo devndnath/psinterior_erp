@@ -4,18 +4,22 @@ namespace App\Providers;
 
 use App\Auth\ScopedEloquentUserProvider;
 use App\Models\ActivityLog;
+use App\Models\Attendance;
 use App\Models\Boq;
 use App\Models\ChangeOrder;
 use App\Models\Client;
 use App\Models\Contract;
 use App\Models\Design;
+use App\Models\Employee;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\GoodsReceive;
 use App\Models\Invoice;
 use App\Models\Lead;
+use App\Models\Leave;
 use App\Models\MaterialRequisition;
 use App\Models\Payment;
+use App\Models\Payroll;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Project;
@@ -24,23 +28,30 @@ use App\Models\PurchaseRequest;
 use App\Models\Quotation;
 use App\Models\SiteVisit;
 use App\Models\StockTransfer;
+use App\Models\Subcontractor;
+use App\Models\SubcontractorAssignment;
+use App\Models\SubcontractorPayment;
 use App\Models\Unit;
 use App\Models\Vendor;
 use App\Models\VendorQuotation;
 use App\Models\Warehouse;
 use App\Policies\ActivityLogPolicy;
+use App\Policies\AttendancePolicy;
 use App\Policies\BoqPolicy;
 use App\Policies\ChangeOrderPolicy;
 use App\Policies\ClientPolicy;
 use App\Policies\ContractPolicy;
 use App\Policies\DesignPolicy;
+use App\Policies\EmployeePolicy;
 use App\Policies\ExpenseCategoryPolicy;
 use App\Policies\ExpensePolicy;
 use App\Policies\GoodsReceivePolicy;
 use App\Policies\InvoicePolicy;
 use App\Policies\LeadPolicy;
+use App\Policies\LeavePolicy;
 use App\Policies\MaterialRequisitionPolicy;
 use App\Policies\PaymentPolicy;
+use App\Policies\PayrollPolicy;
 use App\Policies\ProductCategoryPolicy;
 use App\Policies\ProductPolicy;
 use App\Policies\ProjectPolicy;
@@ -49,6 +60,9 @@ use App\Policies\PurchaseRequestPolicy;
 use App\Policies\QuotationPolicy;
 use App\Policies\SiteVisitPolicy;
 use App\Policies\StockTransferPolicy;
+use App\Policies\SubcontractorAssignmentPolicy;
+use App\Policies\SubcontractorPaymentPolicy;
+use App\Policies\SubcontractorPolicy;
 use App\Policies\UnitPolicy;
 use App\Policies\VendorPolicy;
 use App\Policies\VendorQuotationPolicy;
@@ -91,6 +105,13 @@ class AuthServiceProvider extends ServiceProvider
         VendorQuotation::class => VendorQuotationPolicy::class,
         PurchaseOrder::class => PurchaseOrderPolicy::class,
         GoodsReceive::class => GoodsReceivePolicy::class,
+        Employee::class => EmployeePolicy::class,
+        Attendance::class => AttendancePolicy::class,
+        Leave::class => LeavePolicy::class,
+        Payroll::class => PayrollPolicy::class,
+        Subcontractor::class => SubcontractorPolicy::class,
+        SubcontractorAssignment::class => SubcontractorAssignmentPolicy::class,
+        SubcontractorPayment::class => SubcontractorPaymentPolicy::class,
     ];
 
     public function register(): void {}

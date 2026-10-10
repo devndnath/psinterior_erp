@@ -39,7 +39,17 @@
         ['label' => 'Vendors', 'route' => 'vendors.index', 'active' => 'vendors.*', 'icon' => 'truck', 'permission' => 'view_vendors'],
         ['label' => 'Purchase Requests', 'route' => 'purchase-requests.index', 'active' => 'purchase-requests.*', 'icon' => 'file-plus', 'permission' => 'view_purchase_orders'],
         ['label' => 'Purchase Orders', 'route' => 'purchase-orders.index', 'active' => 'purchase-orders.*', 'icon' => 'shopping-cart', 'permission' => 'view_purchase_orders'],
-        // Phase 9+: Employees, Attendance, Leave, Payroll, Subcontractors...
+        // Phase 9: Employees, Attendance, Leave, Payroll, Subcontractors
+        // (ARCHITECTURE.md §3.9). Subcontractor Assignments are reached
+        // from a Subcontractor's / Project's Show page, not given their
+        // own top-level entry, same reasoning as Vendor Quotations/
+        // Goods Receives in Phase 8.
+        ['label' => 'Employees', 'route' => 'employees.index', 'active' => 'employees.*', 'icon' => 'users', 'permission' => 'view_employees'],
+        ['label' => 'Attendance', 'route' => 'attendance.index', 'active' => 'attendance.*', 'icon' => 'clock', 'permission' => 'view_attendance'],
+        ['label' => 'Leaves', 'route' => 'leaves.index', 'active' => 'leaves.*', 'icon' => 'calendar-off', 'permission' => 'view_leaves'],
+        ['label' => 'Payroll', 'route' => 'payroll.index', 'active' => 'payroll.*', 'icon' => 'banknote', 'permission' => 'view_payroll'],
+        ['label' => 'Subcontractors', 'route' => 'subcontractors.index', 'active' => 'subcontractors.*', 'icon' => 'hard-hat', 'permission' => 'view_subcontractors'],
+        // Phase 10+: Meetings, QC/Inspections, Snags, Handover, Warranty...
         ['label' => 'Settings', 'route' => 'settings.index', 'icon' => 'settings', 'permission' => 'manage_settings'],
     ];
 @endphp

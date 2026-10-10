@@ -459,8 +459,36 @@
                 </div>
             @endcan
 
+            @can('view_subcontractors')
+                <div class="card p-6">
+                    <div class="mb-4 flex items-center justify-between">
+                        <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500">Subcontractor Assignments</h2>
+                        @can('create', \App\Models\SubcontractorAssignment::class)
+                            <a href="{{ route('subcontractor-assignments.create', ['project' => $project->id]) }}" wire:navigate class="text-sm text-brand-600 hover:underline">+ New Assignment</a>
+                        @endcan
+                    </div>
+                    @if ($subcontractorAssignments->isEmpty())
+                        <p class="text-sm text-gray-500">No subcontractors assigned to this project yet.</p>
+                    @else
+                        <ul class="divide-y divide-gray-100">
+                            @foreach ($subcontractorAssignments as $assignment)
+                                <li class="py-2 text-sm">
+                                    <div class="flex items-center justify-between">
+                                        <a href="{{ route('subcontractor-assignments.show', $assignment) }}" wire:navigate class="font-medium text-brand-600 hover:underline">{{ $assignment->subcontractor?->name }}</a>
+                                        <span class="text-gray-500">{{ number_format($assignment->rate, 2) }}</span>
+                                    </div>
+                                    <div class="mt-1">
+                                        <x-progress-bar :value="$assignment->progress" :show-label="false" />
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            @endcan
+
             <div class="card p-6 text-sm text-gray-400">
-                Meetings, Inspections, Snags and Handover will appear here as those modules ship (Phase 9+).
+                Meetings, Inspections, Snags and Handover will appear here as those modules ship (Phase 10+).
             </div>
         </div>
 

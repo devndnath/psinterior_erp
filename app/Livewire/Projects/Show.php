@@ -203,6 +203,9 @@ class Show extends Component
             'purchaseOrders' => Auth::user()->can('view_purchase_orders')
                 ? $this->project->purchaseOrders()->latest()->get()
                 : collect(),
+            'subcontractorAssignments' => Auth::user()->can('view_subcontractors')
+                ? $this->project->subcontractorAssignments()->with('subcontractor')->latest()->get()
+                : collect(),
             'profitability' => Auth::user()->can('view_finance')
                 ? $profitability->forProject($this->project)
                 : null,
