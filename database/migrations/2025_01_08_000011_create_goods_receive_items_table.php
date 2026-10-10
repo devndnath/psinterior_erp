@@ -25,7 +25,10 @@ return new class extends Migration
             $table->decimal('accepted_qty', 14, 2);
             $table->timestamps();
 
-            $table->index(['goods_receive_id', 'purchase_order_item_id']);
+            // Explicit short name — the auto-generated one
+            // ("goods_receive_items_goods_receive_id_purchase_order_item_id_index",
+            // 69 chars) exceeds MySQL's 64-char identifier limit (error 1059).
+            $table->index(['goods_receive_id', 'purchase_order_item_id'], 'gri_grn_poi_index');
         });
     }
 
