@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureUserType;
+use App\Http\Middleware\SanitizeUtf8Input;
 use App\Http\Middleware\SetPortalGuard;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -30,6 +31,15 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'user_type' => EnsureUserType::class,
+        ]);
+
+        // Runs before anything else touches request input — including
+        // Livewire's own property hydration — so a stray invalid UTF-8
+        // byte sequence never reaches a component property in the first
+        // place (see SanitizeUtf8Input's docblock for the crash this
+        // prevents).
+        $middleware->web(prepend: [
+            SanitizeUtf8Input::class,
         ]);
 
         $middleware->web(append: [
