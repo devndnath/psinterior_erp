@@ -129,6 +129,17 @@ class Index extends Component
             // Gated on view_warranties, not an invented
             // view_service_requests — see ServiceRequestPolicy.
             'openServiceRequests' => $user->can('view_warranties') ? ServiceRequest::where('status', '!=', ServiceRequestStatus::Closed->value)->count() : null,
+            // Phase 15a: lead-status breakdown for the Dashboard's new
+            // Chart.js bar chart. Aggregated via GROUP BY status (status
+            // is in the GROUP BY clause, so this is safe under MySQL's
+            // default ONLY_FULL_GROUP_BY — no raw HAVING on a
+            // non-aggregated column). Same view_leads gate as every
+            // other lead stat above.
+            'leadsByStatus' => $user->can('view_leads') ? Lead::query()
+                ->selectRaw('status, count(*) as total')
+                ->groupBy('status')
+                ->pluck('total', 'status')
+                ->all() : null,
         ]);
     }
 }
