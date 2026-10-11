@@ -1,128 +1,82 @@
 <div>
-    <x-breadcrumbs :items="['Projects' => route('projects.index'), ($project ? 'Edit' : 'New') => null]" class="mb-4" />
-
-    <h1 class="mb-6 text-2xl font-semibold text-gray-900">
-        {{ $project ? "Edit Project {$project->project_code}" : 'New Project' }}
-    </h1>
+    <x-page-header :title='$project ? "Edit Project {$project->project_code}" : "New Project"'>
+        <x-slot:breadcrumbs>
+            <x-breadcrumbs :items="['Projects' => route('projects.index'), ($project ? 'Edit' : 'New') => null]" />
+        </x-slot:breadcrumbs>
+    </x-page-header>
 
     @if ($lead_id)
-        <p class="mb-4 rounded-lg bg-brand-50 px-4 py-2 text-sm text-brand-700">
+        <p class="mb-4 rounded-lg bg-accent-50 px-4 py-2 text-sm text-accent-700">
             This project will be linked back to lead #{{ $lead_id }} once created.
         </p>
     @endif
 
-    <form wire:submit="save" class="card max-w-3xl space-y-6 p-6">
-        <div class="grid grid-cols-2 gap-4">
+    <form wire:submit="save" class="max-w-3xl space-y-6">
+        <div class="panel grid grid-cols-2 gap-4 p-6">
             <div class="col-span-2">
-                <label class="form-label">Name *</label>
-                <input wire:model="name" type="text" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                @error('name') <p class="form-error">{{ $message }}</p> @enderror
+                <x-input label="Name *" name="name" wire:model="name" />
             </div>
-            <div>
-                <label class="form-label">Client *</label>
-                <select wire:model="client_id" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                    <option value="">Select…</option>
-                    @foreach ($clients as $client)
-                        <option value="{{ $client->id }}">{{ $client->name }} ({{ $client->client_no }})</option>
-                    @endforeach
-                </select>
-                @error('client_id') <p class="form-error">{{ $message }}</p> @enderror
-            </div>
-            <div>
-                <label class="form-label">Type</label>
-                <select wire:model="type" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                    <option value="">Select…</option>
-                    @foreach ($types as $value => $label)
-                        <option value="{{ $value }}">{{ $label }}</option>
-                    @endforeach
-                </select>
-            </div>
+            <x-select label="Client *" name="client_id" wire:model="client_id">
+                <option value="">Select…</option>
+                @foreach ($clients as $client)
+                    <option value="{{ $client->id }}">{{ $client->name }} ({{ $client->client_no }})</option>
+                @endforeach
+            </x-select>
+            <x-select label="Type" name="type" wire:model="type">
+                <option value="">Select…</option>
+                @foreach ($types as $value => $label)
+                    <option value="{{ $value }}">{{ $label }}</option>
+                @endforeach
+            </x-select>
             <div class="col-span-2">
-                <label class="form-label">Location</label>
-                <input wire:model="location" type="text" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                <x-input label="Location" name="location" wire:model="location" />
             </div>
-            <div>
-                <label class="form-label">Start date</label>
-                <input wire:model="start_date" type="date" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                @error('start_date') <p class="form-error">{{ $message }}</p> @enderror
-            </div>
-            <div>
-                <label class="form-label">Expected end date</label>
-                <input wire:model="expected_end_date" type="date" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                @error('expected_end_date') <p class="form-error">{{ $message }}</p> @enderror
-            </div>
-            <div>
-                <label class="form-label">Contract value</label>
-                <input wire:model="contract_value" type="number" step="0.01" min="0" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                @error('contract_value') <p class="form-error">{{ $message }}</p> @enderror
-            </div>
-            <div>
-                <label class="form-label">Estimated budget</label>
-                <input wire:model="estimated_budget" type="number" step="0.01" min="0" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                @error('estimated_budget') <p class="form-error">{{ $message }}</p> @enderror
-            </div>
-            <div>
-                <label class="form-label">Project manager</label>
-                <select wire:model="project_manager_id" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                    <option value="">Unassigned</option>
-                    @foreach ($users as $user)
-                        <option value="{{ $user->id }}">{{ $user->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div>
-                <label class="form-label">Designer</label>
-                <select wire:model="designer_id" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                    <option value="">Unassigned</option>
-                    @foreach ($users as $user)
-                        <option value="{{ $user->id }}">{{ $user->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div>
-                <label class="form-label">Site engineer</label>
-                <select wire:model="site_engineer_id" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                    <option value="">Unassigned</option>
-                    @foreach ($users as $user)
-                        <option value="{{ $user->id }}">{{ $user->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div>
-                <label class="form-label">Supervisor</label>
-                <select wire:model="supervisor_id" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                    <option value="">Unassigned</option>
-                    @foreach ($users as $user)
-                        <option value="{{ $user->id }}">{{ $user->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div>
-                <label class="form-label">Priority *</label>
-                <select wire:model="priority" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                    @foreach ($priorities as $value => $label)
-                        <option value="{{ $value }}">{{ $label }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div>
-                <label class="form-label">Status *</label>
-                <select wire:model="status" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                    @foreach ($statuses as $value => $label)
-                        <option value="{{ $value }}">{{ $label }}</option>
-                    @endforeach
-                </select>
-            </div>
+            <x-input label="Start date" name="start_date" type="date" wire:model="start_date" />
+            <x-input label="Expected end date" name="expected_end_date" type="date" wire:model="expected_end_date" />
+            <x-input label="Contract value" name="contract_value" type="number" step="0.01" min="0" wire:model="contract_value" />
+            <x-input label="Estimated budget" name="estimated_budget" type="number" step="0.01" min="0" wire:model="estimated_budget" />
+            <x-select label="Project manager" name="project_manager_id" wire:model="project_manager_id">
+                <option value="">Unassigned</option>
+                @foreach ($users as $user)
+                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                @endforeach
+            </x-select>
+            <x-select label="Designer" name="designer_id" wire:model="designer_id">
+                <option value="">Unassigned</option>
+                @foreach ($users as $user)
+                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                @endforeach
+            </x-select>
+            <x-select label="Site engineer" name="site_engineer_id" wire:model="site_engineer_id">
+                <option value="">Unassigned</option>
+                @foreach ($users as $user)
+                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                @endforeach
+            </x-select>
+            <x-select label="Supervisor" name="supervisor_id" wire:model="supervisor_id">
+                <option value="">Unassigned</option>
+                @foreach ($users as $user)
+                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                @endforeach
+            </x-select>
+            <x-select label="Priority *" name="priority" wire:model="priority">
+                @foreach ($priorities as $value => $label)
+                    <option value="{{ $value }}">{{ $label }}</option>
+                @endforeach
+            </x-select>
+            <x-select label="Status *" name="status" wire:model="status">
+                @foreach ($statuses as $value => $label)
+                    <option value="{{ $value }}">{{ $label }}</option>
+                @endforeach
+            </x-select>
             <div class="col-span-2">
-                <label class="form-label">Description</label>
-                <textarea wire:model="description" rows="3" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm"></textarea>
-                @error('description') <p class="form-error">{{ $message }}</p> @enderror
+                <x-textarea label="Description" name="description" rows="3" wire:model="description" />
             </div>
         </div>
 
-        <div class="flex items-center gap-3 border-t border-gray-100 pt-5">
-            <button type="submit" class="btn-primary">{{ $project ? 'Save changes' : 'Create project' }}</button>
-            <a href="{{ $project ? route('projects.show', $project) : route('projects.index') }}" wire:navigate class="btn-secondary">Cancel</a>
+        <div class="flex items-center gap-3">
+            <x-button type="submit">{{ $project ? 'Save changes' : 'Create project' }}</x-button>
+            <x-button variant="secondary" href="{{ $project ? route('projects.show', $project) : route('projects.index') }}" wire:navigate>Cancel</x-button>
         </div>
     </form>
 </div>
