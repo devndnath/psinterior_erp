@@ -1,103 +1,68 @@
 <div>
-    <x-breadcrumbs :items="['Meetings' => route('meetings.index'), ($meeting ? 'Edit' : 'New') => null]" class="mb-4" />
-
-    <h1 class="mb-6 text-2xl font-semibold text-gray-900">
-        {{ $meeting ? 'Edit Meeting' : 'New Meeting' }}
-    </h1>
+    <x-page-header :title="$meeting ? 'Edit Meeting' : 'New Meeting'">
+        <x-slot:breadcrumbs>
+            <x-breadcrumbs :items="['Meetings' => route('meetings.index'), ($meeting ? 'Edit' : 'New') => null]" />
+        </x-slot:breadcrumbs>
+    </x-page-header>
 
     <form wire:submit="save" class="max-w-4xl space-y-6">
-        <div class="card grid grid-cols-2 gap-4 p-6">
-            <div>
-                <label class="form-label">Project</label>
-                <select wire:model="project_id" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                    <option value="">No project</option>
-                    @foreach ($projects as $proj)
-                        <option value="{{ $proj->id }}">{{ $proj->project_code }} — {{ $proj->name }}</option>
-                    @endforeach
-                </select>
-                @error('project_id') <p class="form-error">{{ $message }}</p> @enderror
-            </div>
-            <div>
-                <label class="form-label">Type *</label>
-                <select wire:model="type" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                    <option value="">Select…</option>
-                    @foreach ($types as $value => $label)
-                        <option value="{{ $value }}">{{ $label }}</option>
-                    @endforeach
-                </select>
-                @error('type') <p class="form-error">{{ $message }}</p> @enderror
-            </div>
-            <div>
-                <label class="form-label">Date *</label>
-                <input wire:model="date" type="date" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                @error('date') <p class="form-error">{{ $message }}</p> @enderror
-            </div>
-            <div>
-                <label class="form-label">Time</label>
-                <input wire:model="time" type="text" placeholder="e.g. 10:00 AM" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                @error('time') <p class="form-error">{{ $message }}</p> @enderror
+        <div class="panel grid grid-cols-2 gap-4 p-6">
+            <x-select label="Project" name="project_id" wire:model="project_id">
+                <option value="">No project</option>
+                @foreach ($projects as $proj)
+                    <option value="{{ $proj->id }}">{{ $proj->project_code }} — {{ $proj->name }}</option>
+                @endforeach
+            </x-select>
+            <x-select label="Type *" name="type" wire:model="type">
+                <option value="">Select…</option>
+                @foreach ($types as $value => $label)
+                    <option value="{{ $value }}">{{ $label }}</option>
+                @endforeach
+            </x-select>
+            <x-input label="Date *" name="date" type="date" wire:model="date" />
+            <x-input label="Time" name="time" placeholder="e.g. 10:00 AM" wire:model="time" />
+            <div class="col-span-2">
+                <x-input label="Location" name="location" wire:model="location" />
             </div>
             <div class="col-span-2">
-                <label class="form-label">Location</label>
-                <input wire:model="location" type="text" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                @error('location') <p class="form-error">{{ $message }}</p> @enderror
+                <x-textarea label="Agenda" name="agenda" rows="2" wire:model="agenda" />
             </div>
             <div class="col-span-2">
-                <label class="form-label">Agenda</label>
-                <textarea wire:model="agenda" rows="2" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm"></textarea>
-                @error('agenda') <p class="form-error">{{ $message }}</p> @enderror
+                <x-textarea label="Discussion" name="discussion" rows="2" wire:model="discussion" />
             </div>
             <div class="col-span-2">
-                <label class="form-label">Discussion</label>
-                <textarea wire:model="discussion" rows="2" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm"></textarea>
-                @error('discussion') <p class="form-error">{{ $message }}</p> @enderror
+                <x-textarea label="Decisions" name="decisions" rows="2" wire:model="decisions" />
             </div>
             <div class="col-span-2">
-                <label class="form-label">Decisions</label>
-                <textarea wire:model="decisions" rows="2" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm"></textarea>
-                @error('decisions') <p class="form-error">{{ $message }}</p> @enderror
-            </div>
-            <div class="col-span-2">
-                <label class="form-label">Follow-up</label>
-                <textarea wire:model="follow_up" rows="2" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm"></textarea>
-                @error('follow_up') <p class="form-error">{{ $message }}</p> @enderror
+                <x-textarea label="Follow-up" name="follow_up" rows="2" wire:model="follow_up" />
             </div>
         </div>
 
-        <div class="card p-6">
-            <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Participants</h2>
+        <div class="panel p-6">
+            <h2 class="mb-4 text-sm font-semibold text-ink-700">Participants</h2>
             <div class="grid grid-cols-3 gap-4">
-                <div>
-                    <label class="form-label">Users</label>
-                    <select wire:model="participant_users" multiple size="6" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                        @foreach ($users as $u)
-                            <option value="{{ $u->id }}">{{ $u->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label class="form-label">Clients</label>
-                    <select wire:model="participant_clients" multiple size="6" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                        @foreach ($clients as $c)
-                            <option value="{{ $c->id }}">{{ $c->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label class="form-label">Vendors</label>
-                    <select wire:model="participant_vendors" multiple size="6" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                        @foreach ($vendors as $v)
-                            <option value="{{ $v->id }}">{{ $v->company_name }}</option>
-                        @endforeach
-                    </select>
-                </div>
+                <x-select label="Users" name="participant_users" wire:model="participant_users" multiple size="6">
+                    @foreach ($users as $u)
+                        <option value="{{ $u->id }}">{{ $u->name }}</option>
+                    @endforeach
+                </x-select>
+                <x-select label="Clients" name="participant_clients" wire:model="participant_clients" multiple size="6">
+                    @foreach ($clients as $c)
+                        <option value="{{ $c->id }}">{{ $c->name }}</option>
+                    @endforeach
+                </x-select>
+                <x-select label="Vendors" name="participant_vendors" wire:model="participant_vendors" multiple size="6">
+                    @foreach ($vendors as $v)
+                        <option value="{{ $v->id }}">{{ $v->company_name }}</option>
+                    @endforeach
+                </x-select>
             </div>
-            <p class="mt-3 text-xs text-gray-400">Hold Ctrl/Cmd to select multiple.</p>
+            <p class="mt-3 text-xs text-ink-400">Hold Ctrl/Cmd to select multiple.</p>
         </div>
 
         <div class="flex items-center gap-3">
-            <button type="submit" class="btn-primary">{{ $meeting ? 'Save changes' : 'Create meeting' }}</button>
-            <a href="{{ $meeting ? route('meetings.show', $meeting) : route('meetings.index') }}" wire:navigate class="btn-secondary">Cancel</a>
+            <x-button type="submit">{{ $meeting ? 'Save changes' : 'Create meeting' }}</x-button>
+            <x-button variant="secondary" href="{{ $meeting ? route('meetings.show', $meeting) : route('meetings.index') }}" wire:navigate>Cancel</x-button>
         </div>
     </form>
 </div>
