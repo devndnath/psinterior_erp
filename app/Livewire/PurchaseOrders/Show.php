@@ -4,7 +4,6 @@ namespace App\Livewire\PurchaseOrders;
 
 use App\Models\PurchaseOrder;
 use App\Services\PurchaseOrderService;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -46,14 +45,17 @@ class Show extends Component
         }
     }
 
+    /**
+     * See App\Http\Controllers\Pdf\InvoicePdfController's docblock — same
+     * fix, same reason: a binary PDF can't safely travel through
+     * Livewire's own JSON response, so this redirects (full browser
+     * navigation, not `navigate: true`) to a plain GET route instead.
+     */
     public function downloadPdf()
     {
         Gate::authorize('view', $this->purchaseOrder);
 
-        $this->purchaseOrder->load(['vendor', 'project', 'warehouse', 'items.product']);
-
-        return Pdf::loadView('pdf.purchase-order', ['purchaseOrder' => $this->purchaseOrder])
-            ->download("{$this->purchaseOrder->po_no}.pdf");
+        return $this->redirect(route('purchase-orders.pdf', $this->purchaseOrder));
     }
 
     public function deletePurchaseOrder(): void

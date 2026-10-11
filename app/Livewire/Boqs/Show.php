@@ -4,7 +4,6 @@ namespace App\Livewire\Boqs;
 
 use App\Models\Boq;
 use App\Services\BoqService;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -61,14 +60,17 @@ class Show extends Component
         $this->redirectRoute('boqs.edit', ['boq' => $newBoq->id], navigate: true);
     }
 
+    /**
+     * See App\Http\Controllers\Pdf\InvoicePdfController's docblock — same
+     * fix, same reason: a binary PDF can't safely travel through
+     * Livewire's own JSON response, so this redirects (full browser
+     * navigation, not `navigate: true`) to a plain GET route instead.
+     */
     public function downloadPdf()
     {
         Gate::authorize('view', $this->boq);
 
-        $this->boq->load(['project.client', 'items']);
-
-        return Pdf::loadView('pdf.boq', ['boq' => $this->boq])
-            ->download("{$this->boq->boq_no}.pdf");
+        return $this->redirect(route('boqs.pdf', $this->boq));
     }
 
     public function deleteBoq(): void

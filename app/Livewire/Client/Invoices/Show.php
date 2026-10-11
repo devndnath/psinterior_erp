@@ -3,7 +3,6 @@
 namespace App\Livewire\Client\Invoices;
 
 use App\Models\Invoice;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -28,12 +27,18 @@ class Show extends Component
         $this->invoice = $invoice;
     }
 
+    /**
+     * See App\Http\Controllers\Pdf\InvoicePdfController's docblock — same
+     * fix, same reason: a binary PDF can't safely travel through
+     * Livewire's own JSON response, so this redirects (full browser
+     * navigation, not `navigate: true`) to a plain GET route instead. The
+     * ownership check that used to live here now lives in
+     * App\Http\Controllers\Client\InvoicePdfController, which this route
+     * reaches.
+     */
     public function downloadPdf()
     {
-        $this->invoice->load(['project', 'client', 'items']);
-
-        return Pdf::loadView('pdf.invoice', ['invoice' => $this->invoice])
-            ->download("{$this->invoice->invoice_no}.pdf");
+        return $this->redirect(route('client.invoices.pdf', $this->invoice));
     }
 
     #[Title('Invoice')]

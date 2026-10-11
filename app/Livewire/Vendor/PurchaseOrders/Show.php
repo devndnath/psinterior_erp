@@ -3,7 +3,6 @@
 namespace App\Livewire\Vendor\PurchaseOrders;
 
 use App\Models\PurchaseOrder;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -29,12 +28,18 @@ class Show extends Component
         $this->purchaseOrder = $purchaseOrder;
     }
 
+    /**
+     * See App\Http\Controllers\Pdf\InvoicePdfController's docblock — same
+     * fix, same reason: a binary PDF can't safely travel through
+     * Livewire's own JSON response, so this redirects (full browser
+     * navigation, not `navigate: true`) to a plain GET route instead. The
+     * ownership check that used to live here now lives in
+     * App\Http\Controllers\Vendor\PurchaseOrderPdfController, which this
+     * route reaches.
+     */
     public function downloadPdf()
     {
-        $this->purchaseOrder->load(['vendor', 'project', 'warehouse', 'items.product']);
-
-        return Pdf::loadView('pdf.purchase-order', ['purchaseOrder' => $this->purchaseOrder])
-            ->download("{$this->purchaseOrder->po_no}.pdf");
+        return $this->redirect(route('vendor.purchase-orders.pdf', $this->purchaseOrder));
     }
 
     #[Title('Purchase Order')]

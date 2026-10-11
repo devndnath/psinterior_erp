@@ -63,6 +63,27 @@ class InvoiceTest extends TestCase
         $this->assertEquals(9600, $invoice->grand_total); // 10000 - 500 + 100
     }
 
+    /**
+     * Regression test: downloadPdf() used to `return Pdf::loadView(...)
+     * ->download(...)` directly from the Livewire action, and the binary
+     * PDF bytes had to round-trip through `/livewire/update`'s own
+     * json_encode() of the component's dehydrated state — which always
+     * failed with "Malformed UTF-8 characters, possibly incorrectly
+     * encoded", since a PDF is binary, not valid UTF-8 text, regardless of
+     * what the invoice's own data contained. The fix redirects to a plain
+     * GET route (App\Http\Controllers\Pdf\InvoicePdfController) instead,
+     * so the actual PDF response never touches Livewire's JSON cycle.
+     */
+    public function test_downloading_an_invoice_redirects_to_the_plain_pdf_route_instead_of_returning_the_pdf_directly(): void
+    {
+        $project = Project::factory()->create();
+        $invoice = Invoice::factory()->for($project)->create();
+
+        Livewire::actingAs($this->staff)->test(InvoiceShow::class, ['invoice' => $invoice])
+            ->call('downloadPdf')
+            ->assertRedirect(route('invoices.pdf', $invoice));
+    }
+
     public function test_a_paid_invoice_cannot_be_deleted(): void
     {
         $project = Project::factory()->create();

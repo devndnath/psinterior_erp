@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\Client\InvoicePdfController;
 use App\Livewire\Auth\ClientLogin;
 use App\Livewire\Client\ChangeOrders\Index as ClientChangeOrderIndex;
 use App\Livewire\Client\ChangeOrders\Show as ClientChangeOrderShow;
@@ -65,6 +66,11 @@ Route::middleware(['auth:client', 'user_type:client'])->group(function () {
     Route::prefix('invoices')->name('invoices.')->group(function () {
         Route::get('/', ClientInvoiceIndex::class)->name('index');
         Route::get('/{invoice}', ClientInvoiceShow::class)->name('show');
+        // Plain GET route, not a Livewire action — see
+        // App\Http\Controllers\Pdf\InvoicePdfController's docblock: a
+        // binary PDF response can't safely round-trip through Livewire's
+        // JSON update cycle. Ownership re-checked inside the controller.
+        Route::get('/{invoice}/pdf', InvoicePdfController::class)->name('pdf');
     });
 
     Route::get('/documents', ClientDocumentIndex::class)->name('documents.index');

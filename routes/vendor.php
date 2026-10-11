@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\Vendor\PurchaseOrderPdfController;
 use App\Livewire\Auth\VendorLogin;
 use App\Livewire\Vendor\Dashboard as VendorDashboard;
 use App\Livewire\Vendor\Ledger\Index as VendorLedgerIndex;
@@ -31,6 +32,11 @@ Route::middleware(['auth:vendor', 'user_type:vendor'])->group(function () {
     Route::prefix('purchase-orders')->name('purchase-orders.')->group(function () {
         Route::get('/', VendorPurchaseOrderIndex::class)->name('index');
         Route::get('/{purchaseOrder}', VendorPurchaseOrderShow::class)->name('show');
+        // Plain GET route, not a Livewire action — see
+        // App\Http\Controllers\Pdf\InvoicePdfController's docblock: a
+        // binary PDF response can't safely round-trip through Livewire's
+        // JSON update cycle. Ownership re-checked inside the controller.
+        Route::get('/{purchaseOrder}/pdf', PurchaseOrderPdfController::class)->name('pdf');
     });
 
     Route::get('/ledger', VendorLedgerIndex::class)->name('ledger.index');

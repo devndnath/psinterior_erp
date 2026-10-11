@@ -4,7 +4,6 @@ namespace App\Livewire\Invoices;
 
 use App\Models\Invoice;
 use App\Services\InvoiceService;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -43,14 +42,21 @@ class Show extends Component
         }
     }
 
+    /**
+     * A full browser redirect (no `navigate: true`) to a plain GET route,
+     * not a direct PDF response — see
+     * App\Http\Controllers\Pdf\InvoicePdfController's docblock: a binary
+     * PDF can't safely travel through Livewire's own `/livewire/update`
+     * JSON response, which is what the old `return Pdf::loadView(...)
+     * ->download(...)` here was actually doing under the hood, and why
+     * the download button threw "Malformed UTF-8 characters, possibly
+     * incorrectly encoded" even after every data-corruption fix.
+     */
     public function downloadPdf()
     {
         Gate::authorize('view', $this->invoice);
 
-        $this->invoice->load(['project', 'client', 'items']);
-
-        return Pdf::loadView('pdf.invoice', ['invoice' => $this->invoice])
-            ->download("{$this->invoice->invoice_no}.pdf");
+        return $this->redirect(route('invoices.pdf', $this->invoice));
     }
 
     public function deleteInvoice(): void

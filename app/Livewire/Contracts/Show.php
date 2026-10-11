@@ -4,7 +4,6 @@ namespace App\Livewire\Contracts;
 
 use App\Models\Contract;
 use App\Services\ContractService;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -31,14 +30,17 @@ class Show extends Component
         $this->dispatch('toast', message: "Contract {$this->contract->contract_no} is now Active — project contract value updated.", type: 'success');
     }
 
+    /**
+     * See App\Http\Controllers\Pdf\InvoicePdfController's docblock — same
+     * fix, same reason: a binary PDF can't safely travel through
+     * Livewire's own JSON response, so this redirects (full browser
+     * navigation, not `navigate: true`) to a plain GET route instead.
+     */
     public function downloadPdf()
     {
         Gate::authorize('view', $this->contract);
 
-        $this->contract->load(['project', 'client', 'items']);
-
-        return Pdf::loadView('pdf.contract', ['contract' => $this->contract])
-            ->download("{$this->contract->contract_no}.pdf");
+        return $this->redirect(route('contracts.pdf', $this->contract));
     }
 
     public function deleteContract(): void

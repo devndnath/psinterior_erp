@@ -1,6 +1,11 @@
 <?php
 
 use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\Pdf\BoqPdfController;
+use App\Http\Controllers\Pdf\ContractPdfController;
+use App\Http\Controllers\Pdf\InvoicePdfController;
+use App\Http\Controllers\Pdf\PurchaseOrderPdfController;
+use App\Http\Controllers\Pdf\QuotationPdfController;
 use App\Livewire\Auth\ForgotPassword;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\ResetPassword;
@@ -186,6 +191,11 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
         Route::get('/create', BoqForm::class)->name('create')->middleware('can:create_boqs');
         Route::get('/{boq}/edit', BoqForm::class)->name('edit')->middleware('can:edit_boqs');
         Route::get('/{boq}', BoqShow::class)->name('show')->middleware('can:view_boqs');
+        // Plain GET route, not a Livewire action — see
+        // App\Http\Controllers\Pdf\BoqPdfController's docblock: a binary
+        // PDF response can't safely round-trip through Livewire's JSON
+        // update cycle.
+        Route::get('/{boq}/pdf', BoqPdfController::class)->name('pdf')->middleware('can:view_boqs');
     });
 
     Route::prefix('quotations')->name('quotations.')->group(function () {
@@ -193,6 +203,7 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
         Route::get('/create', QuotationForm::class)->name('create')->middleware('can:create_quotations');
         Route::get('/{quotation}/edit', QuotationForm::class)->name('edit')->middleware('can:edit_quotations');
         Route::get('/{quotation}', QuotationShow::class)->name('show')->middleware('can:view_quotations');
+        Route::get('/{quotation}/pdf', QuotationPdfController::class)->name('pdf')->middleware('can:view_quotations');
     });
 
     Route::prefix('contracts')->name('contracts.')->group(function () {
@@ -200,6 +211,7 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
         Route::get('/create', ContractForm::class)->name('create')->middleware('can:create_contracts');
         Route::get('/{contract}/edit', ContractForm::class)->name('edit')->middleware('can:edit_contracts');
         Route::get('/{contract}', ContractShow::class)->name('show')->middleware('can:view_contracts');
+        Route::get('/{contract}/pdf', ContractPdfController::class)->name('pdf')->middleware('can:view_contracts');
     });
 
     Route::prefix('change-orders')->name('change-orders.')->group(function () {
@@ -215,6 +227,7 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
         Route::get('/create', InvoiceForm::class)->name('create')->middleware('can:create_invoices');
         Route::get('/{invoice}/edit', InvoiceForm::class)->name('edit')->middleware('can:edit_invoices');
         Route::get('/{invoice}', InvoiceShow::class)->name('show')->middleware('can:view_invoices');
+        Route::get('/{invoice}/pdf', InvoicePdfController::class)->name('pdf')->middleware('can:view_invoices');
     });
 
     Route::prefix('payments')->name('payments.')->group(function () {
@@ -314,6 +327,7 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
         Route::get('/create', PurchaseOrderForm::class)->name('create')->middleware('can:create_purchase_orders');
         Route::get('/{purchaseOrder}/edit', PurchaseOrderForm::class)->name('edit')->middleware('can:edit_purchase_orders');
         Route::get('/{purchaseOrder}', PurchaseOrderShow::class)->name('show')->middleware('can:view_purchase_orders');
+        Route::get('/{purchaseOrder}/pdf', PurchaseOrderPdfController::class)->name('pdf')->middleware('can:view_purchase_orders');
     });
 
     // No Index — always reached from a PO's Show page. No edit/delete —
