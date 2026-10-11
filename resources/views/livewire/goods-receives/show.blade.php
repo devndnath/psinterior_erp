@@ -1,36 +1,37 @@
 <div>
-    <x-breadcrumbs :items="['Purchase Orders' => route('purchase-orders.index'), $goodsReceive->purchaseOrder->po_no => route('purchase-orders.show', $goodsReceive->purchaseOrder), $goodsReceive->grn_no => null]" class="mb-4" />
+    <x-page-header :title="$goodsReceive->grn_no">
+        <x-slot:breadcrumbs>
+            <x-breadcrumbs :items="['Purchase Orders' => route('purchase-orders.index'), $goodsReceive->purchaseOrder->po_no => route('purchase-orders.show', $goodsReceive->purchaseOrder), $goodsReceive->grn_no => null]" />
+        </x-slot:breadcrumbs>
+    </x-page-header>
 
-    <div class="mb-6">
-        <h1 class="text-2xl font-semibold text-gray-900">{{ $goodsReceive->grn_no }}</h1>
-        <p class="mt-1 text-sm text-gray-500">
-            Against <a href="{{ route('purchase-orders.show', $goodsReceive->purchaseOrder) }}" wire:navigate class="text-brand-600 hover:underline">{{ $goodsReceive->purchaseOrder->po_no }}</a>
-            — {{ $goodsReceive->purchaseOrder->vendor?->company_name }}
-        </p>
-    </div>
+    <p class="-mt-4 mb-6 text-sm text-ink-500">
+        Against <a href="{{ route('purchase-orders.show', $goodsReceive->purchaseOrder) }}" wire:navigate class="text-accent-600 hover:underline">{{ $goodsReceive->purchaseOrder->po_no }}</a>
+        — {{ $goodsReceive->purchaseOrder->vendor?->company_name }}
+    </p>
 
     <div class="grid grid-cols-3 gap-6">
         <div class="col-span-2 space-y-6">
-            <div class="card p-6">
-                <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Received Items</h2>
-                <table class="min-w-full divide-y divide-gray-200">
+            <div class="panel p-6">
+                <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Received Items</h2>
+                <table class="table-base">
                     <thead>
                         <tr>
-                            <th class="px-3 py-2 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Product</th>
-                            <th class="px-3 py-2 text-right text-xs font-medium uppercase tracking-wide text-gray-500">Ordered</th>
-                            <th class="px-3 py-2 text-right text-xs font-medium uppercase tracking-wide text-gray-500">Received</th>
-                            <th class="px-3 py-2 text-right text-xs font-medium uppercase tracking-wide text-gray-500">Damaged</th>
-                            <th class="px-3 py-2 text-right text-xs font-medium uppercase tracking-wide text-gray-500">Accepted</th>
+                            <th>Product</th>
+                            <th class="text-right">Ordered</th>
+                            <th class="text-right">Received</th>
+                            <th class="text-right">Damaged</th>
+                            <th class="text-right">Accepted</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100">
+                    <tbody>
                         @foreach ($goodsReceive->items as $item)
                             <tr>
-                                <td class="px-3 py-2 text-sm text-gray-900">{{ $item->purchaseOrderItem?->product?->name }} <span class="text-gray-400">({{ $item->purchaseOrderItem?->product?->sku }})</span></td>
-                                <td class="px-3 py-2 text-right text-sm text-gray-500">{{ number_format($item->ordered_qty, 2) }}</td>
-                                <td class="px-3 py-2 text-right text-sm text-gray-500">{{ number_format($item->received_qty, 2) }}</td>
-                                <td class="px-3 py-2 text-right text-sm text-gray-500">{{ number_format($item->damaged_qty, 2) }}</td>
-                                <td class="px-3 py-2 text-right text-sm font-medium text-gray-900">{{ number_format($item->accepted_qty, 2) }}</td>
+                                <td class="text-ink-900">{{ $item->purchaseOrderItem?->product?->name }} <span class="text-ink-400">({{ $item->purchaseOrderItem?->product?->sku }})</span></td>
+                                <td class="text-right text-ink-500">{{ number_format($item->ordered_qty, 2) }}</td>
+                                <td class="text-right text-ink-500">{{ number_format($item->received_qty, 2) }}</td>
+                                <td class="text-right text-ink-500">{{ number_format($item->damaged_qty, 2) }}</td>
+                                <td class="text-right font-medium text-ink-900">{{ number_format($item->accepted_qty, 2) }}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -38,20 +39,20 @@
             </div>
 
             @if ($goodsReceive->notes)
-                <div class="card p-6">
-                    <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Notes</h2>
-                    <p class="whitespace-pre-line text-sm text-gray-900">{{ $goodsReceive->notes }}</p>
+                <div class="panel p-6">
+                    <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Notes</h2>
+                    <p class="whitespace-pre-line text-sm text-ink-900">{{ $goodsReceive->notes }}</p>
                 </div>
             @endif
         </div>
 
         <div class="space-y-6">
-            <div class="card p-6">
-                <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Receipt Details</h2>
+            <div class="panel p-6">
+                <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Receipt Details</h2>
                 <dl class="space-y-2 text-sm">
-                    <div><dt class="text-gray-500">Received Date</dt><dd class="font-medium text-gray-900">{{ $goodsReceive->received_date?->format('d M, Y') }}</dd></div>
-                    <div><dt class="text-gray-500">Received By</dt><dd class="font-medium text-gray-900">{{ $goodsReceive->receivedBy?->name ?? '—' }}</dd></div>
-                    <div><dt class="text-gray-500">Warehouse</dt><dd class="font-medium text-gray-900">{{ $goodsReceive->purchaseOrder->warehouse?->name }}</dd></div>
+                    <div><dt class="text-ink-500">Received Date</dt><dd class="font-medium text-ink-900">{{ $goodsReceive->received_date?->format('d M, Y') }}</dd></div>
+                    <div><dt class="text-ink-500">Received By</dt><dd class="font-medium text-ink-900">{{ $goodsReceive->receivedBy?->name ?? '—' }}</dd></div>
+                    <div><dt class="text-ink-500">Warehouse</dt><dd class="font-medium text-ink-900">{{ $goodsReceive->purchaseOrder->warehouse?->name }}</dd></div>
                 </dl>
             </div>
         </div>
