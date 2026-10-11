@@ -1,36 +1,36 @@
+@php($leaveTitle = ($leave->employee?->name ?? 'Employee')."'s {$leave->type->label()} Leave")
 <div>
-    <x-breadcrumbs :items="['Leaves' => route('leaves.index'), 'Request #'.$leave->id => null]" class="mb-4" />
+    <x-page-header :title="$leaveTitle">
+        <x-slot:breadcrumbs>
+            <x-breadcrumbs :items="['Leaves' => route('leaves.index'), 'Request #'.$leave->id => null]" />
+        </x-slot:breadcrumbs>
+    </x-page-header>
 
-    <div class="mb-6 flex items-start justify-between">
-        <div>
-            <h1 class="text-2xl font-semibold text-gray-900">{{ $leave->employee?->name }}'s {{ $leave->type->label() }} Leave</h1>
-            <p class="mt-1 text-sm text-gray-500">{{ $leave->from_date->format('d M, Y') }} – {{ $leave->to_date->format('d M, Y') }}</p>
-        </div>
-    </div>
+    <p class="-mt-4 mb-6 text-sm text-ink-500">{{ $leave->from_date->format('d M, Y') }} – {{ $leave->to_date->format('d M, Y') }}</p>
 
     <div class="grid grid-cols-3 gap-6">
         <div class="col-span-2 space-y-6">
-            <div class="card p-6">
-                <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Reason</h2>
-                <p class="whitespace-pre-line text-sm text-gray-900">{{ $leave->reason ?: 'No reason provided.' }}</p>
+            <div class="panel p-6">
+                <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Reason</h2>
+                <p class="whitespace-pre-line text-sm text-ink-900">{{ $leave->reason ?: 'No reason provided.' }}</p>
             </div>
         </div>
 
         <div class="space-y-6">
-            <div class="card p-6">
-                <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Approval Status</h2>
+            <div class="panel p-6">
+                <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Approval Status</h2>
                 <dl class="space-y-3 text-sm">
                     <div class="flex items-center justify-between">
-                        <dt class="text-gray-500">Manager</dt>
+                        <dt class="text-ink-500">Manager</dt>
                         <dd><x-status-badge :label="$leave->manager_status->label()" :color="$leave->manager_status->color()" /></dd>
                     </div>
                     <div class="flex items-center justify-between">
-                        <dt class="text-gray-500">HR</dt>
+                        <dt class="text-ink-500">HR</dt>
                         <dd><x-status-badge :label="$leave->hr_status->label()" :color="$leave->hr_status->color()" /></dd>
                     </div>
                 </dl>
 
-                <div class="mt-6 space-y-3 border-t border-gray-100 pt-4">
+                <div class="mt-6 space-y-3 border-t border-ink-100 pt-4">
                     @can('approveByManager', $leave)
                         @if ($leave->manager_status->value === 'pending')
                             <div class="flex gap-2">
@@ -41,7 +41,7 @@
                                     action="rejectByManager"
                                 >
                                     <x-slot:trigger>
-                                        <button type="button" class="btn-secondary text-red-600">Reject</button>
+                                        <button type="button" class="btn-secondary text-danger-600">Reject</button>
                                     </x-slot:trigger>
                                 </x-confirm-dialog>
                             </div>
@@ -58,7 +58,7 @@
                                     action="rejectByHr"
                                 >
                                     <x-slot:trigger>
-                                        <button type="button" class="btn-secondary text-red-600">Reject</button>
+                                        <button type="button" class="btn-secondary text-danger-600">Reject</button>
                                     </x-slot:trigger>
                                 </x-confirm-dialog>
                             </div>
@@ -66,9 +66,9 @@
                     @endcan
 
                     @if ($leave->isFullyApproved())
-                        <p class="text-sm font-medium text-green-600">Fully approved.</p>
+                        <p class="text-sm font-medium text-success-600">Fully approved.</p>
                     @elseif ($leave->isRejected())
-                        <p class="text-sm font-medium text-red-600">Rejected.</p>
+                        <p class="text-sm font-medium text-danger-600">Rejected.</p>
                     @endif
                 </div>
             </div>

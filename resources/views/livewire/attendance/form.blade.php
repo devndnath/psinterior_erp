@@ -1,51 +1,41 @@
 <div>
-    <x-breadcrumbs :items="['Attendance' => route('attendance.index'), ($attendance ? 'Edit' : 'New') => null]" class="mb-4" />
-
-    <h1 class="mb-6 text-2xl font-semibold text-gray-900">
-        {{ $attendance ? 'Edit Attendance' : 'Record Attendance' }}
-    </h1>
+    <x-page-header :title="$attendance ? 'Edit Attendance' : 'Record Attendance'">
+        <x-slot:breadcrumbs>
+            <x-breadcrumbs :items="['Attendance' => route('attendance.index'), ($attendance ? 'Edit' : 'New') => null]" />
+        </x-slot:breadcrumbs>
+    </x-page-header>
 
     <form wire:submit="save" class="max-w-2xl space-y-6">
-        <div class="card grid grid-cols-2 gap-4 p-6">
+        <div class="panel grid grid-cols-2 gap-4 p-6">
             <div class="col-span-2">
-                <label class="form-label">Employee *</label>
-                <select wire:model="employee_id" @disabled($attendance) class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm disabled:bg-gray-50">
+                <x-select label="Employee *" name="employee_id" wire:model="employee_id" :disabled="(bool) $attendance">
                     <option value="">Select…</option>
                     @foreach ($employees as $emp)
                         <option value="{{ $emp->id }}">{{ $emp->employee_id }} — {{ $emp->name }}</option>
                     @endforeach
-                </select>
-                @error('employee_id') <p class="form-error">{{ $message }}</p> @enderror
+                </x-select>
             </div>
             <div>
-                <label class="form-label">Date *</label>
-                <input wire:model="date" type="date" @disabled($attendance) class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm disabled:bg-gray-50">
-                @error('date') <p class="form-error">{{ $message }}</p> @enderror
+                <x-input label="Date *" name="date" type="date" wire:model="date" :disabled="(bool) $attendance" />
             </div>
             <div>
-                <label class="form-label">Status *</label>
-                <select wire:model="status" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                <x-select label="Status *" name="status" wire:model="status">
                     @foreach ($statuses as $value => $label)
                         <option value="{{ $value }}">{{ $label }}</option>
                     @endforeach
-                </select>
-                @error('status') <p class="form-error">{{ $message }}</p> @enderror
+                </x-select>
             </div>
             <div>
-                <label class="form-label">Check In</label>
-                <input wire:model="check_in" type="time" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                @error('check_in') <p class="form-error">{{ $message }}</p> @enderror
+                <x-input label="Check In" name="check_in" type="time" wire:model="check_in" />
             </div>
             <div>
-                <label class="form-label">Check Out</label>
-                <input wire:model="check_out" type="time" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                @error('check_out') <p class="form-error">{{ $message }}</p> @enderror
+                <x-input label="Check Out" name="check_out" type="time" wire:model="check_out" />
             </div>
         </div>
 
         <div class="flex items-center gap-3">
-            <button type="submit" class="btn-primary">{{ $attendance ? 'Save changes' : 'Record attendance' }}</button>
-            <a href="{{ route('attendance.index') }}" wire:navigate class="btn-secondary">Cancel</a>
+            <x-button type="submit">{{ $attendance ? 'Save changes' : 'Record attendance' }}</x-button>
+            <x-button variant="secondary" href="{{ route('attendance.index') }}" wire:navigate>Cancel</x-button>
         </div>
     </form>
 </div>

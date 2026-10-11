@@ -1,91 +1,69 @@
 <div>
-    <x-breadcrumbs :items="['Employees' => route('employees.index'), ($employee ? 'Edit' : 'New') => null]" class="mb-4" />
-
-    <h1 class="mb-6 text-2xl font-semibold text-gray-900">
-        {{ $employee ? "Edit Employee {$employee->employee_id}" : 'New Employee' }}
-    </h1>
+    <x-page-header :title="$employee ? 'Edit Employee '.$employee->employee_id : 'New Employee'">
+        <x-slot:breadcrumbs>
+            <x-breadcrumbs :items="['Employees' => route('employees.index'), ($employee ? 'Edit' : 'New') => null]" />
+        </x-slot:breadcrumbs>
+    </x-page-header>
 
     <form wire:submit="save" class="max-w-4xl space-y-6">
-        <div class="card grid grid-cols-2 gap-4 p-6">
+        <div class="panel grid grid-cols-2 gap-4 p-6">
             <div class="col-span-2">
-                <label class="form-label">Name *</label>
-                <input wire:model="name" type="text" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                @error('name') <p class="form-error">{{ $message }}</p> @enderror
+                <x-input label="Name *" name="name" wire:model="name" />
             </div>
             <div>
-                <label class="form-label">Phone</label>
-                <input wire:model="phone" type="text" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                @error('phone') <p class="form-error">{{ $message }}</p> @enderror
+                <x-input label="Phone" name="phone" wire:model="phone" />
             </div>
             <div>
-                <label class="form-label">Email</label>
-                <input wire:model="email" type="email" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                @error('email') <p class="form-error">{{ $message }}</p> @enderror
+                <x-input label="Email" name="email" type="email" wire:model="email" />
             </div>
             <div class="col-span-2">
-                <label class="form-label">Address</label>
-                <textarea wire:model="address" rows="2" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm"></textarea>
-                @error('address') <p class="form-error">{{ $message }}</p> @enderror
+                <x-textarea label="Address" name="address" rows="2" wire:model="address" />
             </div>
             <div>
-                <label class="form-label">Department</label>
-                <select wire:model.live="department_id" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                <x-select label="Department" name="department_id" wire:model.live="department_id">
                     <option value="">None</option>
                     @foreach ($departments as $dept)
                         <option value="{{ $dept->id }}">{{ $dept->name }}</option>
                     @endforeach
-                </select>
-                @error('department_id') <p class="form-error">{{ $message }}</p> @enderror
+                </x-select>
             </div>
             <div>
-                <label class="form-label">Designation</label>
-                <select wire:model="designation_id" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                <x-select label="Designation" name="designation_id" wire:model="designation_id">
                     <option value="">None</option>
                     @foreach ($designations as $designation)
                         <option value="{{ $designation->id }}">{{ $designation->name }}</option>
                     @endforeach
-                </select>
-                @error('designation_id') <p class="form-error">{{ $message }}</p> @enderror
-                <p class="mt-1 text-xs text-gray-400">Filtered to the selected department.</p>
+                </x-select>
+                <p class="mt-1 text-xs text-ink-400">Filtered to the selected department.</p>
             </div>
             <div>
-                <label class="form-label">Joining Date *</label>
-                <input wire:model="joining_date" type="date" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                @error('joining_date') <p class="form-error">{{ $message }}</p> @enderror
+                <x-input label="Joining Date *" name="joining_date" type="date" wire:model="joining_date" />
             </div>
             <div>
-                <label class="form-label">Salary *</label>
-                <input wire:model="salary" type="number" step="0.01" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                @error('salary') <p class="form-error">{{ $message }}</p> @enderror
+                <x-input label="Salary *" name="salary" type="number" step="0.01" wire:model="salary" />
             </div>
             <div>
-                <label class="form-label">Employment Type *</label>
-                <select wire:model="employment_type" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                <x-select label="Employment Type *" name="employment_type" wire:model="employment_type">
                     @foreach ($employmentTypes as $value => $label)
                         <option value="{{ $value }}">{{ $label }}</option>
                     @endforeach
-                </select>
-                @error('employment_type') <p class="form-error">{{ $message }}</p> @enderror
+                </x-select>
             </div>
             <div>
-                <label class="form-label">Status *</label>
-                <select wire:model="status" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                <x-select label="Status *" name="status" wire:model="status">
                     @foreach ($statuses as $value => $label)
                         <option value="{{ $value }}">{{ $label }}</option>
                     @endforeach
-                </select>
-                @error('status') <p class="form-error">{{ $message }}</p> @enderror
+                </x-select>
             </div>
             <div>
-                <label class="form-label">Emergency Contact</label>
-                <input wire:model="emergency_contact" type="text" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                @error('emergency_contact') <p class="form-error">{{ $message }}</p> @enderror
+                <x-input label="Emergency Contact" name="emergency_contact" wire:model="emergency_contact" />
             </div>
         </div>
 
         <div class="flex items-center gap-3">
-            <button type="submit" class="btn-primary">{{ $employee ? 'Save changes' : 'Create employee' }}</button>
-            <a href="{{ $employee ? route('employees.show', $employee) : route('employees.index') }}" wire:navigate class="btn-secondary">Cancel</a>
+            <x-button type="submit">{{ $employee ? 'Save changes' : 'Create employee' }}</x-button>
+            <x-button variant="secondary" href="{{ $employee ? route('employees.show', $employee) : route('employees.index') }}" wire:navigate>Cancel</x-button>
         </div>
     </form>
 </div>
