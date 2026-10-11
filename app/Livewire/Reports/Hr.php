@@ -32,7 +32,16 @@ class Hr extends Component
             ->groupBy('employee_id');
 
         return Employee::query()->orderBy('name')->get()->map(function (Employee $employee) use ($counts) {
-            $rows = $counts->get($employee->id, collect())->pluck('total', 'status');
+            // Not a plain ->pluck('total', 'status'): Attendance::query()->get()
+            // hydrates Eloquent models, so the 'status' column is cast to the
+            // AttendanceStatus backed enum (see Attendance::casts()). Using an
+            // enum object directly as an array key throws "Illegal offset type"
+            // (Illuminate\Support\Arr::pluck → Arr.php), since PHP array keys
+            // must be int|string. Unwrap the enum's ->value explicitly instead.
+            $rows = $counts->get($employee->id, collect())
+                ->mapWithKeys(fn ($row) => [
+                    $row->status instanceof \BackedEnum ? $row->status->value : $row->status => $row->total,
+                ]);
 
             return [
                 'employee' => $employee,

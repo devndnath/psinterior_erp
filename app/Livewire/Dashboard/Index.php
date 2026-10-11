@@ -135,10 +135,20 @@ class Index extends Component
             // default ONLY_FULL_GROUP_BY — no raw HAVING on a
             // non-aggregated column). Same view_leads gate as every
             // other lead stat above.
+            //
+            // Not ->pluck('total', 'status'): ->get() hydrates Eloquent
+            // models, so 'status' is cast to the LeadStatus backed enum
+            // (see Lead::casts()). An enum object as an array key throws
+            // "Illegal offset type" (Illuminate\Support\Arr::pluck).
+            // Unwrap ->value explicitly instead — same bug class fixed in
+            // Reports\Hr::attendanceByEmployee() and Reports\SalesFunnel::byStatus().
             'leadsByStatus' => $user->can('view_leads') ? Lead::query()
                 ->selectRaw('status, count(*) as total')
                 ->groupBy('status')
-                ->pluck('total', 'status')
+                ->get()
+                ->mapWithKeys(fn ($row) => [
+                    $row->status instanceof \BackedEnum ? $row->status->value : $row->status => $row->total,
+                ])
                 ->all() : null,
         ]);
     }

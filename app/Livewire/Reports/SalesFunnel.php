@@ -25,7 +25,16 @@ class SalesFunnel extends Component
 
     protected function byStatus(): array
     {
-        $counts = $this->leadsQuery()->selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status');
+        // Not ->pluck('total', 'status'): Lead::query()->get() hydrates
+        // Eloquent models, so 'status' is cast to the LeadStatus backed enum
+        // (see Lead::casts()). An enum object as an array key throws
+        // "Illegal offset type" (Illuminate\Support\Arr::pluck). Unwrap
+        // ->value explicitly instead — same bug class fixed in
+        // Reports\Hr::attendanceByEmployee() and Dashboard\Index::render().
+        $counts = $this->leadsQuery()->selectRaw('status, count(*) as total')->groupBy('status')->get()
+            ->mapWithKeys(fn ($row) => [
+                $row->status instanceof \BackedEnum ? $row->status->value : $row->status => $row->total,
+            ]);
 
         return collect(LeadStatus::cases())->mapWithKeys(fn (LeadStatus $status) => [
             $status->value => ['label' => $status->label(), 'count' => (int) ($counts[$status->value] ?? 0)],
