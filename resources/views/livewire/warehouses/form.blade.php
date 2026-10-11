@@ -1,36 +1,24 @@
 <div>
-    <x-breadcrumbs :items="['Warehouses' => route('warehouses.index'), ($warehouse ? 'Edit' : 'New') => null]" class="mb-4" />
-
-    <h1 class="mb-6 text-2xl font-semibold text-gray-900">
-        {{ $warehouse ? "Edit {$warehouse->name}" : 'New Warehouse' }}
-    </h1>
+    <x-page-header :title='$warehouse ? "Edit {$warehouse->name}" : "New Warehouse"'>
+        <x-slot:breadcrumbs>
+            <x-breadcrumbs :items="['Warehouses' => route('warehouses.index'), ($warehouse ? 'Edit' : 'New') => null]" />
+        </x-slot:breadcrumbs>
+    </x-page-header>
 
     <form wire:submit="save" class="max-w-lg space-y-6">
-        <div class="card grid grid-cols-1 gap-4 p-6">
-            <div>
-                <label class="form-label">Name *</label>
-                <input wire:model="name" type="text" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                @error('name') <p class="form-error">{{ $message }}</p> @enderror
-            </div>
-            <div>
-                <label class="form-label">Type *</label>
-                <select wire:model="type" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                    @foreach ($types as $value => $label)
-                        <option value="{{ $value }}">{{ $label }}</option>
-                    @endforeach
-                </select>
-                @error('type') <p class="form-error">{{ $message }}</p> @enderror
-            </div>
-            <div>
-                <label class="form-label">Location</label>
-                <input wire:model="location" type="text" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                @error('location') <p class="form-error">{{ $message }}</p> @enderror
-            </div>
+        <div class="panel grid grid-cols-1 gap-4 p-6">
+            <x-input label="Name *" name="name" wire:model="name" />
+            <x-select label="Type *" name="type" wire:model="type">
+                @foreach ($types as $value => $label)
+                    <option value="{{ $value }}">{{ $label }}</option>
+                @endforeach
+            </x-select>
+            <x-input label="Location" name="location" wire:model="location" />
         </div>
 
         <div class="flex items-center gap-3">
-            <button type="submit" class="btn-primary">{{ $warehouse ? 'Save changes' : 'Create warehouse' }}</button>
-            <a href="{{ $warehouse ? route('warehouses.show', $warehouse) : route('warehouses.index') }}" wire:navigate class="btn-secondary">Cancel</a>
+            <x-button type="submit">{{ $warehouse ? 'Save changes' : 'Create warehouse' }}</x-button>
+            <x-button variant="secondary" href="{{ $warehouse ? route('warehouses.show', $warehouse) : route('warehouses.index') }}" wire:navigate>Cancel</x-button>
         </div>
     </form>
 </div>

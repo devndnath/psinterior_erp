@@ -1,61 +1,63 @@
 <div>
-    <x-breadcrumbs :items="['Product Categories' => null]" class="mb-4" />
+    <x-page-header title="Product Categories" description="Classify products into categories for filtering and reporting.">
+        <x-slot:breadcrumbs>
+            <x-breadcrumbs :items="['Product Categories' => null]" />
+        </x-slot:breadcrumbs>
+        <x-slot:actions>
+            @can('create', \App\Models\ProductCategory::class)
+                <x-button href="{{ route('product-categories.create') }}" wire:navigate>+ New Category</x-button>
+            @endcan
+        </x-slot:actions>
+    </x-page-header>
 
-    <div class="mb-6 flex items-center justify-between">
-        <h1 class="text-2xl font-semibold text-gray-900">Product Categories</h1>
-        @can('create', \App\Models\ProductCategory::class)
-            <a href="{{ route('product-categories.create') }}" wire:navigate class="btn-primary">+ New Category</a>
-        @endcan
-    </div>
-
-    <div class="card overflow-hidden">
-        @if ($categories->isEmpty())
+    @if ($categories->isEmpty())
+        <div class="panel overflow-hidden">
             <x-empty-state
                 title="No product categories found"
                 description="Create a category to classify products."
             />
-        @else
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Name</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Status</th>
-                        <th class="px-4 py-3"></th>
+        </div>
+    @else
+        <x-table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($categories as $category)
+                    <tr wire:key="category-{{ $category->id }}">
+                        <td class="font-medium text-ink-900">{{ $category->name }}</td>
+                        <td>
+                            <x-status-badge :label="$category->is_active ? 'Active' : 'Inactive'" :color="$category->is_active ? 'green' : 'gray'" />
+                        </td>
+                        <td class="text-right">
+                            @can('update', $category)
+                                <a href="{{ route('product-categories.edit', $category) }}" wire:navigate class="text-ink-500 hover:text-ink-700">Edit</a>
+                            @endcan
+                            @can('delete', $category)
+                                <span class="ml-3 inline-block">
+                                    <x-confirm-dialog
+                                        title="Delete this category?"
+                                        :message='"This will remove {$category->name}. This cannot be undone."'
+                                        action="deleteCategory"
+                                        :params="[$category->id]"
+                                    >
+                                        <x-slot:trigger>
+                                            <button type="button" class="text-danger-600 hover:text-danger-700">Delete</button>
+                                        </x-slot:trigger>
+                                    </x-confirm-dialog>
+                                </span>
+                            @endcan
+                        </td>
                     </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100 bg-white">
-                    @foreach ($categories as $category)
-                        <tr wire:key="category-{{ $category->id }}" class="hover:bg-gray-50">
-                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $category->name }}</td>
-                            <td class="px-4 py-3 text-sm">
-                                <x-status-badge :label="$category->is_active ? 'Active' : 'Inactive'" :color="$category->is_active ? 'green' : 'gray'" />
-                            </td>
-                            <td class="px-4 py-3 text-right text-sm">
-                                @can('update', $category)
-                                    <a href="{{ route('product-categories.edit', $category) }}" wire:navigate class="text-gray-500 hover:text-gray-700">Edit</a>
-                                @endcan
-                                @can('delete', $category)
-                                    <span class="ml-3 inline-block">
-                                        <x-confirm-dialog
-                                            title="Delete this category?"
-                                            :message='"This will remove {$category->name}. This cannot be undone."'
-                                            action="deleteCategory"
-                                            :params="[$category->id]"
-                                        >
-                                            <x-slot:trigger>
-                                                <button type="button" class="text-red-500 hover:text-red-700">Delete</button>
-                                            </x-slot:trigger>
-                                        </x-confirm-dialog>
-                                    </span>
-                                @endcan
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-            <div class="border-t border-gray-100 px-4 py-3">
-                {{ $categories->links() }}
-            </div>
-        @endif
-    </div>
+                @endforeach
+            </tbody>
+        </x-table>
+        <div class="mt-4">
+            {{ $categories->links() }}
+        </div>
+    @endif
 </div>
