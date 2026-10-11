@@ -92,6 +92,7 @@
                         'text-gray-300 hover:bg-gray-800 hover:text-white' => ! request()->routeIs($item['active'] ?? $item['route'].'*'),
                     ])
                 >
+                    <x-icon :name="$item['icon']" class="h-5 w-5 shrink-0" />
                     <span class="truncate">{{ $item['label'] }}</span>
                 </a>
             @endif
