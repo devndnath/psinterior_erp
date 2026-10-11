@@ -1,69 +1,47 @@
 <div>
-    <x-breadcrumbs :items="['Payments' => route('payments.index'), 'Record Payment' => null]" class="mb-4" />
-
-    <h1 class="mb-6 text-2xl font-semibold text-gray-900">Record Payment</h1>
+    <x-page-header title="Record Payment">
+        <x-slot:breadcrumbs>
+            <x-breadcrumbs :items="['Payments' => route('payments.index'), 'Record Payment' => null]" />
+        </x-slot:breadcrumbs>
+    </x-page-header>
 
     <form wire:submit="save" class="max-w-2xl space-y-6">
-        <div class="card grid grid-cols-2 gap-4 p-6">
+        <div class="panel grid grid-cols-2 gap-4 p-6">
             <div class="col-span-2">
-                <label class="form-label">Project *</label>
-                <select wire:model.live="project_id" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                <x-select label="Project *" name="project_id" wire:model.live="project_id">
                     <option value="">Select…</option>
                     @foreach ($projects as $proj)
                         <option value="{{ $proj->id }}">{{ $proj->project_code }} — {{ $proj->name }}</option>
                     @endforeach
-                </select>
-                @error('project_id') <p class="form-error">{{ $message }}</p> @enderror
+                </x-select>
             </div>
             <div class="col-span-2">
-                <label class="form-label">Invoice</label>
-                <select wire:model="invoice_id" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                <x-select label="Invoice" name="invoice_id" wire:model="invoice_id">
                     <option value="">None — general payment</option>
                     @foreach ($invoices as $inv)
                         <option value="{{ $inv->id }}">{{ $inv->invoice_no }} — outstanding {{ number_format($inv->outstandingAmount(), 2) }}</option>
                     @endforeach
-                </select>
-                @error('invoice_id') <p class="form-error">{{ $message }}</p> @enderror
+                </x-select>
             </div>
-            <div>
-                <label class="form-label">Amount *</label>
-                <input wire:model="amount" type="number" step="0.01" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                @error('amount') <p class="form-error">{{ $message }}</p> @enderror
-            </div>
-            <div>
-                <label class="form-label">Date *</label>
-                <input wire:model="date" type="date" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                @error('date') <p class="form-error">{{ $message }}</p> @enderror
-            </div>
-            <div>
-                <label class="form-label">Method *</label>
-                <select wire:model="method" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                    @foreach ($methods as $value => $label)
-                        <option value="{{ $value }}">{{ $label }}</option>
-                    @endforeach
-                </select>
-                @error('method') <p class="form-error">{{ $message }}</p> @enderror
-            </div>
-            <div>
-                <label class="form-label">Reference</label>
-                <input wire:model="reference" type="text" placeholder="Cheque / transaction no." class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                @error('reference') <p class="form-error">{{ $message }}</p> @enderror
+            <x-input label="Amount *" name="amount" type="number" step="0.01" wire:model="amount" />
+            <x-input label="Date *" name="date" type="date" wire:model="date" />
+            <x-select label="Method *" name="method" wire:model="method">
+                @foreach ($methods as $value => $label)
+                    <option value="{{ $value }}">{{ $label }}</option>
+                @endforeach
+            </x-select>
+            <x-input label="Reference" name="reference" type="text" placeholder="Cheque / transaction no." wire:model="reference" />
+            <div class="col-span-2">
+                <x-input label="Account" name="account" type="text" placeholder="Bank / cash account received into" wire:model="account" />
             </div>
             <div class="col-span-2">
-                <label class="form-label">Account</label>
-                <input wire:model="account" type="text" placeholder="Bank / cash account received into" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                @error('account') <p class="form-error">{{ $message }}</p> @enderror
-            </div>
-            <div class="col-span-2">
-                <label class="form-label">Notes</label>
-                <textarea wire:model="notes" rows="2" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm"></textarea>
-                @error('notes') <p class="form-error">{{ $message }}</p> @enderror
+                <x-textarea label="Notes" name="notes" rows="2" wire:model="notes" />
             </div>
         </div>
 
         <div class="flex items-center gap-3">
-            <button type="submit" class="btn-primary">Record payment</button>
-            <a href="{{ route('payments.index') }}" wire:navigate class="btn-secondary">Cancel</a>
+            <x-button type="submit">Record payment</x-button>
+            <x-button variant="secondary" href="{{ route('payments.index') }}" wire:navigate>Cancel</x-button>
         </div>
     </form>
 </div>
