@@ -1,23 +1,13 @@
 <div>
-    <x-breadcrumbs :items="['Purchase Orders' => route('purchase-orders.index'), $purchaseOrder->po_no => null]" class="mb-4" />
-
-    <div class="mb-6 flex items-start justify-between">
-        <div>
-            <div class="flex items-center gap-3">
-                <h1 class="text-2xl font-semibold text-gray-900">{{ $purchaseOrder->po_no }}</h1>
-                <x-status-badge :label="$purchaseOrder->status->label()" :color="$purchaseOrder->status->color()" />
-            </div>
-            <p class="mt-1 text-sm text-gray-500">
-                {{ $purchaseOrder->vendor?->company_name }}
-                @if ($purchaseOrder->project)
-                    &middot; <a href="{{ route('projects.show', $purchaseOrder->project) }}" wire:navigate class="text-brand-600 hover:underline">{{ $purchaseOrder->project->project_code }}</a>
-                @endif
-            </p>
-        </div>
-        <div class="flex items-center gap-3">
-            <button type="button" wire:click="downloadPdf" class="btn-secondary">Download PDF</button>
+    <x-page-header :title="$purchaseOrder->po_no">
+        <x-slot:breadcrumbs>
+            <x-breadcrumbs :items="['Purchase Orders' => route('purchase-orders.index'), $purchaseOrder->po_no => null]" />
+        </x-slot:breadcrumbs>
+        <x-slot:actions>
+            <x-status-badge :label="$purchaseOrder->status->label()" :color="$purchaseOrder->status->color()" />
+            <x-button variant="secondary" wire:click="downloadPdf">Download PDF</x-button>
             @can('update', $purchaseOrder)
-                <a href="{{ route('purchase-orders.edit', $purchaseOrder) }}" wire:navigate class="btn-secondary">Edit</a>
+                <x-button variant="secondary" href="{{ route('purchase-orders.edit', $purchaseOrder) }}" wire:navigate>Edit</x-button>
             @endcan
             @can('send', $purchaseOrder)
                 @if ($purchaseOrder->status->value === 'draft')
@@ -34,7 +24,7 @@
             @endcan
             @if (in_array($purchaseOrder->status->value, ['sent', 'partially_received'], true))
                 @can('create_goods_receives')
-                    <a href="{{ route('goods-receives.create', ['purchase_order' => $purchaseOrder->id]) }}" wire:navigate class="btn-primary">Receive Goods</a>
+                    <x-button href="{{ route('goods-receives.create', ['purchase_order' => $purchaseOrder->id]) }}" wire:navigate>Receive Goods</x-button>
                 @endcan
             @endif
             @can('cancel', $purchaseOrder)
@@ -45,7 +35,7 @@
                         action="cancel"
                     >
                         <x-slot:trigger>
-                            <button type="button" class="btn-secondary text-red-600">Cancel</button>
+                            <button type="button" class="btn-secondary text-danger-600">Cancel</button>
                         </x-slot:trigger>
                     </x-confirm-dialog>
                 @endif
@@ -57,33 +47,40 @@
                     action="deletePurchaseOrder"
                 >
                     <x-slot:trigger>
-                        <button type="button" class="btn-secondary text-red-600">Delete</button>
+                        <button type="button" class="btn-secondary text-danger-600">Delete</button>
                     </x-slot:trigger>
                 </x-confirm-dialog>
             @endcan
-        </div>
-    </div>
+        </x-slot:actions>
+    </x-page-header>
+
+    <p class="-mt-4 mb-6 text-sm text-ink-500">
+        {{ $purchaseOrder->vendor?->company_name }}
+        @if ($purchaseOrder->project)
+            &middot; <a href="{{ route('projects.show', $purchaseOrder->project) }}" wire:navigate class="text-accent-600 hover:underline">{{ $purchaseOrder->project->project_code }}</a>
+        @endif
+    </p>
 
     <div class="grid grid-cols-3 gap-6">
         <div class="col-span-2 space-y-6">
-            <div class="card p-6">
-                <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Line items</h2>
-                <table class="min-w-full divide-y divide-gray-200">
+            <div class="panel p-6">
+                <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Line items</h2>
+                <table class="table-base">
                     <thead>
                         <tr>
-                            <th class="px-3 py-2 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Product</th>
-                            <th class="px-3 py-2 text-right text-xs font-medium uppercase tracking-wide text-gray-500">Qty</th>
-                            <th class="px-3 py-2 text-right text-xs font-medium uppercase tracking-wide text-gray-500">Rate</th>
-                            <th class="px-3 py-2 text-right text-xs font-medium uppercase tracking-wide text-gray-500">Amount</th>
+                            <th>Product</th>
+                            <th class="text-right">Qty</th>
+                            <th class="text-right">Rate</th>
+                            <th class="text-right">Amount</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100">
+                    <tbody>
                         @foreach ($purchaseOrder->items as $item)
                             <tr>
-                                <td class="px-3 py-2 text-sm text-gray-900">{{ $item->product?->name }} <span class="text-gray-400">({{ $item->product?->sku }})</span></td>
-                                <td class="px-3 py-2 text-right text-sm text-gray-500">{{ $item->qty }}</td>
-                                <td class="px-3 py-2 text-right text-sm text-gray-500">{{ number_format($item->rate, 2) }}</td>
-                                <td class="px-3 py-2 text-right text-sm font-medium text-gray-900">{{ number_format($item->amount, 2) }}</td>
+                                <td class="text-ink-900">{{ $item->product?->name }} <span class="text-ink-400">({{ $item->product?->sku }})</span></td>
+                                <td class="text-right">{{ $item->qty }}</td>
+                                <td class="text-right">{{ number_format($item->rate, 2) }}</td>
+                                <td class="text-right font-medium text-ink-900">{{ number_format($item->amount, 2) }}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -91,33 +88,33 @@
             </div>
 
             @if ($purchaseOrder->terms)
-                <div class="card p-6">
-                    <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Terms</h2>
-                    <p class="whitespace-pre-line text-sm text-gray-900">{{ $purchaseOrder->terms }}</p>
+                <div class="panel p-6">
+                    <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Terms</h2>
+                    <p class="whitespace-pre-line text-sm text-ink-900">{{ $purchaseOrder->terms }}</p>
                 </div>
             @endif
 
-            <div class="card p-6">
-                <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Goods Receives</h2>
+            <div class="panel p-6">
+                <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Goods Receives</h2>
                 @if ($purchaseOrder->goodsReceives->isEmpty())
-                    <p class="text-sm text-gray-500">No goods received against this order yet.</p>
+                    <p class="text-sm text-ink-500">No goods received against this order yet.</p>
                 @else
-                    <table class="min-w-full divide-y divide-gray-200">
+                    <table class="table-base">
                         <thead>
                             <tr>
-                                <th class="px-3 py-2 text-left text-xs font-medium uppercase tracking-wide text-gray-500">GRN #</th>
-                                <th class="px-3 py-2 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Received Date</th>
-                                <th class="px-3 py-2 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Received By</th>
+                                <th>GRN #</th>
+                                <th>Received Date</th>
+                                <th>Received By</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100">
+                        <tbody>
                             @foreach ($purchaseOrder->goodsReceives as $grn)
                                 <tr>
-                                    <td class="px-3 py-2 text-sm">
-                                        <a href="{{ route('goods-receives.show', $grn) }}" wire:navigate class="font-medium text-brand-600 hover:underline">{{ $grn->grn_no }}</a>
+                                    <td>
+                                        <a href="{{ route('goods-receives.show', $grn) }}" wire:navigate class="font-medium text-accent-600 hover:underline">{{ $grn->grn_no }}</a>
                                     </td>
-                                    <td class="px-3 py-2 text-sm text-gray-500">{{ $grn->received_date?->format('d M, Y') }}</td>
-                                    <td class="px-3 py-2 text-sm text-gray-500">{{ $grn->receivedBy?->name ?? '—' }}</td>
+                                    <td>{{ $grn->received_date?->format('d M, Y') }}</td>
+                                    <td>{{ $grn->receivedBy?->name ?? '—' }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -127,19 +124,19 @@
         </div>
 
         <div class="space-y-6">
-            <div class="card p-6">
-                <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Totals</h2>
+            <div class="panel p-6">
+                <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Totals</h2>
                 <dl class="space-y-2 text-sm">
-                    <div class="flex justify-between"><dt class="text-gray-500">Subtotal</dt><dd class="font-medium text-gray-900">{{ number_format($purchaseOrder->subtotal, 2) }}</dd></div>
-                    <div class="flex justify-between"><dt class="text-gray-500">Discount</dt><dd class="font-medium text-gray-900">{{ number_format($purchaseOrder->discount, 2) }}</dd></div>
-                    <div class="flex justify-between"><dt class="text-gray-500">Tax</dt><dd class="font-medium text-gray-900">{{ number_format($purchaseOrder->tax, 2) }}</dd></div>
-                    <div class="flex justify-between border-t border-gray-100 pt-2"><dt class="font-medium text-gray-700">Total</dt><dd class="text-lg font-semibold text-gray-900">{{ number_format($purchaseOrder->total, 2) }}</dd></div>
+                    <div class="flex justify-between"><dt class="text-ink-500">Subtotal</dt><dd class="font-medium text-ink-900">{{ number_format($purchaseOrder->subtotal, 2) }}</dd></div>
+                    <div class="flex justify-between"><dt class="text-ink-500">Discount</dt><dd class="font-medium text-ink-900">{{ number_format($purchaseOrder->discount, 2) }}</dd></div>
+                    <div class="flex justify-between"><dt class="text-ink-500">Tax</dt><dd class="font-medium text-ink-900">{{ number_format($purchaseOrder->tax, 2) }}</dd></div>
+                    <div class="flex justify-between border-t border-ink-100 pt-2"><dt class="font-medium text-ink-700">Total</dt><dd class="text-lg font-semibold text-ink-900">{{ number_format($purchaseOrder->total, 2) }}</dd></div>
                 </dl>
-                <dl class="mt-4 space-y-2 border-t border-gray-100 pt-4 text-sm">
-                    <div><dt class="text-gray-500">Receiving Warehouse</dt><dd class="font-medium text-gray-900">{{ $purchaseOrder->warehouse?->name }}</dd></div>
-                    <div><dt class="text-gray-500">Date</dt><dd class="font-medium text-gray-900">{{ $purchaseOrder->date?->format('d M, Y') }}</dd></div>
+                <dl class="mt-4 space-y-2 border-t border-ink-100 pt-4 text-sm">
+                    <div><dt class="text-ink-500">Receiving Warehouse</dt><dd class="font-medium text-ink-900">{{ $purchaseOrder->warehouse?->name }}</dd></div>
+                    <div><dt class="text-ink-500">Date</dt><dd class="font-medium text-ink-900">{{ $purchaseOrder->date?->format('d M, Y') }}</dd></div>
                     @if ($purchaseOrder->expected_delivery)
-                        <div><dt class="text-gray-500">Expected Delivery</dt><dd class="font-medium text-gray-900">{{ $purchaseOrder->expected_delivery->format('d M, Y') }}</dd></div>
+                        <div><dt class="text-ink-500">Expected Delivery</dt><dd class="font-medium text-ink-900">{{ $purchaseOrder->expected_delivery->format('d M, Y') }}</dd></div>
                     @endif
                 </dl>
             </div>
