@@ -6,6 +6,7 @@ use App\Http\Controllers\Pdf\ContractPdfController;
 use App\Http\Controllers\Pdf\InvoicePdfController;
 use App\Http\Controllers\Pdf\PurchaseOrderPdfController;
 use App\Http\Controllers\Pdf\QuotationPdfController;
+use App\Livewire\ActivityLogs\Index as ActivityLogIndex;
 use App\Livewire\Auth\ForgotPassword;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\ResetPassword;
@@ -146,6 +147,14 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
     Route::middleware('can:manage_settings')->group(function () {
         Route::get('/settings', SettingsIndex::class)->name('settings.index');
     });
+
+    // Phase 14: read-only Audit Log viewer over the existing
+    // `activity_logs` table (ActivityLogService/LogsActivity trait have
+    // written to it since early phases with no UI until now). Gated on
+    // `view_reports`, matching ActivityLogPolicy::viewAny — see that
+    // Policy's docblock and App\Livewire\ActivityLogs\Index's docblock
+    // for why this isn't an invented `view_audit_log` permission string.
+    Route::get('/audit-log', ActivityLogIndex::class)->name('audit-log.index')->middleware('can:view_reports');
 
     // Phase 2: CRM — Leads, Clients, Site Visits (ARCHITECTURE.md §6/§7).
     Route::prefix('leads')->name('leads.')->group(function () {

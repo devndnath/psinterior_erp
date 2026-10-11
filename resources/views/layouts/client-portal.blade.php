@@ -28,16 +28,7 @@
                 </div>
                 <span class="text-sm font-semibold text-gray-900">Client Portal</span>
             </div>
-            <nav class="hidden items-center gap-5 text-sm font-medium text-gray-600 sm:flex">
-                <a href="{{ route('client.dashboard') }}" wire:navigate class="hover:text-brand-600">Dashboard</a>
-                <a href="{{ route('client.projects.index') }}" wire:navigate class="hover:text-brand-600">Projects</a>
-                <a href="{{ route('client.designs.index') }}" wire:navigate class="hover:text-brand-600">Designs</a>
-                <a href="{{ route('client.quotations.index') }}" wire:navigate class="hover:text-brand-600">Quotations</a>
-                <a href="{{ route('client.change-orders.index') }}" wire:navigate class="hover:text-brand-600">Change Orders</a>
-                <a href="{{ route('client.invoices.index') }}" wire:navigate class="hover:text-brand-600">Invoices</a>
-                <a href="{{ route('client.documents.index') }}" wire:navigate class="hover:text-brand-600">Documents</a>
-                <a href="{{ route('client.service-requests.index') }}" wire:navigate class="hover:text-brand-600">Service Requests</a>
-            </nav>
+            <x-portal-nav guard="client" class="hidden gap-5 text-sm sm:flex" />
             <div class="flex items-center gap-3">
                 <span class="hidden text-sm text-gray-500 sm:inline">{{ auth('client')->user()->name }}</span>
                 <form method="POST" action="{{ route('client.logout') }}">
@@ -46,16 +37,7 @@
                 </form>
             </div>
         </div>
-        <nav class="flex gap-4 overflow-x-auto border-t border-gray-100 px-4 py-2 text-xs font-medium text-gray-600 sm:hidden">
-            <a href="{{ route('client.dashboard') }}" wire:navigate>Dashboard</a>
-            <a href="{{ route('client.projects.index') }}" wire:navigate>Projects</a>
-            <a href="{{ route('client.designs.index') }}" wire:navigate>Designs</a>
-            <a href="{{ route('client.quotations.index') }}" wire:navigate>Quotations</a>
-            <a href="{{ route('client.change-orders.index') }}" wire:navigate>Change Orders</a>
-            <a href="{{ route('client.invoices.index') }}" wire:navigate>Invoices</a>
-            <a href="{{ route('client.documents.index') }}" wire:navigate>Documents</a>
-            <a href="{{ route('client.service-requests.index') }}" wire:navigate>Service Requests</a>
-        </nav>
+        <x-portal-nav guard="client" class="flex gap-4 border-t border-gray-100 px-4 py-2 text-xs sm:hidden" />
     </header>
 
     <main class="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">

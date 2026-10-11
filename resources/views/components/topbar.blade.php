@@ -5,18 +5,11 @@
 
     <div class="flex-1"></div>
 
-    {{-- Global search (spec §47) lands here once modules exist to search
-         across; left as a visible placeholder so the layout shape is
-         final now rather than re-plumbed later. --}}
+    {{-- Phase 14: real global search across Leads/Clients/Projects/
+         Invoices/Quotations (spec §47), replacing the disabled
+         placeholder input. --}}
     <div class="hidden w-full max-w-xs sm:block">
-        <div class="relative">
-            <input
-                type="search"
-                disabled
-                placeholder="Search coming soon…"
-                class="block w-full rounded-lg border-0 bg-gray-100 py-1.5 pl-3 pr-3 text-sm text-gray-500 placeholder:text-gray-400"
-            >
-        </div>
+        <livewire:global-search />
     </div>
 
     {{-- Phase 11: database-channel notification bell (app/Notifications/*). --}}
