@@ -1,24 +1,22 @@
 <div>
-    <x-breadcrumbs :items="['Service Requests' => route('client.service-requests.index'), 'New' => null]" class="mb-4" />
+    <x-page-header title="New Service Request">
+        <x-slot:breadcrumbs>
+            <x-breadcrumbs :items="['Service Requests' => route('client.service-requests.index'), 'New' => null]" />
+        </x-slot:breadcrumbs>
+    </x-page-header>
 
-    <div class="card max-w-xl p-6">
+    <div class="panel max-w-xl p-6">
         <form wire:submit="save" class="space-y-4">
-            <div>
-                <label class="form-label">Project / Warranty *</label>
-                <select wire:model="warrantyId" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                    <option value="">Select…</option>
-                    @foreach ($warranties as $warranty)
-                        <option value="{{ $warranty->id }}">{{ $warranty->project?->name }} ({{ $warranty->start_date?->format('d M, Y') }} – {{ $warranty->end_date?->format('d M, Y') }})</option>
-                    @endforeach
-                </select>
-                @error('warrantyId') <p class="form-error">{{ $message }}</p> @enderror
-            </div>
-            <div>
-                <label class="form-label">Complaint *</label>
-                <textarea wire:model="complaint" rows="4" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm"></textarea>
-                @error('complaint') <p class="form-error">{{ $message }}</p> @enderror
-            </div>
-            <button type="submit" class="btn-primary">Submit</button>
+            <x-select label="Project / Warranty *" name="warrantyId" wire:model="warrantyId">
+                <option value="">Select…</option>
+                @foreach ($warranties as $warranty)
+                    <option value="{{ $warranty->id }}">{{ $warranty->project?->name }} ({{ $warranty->start_date?->format('d M, Y') }} – {{ $warranty->end_date?->format('d M, Y') }})</option>
+                @endforeach
+            </x-select>
+
+            <x-textarea label="Complaint *" name="complaint" rows="4" wire:model="complaint" />
+
+            <x-button type="submit">Submit</x-button>
         </form>
     </div>
 </div>

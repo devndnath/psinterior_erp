@@ -1,34 +1,36 @@
 <div>
-    <x-breadcrumbs :items="['Change Orders' => route('client.change-orders.index'), $changeOrder->co_no => null]" class="mb-4" />
+    <x-page-header :title="$changeOrder->co_no">
+        <x-slot:breadcrumbs>
+            <x-breadcrumbs :items="['Change Orders' => route('client.change-orders.index'), $changeOrder->co_no => null]" />
+        </x-slot:breadcrumbs>
+        <x-slot:actions>
+            <x-status-badge :label="$changeOrder->status->label()" :color="$changeOrder->status->color()" />
+        </x-slot:actions>
+    </x-page-header>
 
-    <div class="mb-6 flex items-center gap-3">
-        <h1 class="text-2xl font-semibold text-gray-900">{{ $changeOrder->co_no }}</h1>
-        <x-status-badge :label="$changeOrder->status->label()" :color="$changeOrder->status->color()" />
-    </div>
-
-    <div class="card p-6">
-        <p class="text-sm text-gray-500">{{ $changeOrder->description }}</p>
-        <p class="mt-4 text-2xl font-semibold text-gray-900">{{ number_format($changeOrder->cost, 2) }}</p>
+    <div class="panel p-6">
+        <p class="text-sm text-ink-500">{{ $changeOrder->description }}</p>
+        <p class="mt-4 text-2xl font-semibold text-ink-900">{{ number_format($changeOrder->cost, 2) }}</p>
     </div>
 
     @if ($changeOrder->items->isNotEmpty())
-        <div class="mt-6 card overflow-hidden">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+        <div class="mt-6 panel overflow-hidden">
+            <table class="table-base">
+                <thead>
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Description</th>
-                        <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-gray-500">Qty</th>
-                        <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-gray-500">Rate</th>
-                        <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-gray-500">Amount</th>
+                        <th>Description</th>
+                        <th class="text-right">Qty</th>
+                        <th class="text-right">Rate</th>
+                        <th class="text-right">Amount</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100 bg-white">
+                <tbody>
                     @foreach ($changeOrder->items as $item)
                         <tr>
-                            <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $item->description }}</td>
-                            <td class="px-4 py-3 text-right text-sm text-gray-500">{{ $item->qty }}</td>
-                            <td class="px-4 py-3 text-right text-sm text-gray-500">{{ number_format($item->rate, 2) }}</td>
-                            <td class="px-4 py-3 text-right text-sm font-medium text-gray-900">{{ number_format($item->amount, 2) }}</td>
+                            <td class="font-medium text-ink-900">{{ $item->description }}</td>
+                            <td class="text-right">{{ $item->qty }}</td>
+                            <td class="text-right">{{ number_format($item->rate, 2) }}</td>
+                            <td class="text-right font-medium text-ink-900">{{ number_format($item->amount, 2) }}</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -37,20 +39,16 @@
     @endif
 
     @if ($changeOrder->status->value === 'pending')
-        <div class="mt-6 card p-6">
-            <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Your Decision</h2>
+        <div class="mt-6 panel p-6">
+            <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Your Decision</h2>
             <form wire:submit="recordDecision" class="space-y-3">
-                <div>
-                    <label class="form-label">Decision *</label>
-                    <select wire:model="decision" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
-                        <option value="">Select…</option>
-                        @foreach ($decisionOptions as $value => $label)
-                            <option value="{{ $value }}">{{ $label }}</option>
-                        @endforeach
-                    </select>
-                    @error('decision') <p class="form-error">{{ $message }}</p> @enderror
-                </div>
-                <button type="submit" class="btn-primary">Submit Decision</button>
+                <x-select label="Decision *" name="decision" wire:model="decision">
+                    <option value="">Select…</option>
+                    @foreach ($decisionOptions as $value => $label)
+                        <option value="{{ $value }}">{{ $label }}</option>
+                    @endforeach
+                </x-select>
+                <x-button type="submit">Submit Decision</x-button>
             </form>
         </div>
     @endif

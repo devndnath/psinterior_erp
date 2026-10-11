@@ -1,32 +1,35 @@
 <div>
-    <div class="card overflow-hidden overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+    @if ($projects->isEmpty())
+        <x-empty-state
+            title="No projects yet"
+            description="Your projects will appear here once work begins."
+        />
+    @else
+        <x-table>
+            <thead>
                 <tr>
-                    <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Code</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Name</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Status</th>
-                    <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-gray-500">Progress</th>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th class="text-right">Progress</th>
                     <th></th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100 bg-white">
-                @forelse ($projects as $project)
-                    <tr>
-                        <td class="px-4 py-3 text-sm text-gray-500">{{ $project->project_code }}</td>
-                        <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $project->name }}</td>
-                        <td class="px-4 py-3 text-sm"><x-status-badge :label="$project->status->label()" :color="$project->status->color()" /></td>
-                        <td class="px-4 py-3 text-right text-sm text-gray-500">{{ $project->progress }}%</td>
-                        <td class="px-4 py-3 text-right text-sm">
-                            <a href="{{ route('client.projects.show', $project) }}" wire:navigate class="text-brand-600 hover:underline">View</a>
+            <tbody>
+                @foreach ($projects as $project)
+                    <tr wire:key="project-{{ $project->id }}">
+                        <td class="font-mono">{{ $project->project_code }}</td>
+                        <td class="font-medium text-ink-900">{{ $project->name }}</td>
+                        <td><x-status-badge :label="$project->status->label()" :color="$project->status->color()" /></td>
+                        <td class="text-right">{{ $project->progress }}%</td>
+                        <td class="text-right">
+                            <a href="{{ route('client.projects.show', $project) }}" wire:navigate class="text-accent-600 hover:underline">View</a>
                         </td>
                     </tr>
-                @empty
-                    <tr><td colspan="5" class="px-4 py-6 text-center text-sm text-gray-400">No projects yet.</td></tr>
-                @endforelse
+                @endforeach
             </tbody>
-        </table>
-    </div>
+        </x-table>
 
-    <div class="mt-4">{{ $projects->links() }}</div>
+        <div class="mt-4">{{ $projects->links() }}</div>
+    @endif
 </div>
