@@ -29,7 +29,36 @@ class Setting extends Model
 
     public static function all_cached(): \Illuminate\Support\Collection
     {
-        return Cache::rememberForever('settings.all', fn () => static::query()->get()->keyBy('key'));
+        return Cache::rememberForever('settings.all', fn () => static::query()->get()->keyBy('key'))
+            ->each(fn (self $setting) => static::scrubUtf8($setting));
+    }
+
+    /**
+     * Cache::rememberForever() stores this collection as a serialized
+     * blob and, on every cache hit, restores it with a raw unserialize()
+     * — which never fires Eloquent's `retrieved` event. That makes this
+     * the one path in the app where AppServiceProvider's global
+     * Model::retrieved() scrub (added for the invalid-UTF-8 500 on
+     * Livewire's JSON response) can never run, so a setting cached with
+     * a bad byte before either fix existed would keep crashing forever,
+     * cache entry or not. Scrubbed explicitly here instead, on every
+     * call, so it self-heals regardless of how old the cached blob is.
+     */
+    private static function scrubUtf8(self $setting): void
+    {
+        $attributes = $setting->getAttributes();
+        $fixed = null;
+
+        foreach ($attributes as $key => $value) {
+            if (is_string($value) && $value !== '' && ! mb_check_encoding($value, 'UTF-8')) {
+                $fixed ??= $attributes;
+                $fixed[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+            }
+        }
+
+        if ($fixed !== null) {
+            $setting->setRawAttributes($fixed, true);
+        }
     }
 
     public static function get(string $key, mixed $default = null): mixed
