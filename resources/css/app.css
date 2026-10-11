@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * x-cloak itself does nothing without this rule — Alpine relies on the
+ * page defining it so a cloaked element stays hidden until Alpine
+ * initializes, instead of flashing visible first. Used by the mobile
+ * sidebar backdrop (layouts/admin.blade.php) and, since Phase 14, by
+ * each sidebar group's collapsible body (components/sidebar.blade.php).
+ * Global because every x-cloak usage in this app needs it, not just one.
+ */
+[x-cloak] {
+    display: none !important;
+}
+
 @layer components {
     .btn {
         @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
