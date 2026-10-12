@@ -18,10 +18,10 @@
     .btn {
         @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
     }
-    /* Phase 16: moved off brand-*/gray-*/red-* (the pre-Phase-13 defaults)
-       onto the ink/accent/danger design-system scale, so every button —
-       raw .btn-* usage and the <x-button> component alike, since button
-       .blade.php is just a wrapper around these same three classes —
+    /* Phase 16: moved off the pre-Phase-13 default brand, gray and red
+       tones onto the ink, accent and danger design-system scale, so every
+       button — raw .btn-* usage and the <x-button> component alike, since
+       button.blade.php is just a wrapper around these same three classes —
        matches the panels, badges and tables already migrated in Phase 15
        instead of standing out as the one piece of old-palette chrome left
        on every page. */
