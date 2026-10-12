@@ -1,9 +1,14 @@
 <div>
-    <x-breadcrumbs :items="['Reports' => route('reports.index'), 'Inventory' => null]" class="mb-4" />
-
-    <div class="mb-4 flex justify-end">
-        <x-button variant="secondary" wire:click="exportCsv">Export CSV</x-button>
-    </div>
+    {{-- Phase 16: see reports/hr.blade.php — this report had no heading
+         of its own and relied on layouts.admin's old fallback <h1>. --}}
+    <x-page-header title="Inventory Report">
+        <x-slot:breadcrumbs>
+            <x-breadcrumbs :items="['Reports' => route('reports.index'), 'Inventory' => null]" />
+        </x-slot:breadcrumbs>
+        <x-slot:actions>
+            <x-button variant="secondary" wire:click="exportCsv">Export CSV</x-button>
+        </x-slot:actions>
+    </x-page-header>
 
     <h2 class="mb-2 text-sm font-semibold uppercase tracking-wide text-ink-500">Stock on hand</h2>
     <x-table class="mb-6">

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-gray-50" x-data="{ sidebarOpen: false }">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-paper" x-data="{ sidebarOpen: false }">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -26,12 +26,21 @@
 
             <main class="flex-1 overflow-y-auto">
                 <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                    {{--
+                        Phase 16: removed the old fallback <h1> that used
+                        to render here from $title (the ['title' => ...]
+                        passed into #[Layout('layouts.admin', [...])] by
+                        42 Livewire components). Every one of those pages
+                        now renders its own heading via <x-page-header> —
+                        the Phase 13 component built exactly for this —
+                        so this block was printing the page title a
+                        *second* time, in the old plain gray-900 sans
+                        style, directly above the new serif page-header
+                        title. $title is kept as the <title> tag's source
+                        above; it's just no longer echoed into the body.
+                    --}}
                     @isset($breadcrumbs)
                         <x-breadcrumbs :items="$breadcrumbs" class="mb-4" />
-                    @endisset
-
-                    @isset($title)
-                        <h1 class="mb-6 text-2xl font-semibold text-gray-900">{{ $title }}</h1>
                     @endisset
 
                     {{ $slot }}

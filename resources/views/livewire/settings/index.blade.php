@@ -1,4 +1,11 @@
 <div x-data="{ tab: 'company' }">
+    {{-- Phase 16: see reports/hr.blade.php — Settings had no heading of
+         its own and relied on layouts.admin's old fallback <h1>. The tab
+         strip and form fields below are still the pre-Phase-13 gray/
+         brand styling (this page was never part of the Phase 15 sweep) —
+         left as-is here; a full restyle of this page is its own task. --}}
+    <x-page-header title="Settings" />
+
     <div class="border-b border-gray-200">
         <nav class="-mb-px flex gap-6">
             @foreach (['company' => 'Company', 'finance' => 'Finance & Tax', 'prefixes' => 'Numbering Prefixes', 'email' => 'Email'] as $key => $label)

@@ -131,12 +131,22 @@
     ];
 @endphp
 
+{{--
+    Phase 16: the shell moves off cool bg-gray-900/gray-800 and the old
+    blue brand-600 badge onto the warm ink-900/ink-800 scale and the
+    accent-600 teal — this was the one piece of chrome Phase 13-15 never
+    touched (see UI_UX_AUDIT_AND_REDESIGN_PLAN.md), so it previously sat
+    next to the paper/ink content area looking like a different, older
+    product. Every class below changed only its color token; the $groups
+    data, permission gating, active-route logic and Alpine behavior are
+    byte-for-byte what they were before this phase.
+--}}
 <aside
     :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
-    class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-gray-900 transition-transform duration-200 ease-in-out lg:static lg:translate-x-0"
+    class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-ink-900 transition-transform duration-200 ease-in-out lg:static lg:translate-x-0"
 >
     <div class="flex h-16 shrink-0 items-center gap-2 px-6">
-        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-sm font-bold text-white">
+        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-600 text-sm font-bold text-white">
             {{ substr(config('app.name'), 0, 1) }}
         </div>
         <span class="truncate text-sm font-semibold text-white">{{ config('app.name') }}</span>
@@ -197,7 +207,7 @@
                     <button
                         type="button"
                         @click="toggle()"
-                        class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-wide text-gray-400 hover:text-gray-200"
+                        class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-wide text-ink-400 hover:text-ink-100"
                     >
                         <span>{{ $group['label'] }}</span>
                         <x-icon
@@ -214,8 +224,8 @@
                                 wire:navigate
                                 @class([
                                     'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition',
-                                    'bg-gray-800 text-white' => request()->routeIs($item['active'] ?? $item['route'].'*'),
-                                    'text-gray-300 hover:bg-gray-800 hover:text-white' => ! request()->routeIs($item['active'] ?? $item['route'].'*'),
+                                    'bg-ink-800 text-white' => request()->routeIs($item['active'] ?? $item['route'].'*'),
+                                    'text-ink-300 hover:bg-ink-800 hover:text-white' => ! request()->routeIs($item['active'] ?? $item['route'].'*'),
                                 ])
                             >
                                 <x-icon :name="$item['icon']" class="h-5 w-5 shrink-0" />
@@ -228,19 +238,19 @@
         @endforeach
     </nav>
 
-    <div class="border-t border-gray-800 p-3">
+    <div class="border-t border-ink-800 p-3">
         <div class="flex items-center gap-3 rounded-lg px-3 py-2">
-            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-700 text-xs font-medium text-white">
+            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ink-700 text-xs font-medium text-white">
                 {{ strtoupper(substr(auth()->user()->name ?? '?', 0, 1)) }}
             </div>
             <div class="min-w-0 flex-1">
                 <p class="truncate text-sm font-medium text-white">{{ auth()->user()->name }}</p>
-                <p class="truncate text-xs text-gray-400">{{ auth()->user()->getRoleNames()->first() ?? 'User' }}</p>
+                <p class="truncate text-xs text-ink-400">{{ auth()->user()->getRoleNames()->first() ?? 'User' }}</p>
             </div>
         </div>
         <form method="POST" action="{{ route('logout') }}" class="mt-1">
             @csrf
-            <button type="submit" class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white">
+            <button type="submit" class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-ink-300 hover:bg-ink-800 hover:text-white">
                 Log out
             </button>
         </form>

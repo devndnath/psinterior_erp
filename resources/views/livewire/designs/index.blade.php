@@ -1,12 +1,17 @@
 <div>
-    <x-breadcrumbs :items="['Designs' => null]" class="mb-4" />
-
-    <div class="mb-6 flex items-center justify-between">
-        <h1 class="text-2xl font-semibold text-gray-900">Designs</h1>
-        @can('create', \App\Models\Design::class)
-            <a href="{{ route('designs.create') }}" wire:navigate class="btn-primary">+ New Design</a>
-        @endcan
-    </div>
+    {{-- Phase 16: replaced the hand-rolled <h1> (duplicated by
+         layouts.admin's old fallback heading, now removed) with the
+         same <x-page-header> every other redesigned Index view uses. --}}
+    <x-page-header title="Designs">
+        <x-slot:breadcrumbs>
+            <x-breadcrumbs :items="['Designs' => null]" />
+        </x-slot:breadcrumbs>
+        <x-slot:actions>
+            @can('create', \App\Models\Design::class)
+                <a href="{{ route('designs.create') }}" wire:navigate class="btn-primary">+ New Design</a>
+            @endcan
+        </x-slot:actions>
+    </x-page-header>
 
     <div class="card mb-4 flex flex-wrap items-end gap-4 p-4">
         <div class="min-w-[220px] flex-1">

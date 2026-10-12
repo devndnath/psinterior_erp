@@ -10,12 +10,20 @@
 @props(['label', 'color' => 'gray'])
 
 @php
+    // Phase 16: the color *names* each status enum's color() method
+    // passes in (gray/blue/green/yellow/red/purple/indigo — see e.g.
+    // LeadStatus::color(), InvoiceStatus::color()) are untouched, so no
+    // enum needs editing. Only what each name renders as moved off the
+    // pre-Phase-13 default Tailwind swatches onto the ink/accent/success
+    // /warning/danger design-system scale, matching the panels and tables
+    // around every badge. purple/indigo have no design-system equivalent
+    // (rare, decorative statuses) and stay on Tailwind's defaults.
     $palette = [
-        'gray' => 'bg-gray-100 text-gray-700',
-        'blue' => 'bg-blue-100 text-blue-700',
-        'green' => 'bg-green-100 text-green-700',
-        'yellow' => 'bg-yellow-100 text-yellow-800',
-        'red' => 'bg-red-100 text-red-700',
+        'gray' => 'bg-ink-100 text-ink-700',
+        'blue' => 'bg-accent-100 text-accent-700',
+        'green' => 'bg-success-100 text-success-700',
+        'yellow' => 'bg-warning-100 text-warning-800',
+        'red' => 'bg-danger-100 text-danger-700',
         'purple' => 'bg-purple-100 text-purple-700',
         'indigo' => 'bg-indigo-100 text-indigo-700',
     ];

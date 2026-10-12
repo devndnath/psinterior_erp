@@ -1,5 +1,13 @@
 <div>
-    <x-breadcrumbs :items="['Reports' => route('reports.index'), 'HR' => null]" class="mb-4" />
+    {{-- Phase 16: this report had no heading of its own and relied on
+         layouts.admin's old fallback <h1> (now removed) for its title —
+         giving it the same <x-page-header> every other redesigned page
+         uses, instead of going titleless. --}}
+    <x-page-header title="HR Report">
+        <x-slot:breadcrumbs>
+            <x-breadcrumbs :items="['Reports' => route('reports.index'), 'HR' => null]" />
+        </x-slot:breadcrumbs>
+    </x-page-header>
 
     <div class="panel mb-4 flex flex-wrap items-end justify-between gap-4 p-4">
         <div class="flex flex-wrap items-end gap-4">

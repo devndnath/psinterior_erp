@@ -1,12 +1,17 @@
 <div>
-    <x-breadcrumbs :items="['Expense Categories' => null]" class="mb-4" />
-
-    <div class="mb-6 flex items-center justify-between">
-        <h1 class="text-2xl font-semibold text-gray-900">Expense Categories</h1>
-        @can('create', \App\Models\ExpenseCategory::class)
-            <a href="{{ route('expense-categories.create') }}" wire:navigate class="btn-primary">+ New Category</a>
-        @endcan
-    </div>
+    {{-- Phase 16: see designs/index.blade.php — replaced the hand-rolled
+         <h1> (duplicated by layouts.admin's old fallback heading, now
+         removed) with the standard <x-page-header>. --}}
+    <x-page-header title="Expense Categories">
+        <x-slot:breadcrumbs>
+            <x-breadcrumbs :items="['Expense Categories' => null]" />
+        </x-slot:breadcrumbs>
+        <x-slot:actions>
+            @can('create', \App\Models\ExpenseCategory::class)
+                <a href="{{ route('expense-categories.create') }}" wire:navigate class="btn-primary">+ New Category</a>
+            @endcan
+        </x-slot:actions>
+    </x-page-header>
 
     <div class="card overflow-hidden">
         @if ($categories->isEmpty())

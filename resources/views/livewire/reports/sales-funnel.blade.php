@@ -1,5 +1,11 @@
 <div>
-    <x-breadcrumbs :items="['Reports' => route('reports.index'), 'Sales Funnel' => null]" class="mb-4" />
+    {{-- Phase 16: see reports/hr.blade.php — this report had no heading
+         of its own and relied on layouts.admin's old fallback <h1>. --}}
+    <x-page-header title="Sales Funnel Report">
+        <x-slot:breadcrumbs>
+            <x-breadcrumbs :items="['Reports' => route('reports.index'), 'Sales Funnel' => null]" />
+        </x-slot:breadcrumbs>
+    </x-page-header>
 
     <div class="panel mb-4 flex flex-wrap items-end justify-between gap-4 p-4">
         <div class="flex flex-wrap items-end gap-4">
