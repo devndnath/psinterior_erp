@@ -132,12 +132,13 @@
 @endphp
 
 {{--
-    Phase 16: the shell moves off cool bg-gray-900/gray-800 and the old
-    blue brand-600 badge onto the warm ink-900/ink-800 scale and the
-    accent-600 teal — this was the one piece of chrome Phase 13-15 never
-    touched (see UI_UX_AUDIT_AND_REDESIGN_PLAN.md), so it previously sat
-    next to the paper/ink content area looking like a different, older
-    product. Every class below changed only its color token; the $groups
+    Phase 16: the shell moves off the cool bg-gray-900 and bg-gray-800
+    tones and the old blue brand-600 badge onto the warm ink-900 and
+    ink-800 scale plus the accent-600 teal — this was the one piece of
+    chrome Phase 13-15 never touched (see UI_UX_AUDIT_AND_REDESIGN_PLAN
+    .md), so it previously sat next to the paper and ink content area
+    looking like a different, older product. Every class below changed
+    only its color token; the $groups
     data, permission gating, active-route logic and Alpine behavior are
     byte-for-byte what they were before this phase.
 --}}

@@ -1,6 +1,6 @@
 <div class="relative" x-data="{ focused: false }">
-    {{-- Phase 16: moved off gray-*/brand-500 onto ink-*/accent-500 to
-         match the rest of the now-restyled topbar. --}}
+    {{-- Phase 16: moved off the old gray and brand-500 tones onto the
+         ink and accent-500 scale to match the now-restyled topbar. --}}
     <div class="relative">
         <x-icon name="search" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400" />
         <input

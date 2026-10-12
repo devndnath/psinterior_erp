@@ -1,6 +1,7 @@
-{{-- Phase 16: moved off gray-*/brand-600 onto ink-*/accent-600; the
-     unread-count pill stays bg-red-500 (semantic "attention" red, not
-     a brand color) rather than being remapped to the danger-* scale. --}}
+{{-- Phase 16: moved off the old gray and brand-600 tones onto the
+     ink and accent-600 scale; the unread-count pill stays bg-red-500
+     (semantic "attention" red, not a brand color) rather than being
+     remapped to the danger scale. --}}
 <div class="relative" x-data="{ open: false }" @click.outside="open = false">
     <button @click="open = ! open" type="button" class="relative text-ink-400 hover:text-ink-600" aria-label="Notifications">
         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
