@@ -98,6 +98,9 @@ use App\Livewire\Payroll\Form as PayrollForm;
 use App\Livewire\Payroll\Index as PayrollIndex;
 use App\Livewire\Payroll\Show as PayrollShow;
 use App\Livewire\Settings\Index as SettingsIndex;
+use App\Livewire\SiteReports\Form as SiteReportForm;
+use App\Livewire\SiteReports\Index as SiteReportIndex;
+use App\Livewire\SiteReports\Show as SiteReportShow;
 use App\Livewire\SiteVisits\Form as SiteVisitForm;
 use App\Livewire\SiteVisits\Index as SiteVisitIndex;
 use App\Livewire\SiteVisits\Show as SiteVisitShow;
@@ -188,6 +191,14 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
         Route::get('/create', SiteVisitForm::class)->name('create')->middleware('can:create_site_visits');
         Route::get('/{siteVisit}/edit', SiteVisitForm::class)->name('edit')->middleware('can:edit_site_visits');
         Route::get('/{siteVisit}', SiteVisitShow::class)->name('show')->middleware('can:view_site_visits');
+    });
+
+    // Phase 17g: Daily Site Report / Site Diary.
+    Route::prefix('site-reports')->name('site-reports.')->group(function () {
+        Route::get('/', SiteReportIndex::class)->name('index')->middleware('can:view_site_reports');
+        Route::get('/create', SiteReportForm::class)->name('create')->middleware('can:create_site_reports');
+        Route::get('/{siteReport}/edit', SiteReportForm::class)->name('edit')->middleware('can:edit_site_reports');
+        Route::get('/{siteReport}', SiteReportShow::class)->name('show')->middleware('can:view_site_reports');
     });
 
     // Phase 3: Projects, Milestones, Tasks (ARCHITECTURE.md §6.3).

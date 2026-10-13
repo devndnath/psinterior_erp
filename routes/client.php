@@ -20,6 +20,8 @@ use App\Livewire\Client\Selections\Show as ClientSelectionShow;
 use App\Livewire\Client\ServiceRequests\Form as ClientServiceRequestForm;
 use App\Livewire\Client\ServiceRequests\Index as ClientServiceRequestIndex;
 use App\Livewire\Client\ServiceRequests\Show as ClientServiceRequestShow;
+use App\Livewire\Client\SiteReports\Index as ClientSiteReportIndex;
+use App\Livewire\Client\SiteReports\Show as ClientSiteReportShow;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -85,6 +87,12 @@ Route::middleware(['auth:client', 'user_type:client'])->group(function () {
     });
 
     Route::get('/documents', ClientDocumentIndex::class)->name('documents.index');
+
+    // Phase 17g: Daily Site Report / Site Diary — read-only progress feed.
+    Route::prefix('site-reports')->name('site-reports.')->group(function () {
+        Route::get('/', ClientSiteReportIndex::class)->name('index');
+        Route::get('/{siteReport}', ClientSiteReportShow::class)->name('show');
+    });
 
     Route::prefix('service-requests')->name('service-requests.')->group(function () {
         Route::get('/', ClientServiceRequestIndex::class)->name('index');

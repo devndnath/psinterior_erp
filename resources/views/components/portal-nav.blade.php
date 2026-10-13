@@ -24,6 +24,7 @@
             ['label' => 'Quotations', 'route' => 'client.quotations.index'],
             ['label' => 'Change Orders', 'route' => 'client.change-orders.index'],
             ['label' => 'Invoices', 'route' => 'client.invoices.index'],
+            ['label' => 'Site Reports', 'route' => 'client.site-reports.index'],
             ['label' => 'Documents', 'route' => 'client.documents.index'],
             ['label' => 'Service Requests', 'route' => 'client.service-requests.index'],
         ],

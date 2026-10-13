@@ -50,7 +50,7 @@ class RolePermissionSeeder extends Seeder
         'material_requisitions', 'vendors', 'purchase_orders', 'goods_receives',
         'employees', 'attendance', 'leaves', 'payroll', 'subcontractors',
         'meetings', 'inspections', 'snags', 'handovers', 'warranties',
-        'material_selections', 'users', 'roles',
+        'material_selections', 'site_reports', 'users', 'roles',
     ];
 
     /** Stand-alone abilities with no view/create/edit/delete siblings. */
@@ -99,17 +99,17 @@ class RolePermissionSeeder extends Seeder
             'admin' => array_values(array_diff($all, ['view_all_companies'])),
 
             'project-manager' => $this->forModules(['projects', 'milestones', 'tasks', 'boqs', 'change_orders', 'material_selections'], ['view', 'create', 'edit'])
-                + $this->forModules(['designs', 'quotations', 'contracts', 'documents', 'meetings', 'inspections', 'snags', 'handovers', 'material_requisitions'], ['view', 'create'])
+                + $this->forModules(['designs', 'quotations', 'contracts', 'documents', 'meetings', 'inspections', 'snags', 'handovers', 'material_requisitions', 'site_reports'], ['view', 'create'])
                 + $this->named(['view_finance', 'view_reports', 'approve_change_order', 'decide_material_selection']),
 
             'designer' => $this->forModules(['designs', 'material_selections'], ['view', 'create', 'edit'])
                 + $this->forModules(['projects', 'documents'], ['view'])
                 + $this->named(['upload_design']),
 
-            'site-engineer' => $this->forModules(['tasks', 'inspections', 'snags', 'material_requisitions'], ['view', 'create', 'edit'])
+            'site-engineer' => $this->forModules(['tasks', 'inspections', 'snags', 'material_requisitions', 'site_reports'], ['view', 'create', 'edit'])
                 + $this->forModules(['projects', 'milestones', 'documents'], ['view']),
 
-            'site-supervisor' => $this->forModules(['tasks', 'attendance'], ['view', 'create', 'edit'])
+            'site-supervisor' => $this->forModules(['tasks', 'attendance', 'site_reports'], ['view', 'create', 'edit'])
                 + $this->forModules(['projects', 'milestones', 'snags', 'inspections'], ['view']),
 
             'accountant' => $this->forModules(['invoices', 'payments', 'expenses'], ['view', 'create', 'edit'])

@@ -209,4 +209,9 @@ class Project extends Model
     {
         return $this->hasMany(Warranty::class);
     }
+
+    public function siteReports(): HasMany
+    {
+        return $this->hasMany(SiteReport::class)->orderByDesc('report_date');
+    }
 }

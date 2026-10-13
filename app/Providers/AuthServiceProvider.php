@@ -31,6 +31,7 @@ use App\Models\PurchaseRequest;
 use App\Models\Quotation;
 use App\Models\SelectionBoard;
 use App\Models\ServiceRequest;
+use App\Models\SiteReport;
 use App\Models\SiteVisit;
 use App\Models\Snag;
 use App\Models\StockTransfer;
@@ -70,6 +71,7 @@ use App\Policies\PurchaseRequestPolicy;
 use App\Policies\QuotationPolicy;
 use App\Policies\SelectionBoardPolicy;
 use App\Policies\ServiceRequestPolicy;
+use App\Policies\SiteReportPolicy;
 use App\Policies\SiteVisitPolicy;
 use App\Policies\SnagPolicy;
 use App\Policies\StockTransferPolicy;
@@ -98,6 +100,7 @@ class AuthServiceProvider extends ServiceProvider
         Lead::class => LeadPolicy::class,
         Client::class => ClientPolicy::class,
         SiteVisit::class => SiteVisitPolicy::class,
+        SiteReport::class => SiteReportPolicy::class,
         Project::class => ProjectPolicy::class,
         Design::class => DesignPolicy::class,
         Boq::class => BoqPolicy::class,
