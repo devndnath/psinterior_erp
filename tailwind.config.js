@@ -134,6 +134,16 @@ export default {
                 md: '8px',
                 lg: '12px',
             },
+            // UI/UX redesign round 2 — a soft, generous, low-opacity
+            // elevation (reference: the dexignzone ERES admin demo's own
+            // `.card` shadow, extracted via computed-style inspection:
+            // 0 12px 33px 0 rgba(62,73,84,.08)) used in place of Tailwind's
+            // stock `shadow-sm`/`shadow-md` on panels, cards and the
+            // active sidebar item, for a "floating" look with no need for
+            // a visible border.
+            boxShadow: {
+                soft: '0 12px 33px 0 rgba(62, 73, 84, 0.08)',
+            },
         },
     },
     plugins: [require('@tailwindcss/forms')],

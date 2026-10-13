@@ -15,22 +15,21 @@
 }
 
 @layer components {
+    /* UI/UX redesign round 2 (reference: dexignzone ERES admin demo) —
+       fully pill-shaped buttons (the demo's own .btn is a 38px/rounded-full
+       radius) instead of rounded-lg, still with the soft shadow + press
+       feedback from round 1. */
     .btn {
-        @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100;
+        @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100;
     }
-    /* Minimalist redesign pass: every button now carries a soft shadow
-       that firms up on hover (depth without clutter) plus the
-       active:scale press-feedback on .btn above — small, standard
-       micro-interactions that read as "polished" rather than flat. Color
-       tokens themselves are unchanged from Phase 16. */
     .btn-primary {
-        @apply btn bg-accent-600 text-white shadow-sm hover:bg-accent-700 hover:shadow focus:ring-accent-500;
+        @apply btn bg-accent-600 text-white shadow-soft hover:bg-accent-700 focus:ring-accent-500;
     }
     .btn-secondary {
-        @apply btn bg-surface text-ink-700 shadow-sm ring-1 ring-inset ring-ink-200 hover:border-ink-300 hover:bg-ink-50 focus:ring-accent-500;
+        @apply btn bg-surface text-ink-700 shadow-soft ring-1 ring-inset ring-ink-200 hover:border-ink-300 hover:bg-ink-50 focus:ring-accent-500;
     }
     .btn-danger {
-        @apply btn bg-danger-600 text-white shadow-sm hover:bg-danger-700 hover:shadow focus:ring-danger-500;
+        @apply btn bg-danger-600 text-white shadow-soft hover:bg-danger-700 focus:ring-danger-500;
     }
     .form-label {
         @apply block text-sm font-medium text-ink-700 mb-1;
@@ -38,8 +37,12 @@
     .form-error {
         @apply mt-1 text-sm text-danger-600;
     }
+    /* Floating card, no border — separation comes from the soft shadow
+       alone (the reference demo's own card pattern), which reads as more
+       minimal than a ring/border on a surface already lighter than the
+       paper page background. */
     .card {
-        @apply rounded-xl bg-surface shadow-sm ring-1 ring-ink-100;
+        @apply rounded-xl bg-surface shadow-soft;
     }
     .badge {
         @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ring-black/[0.04];
@@ -59,20 +62,19 @@
         @apply font-serif text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl;
     }
 
-    /* Hairline-bordered flat panel — a lighter-weight alternative to the
-       heavier shadow .card, for primary content areas in new components.
-       Minimalist redesign pass: softened the border to ink-100, rounded
-       the corners up to rounded-xl, and added a barely-there shadow plus
-       a hover lift — subtle enough to stay "minimalist" at rest, but
-       gives every panel/card on every page a sense of depth instead of
-       sitting perfectly flat on the paper background. */
+    /* Primary content-area surface — same floating, borderless treatment
+       as .card above (unified in the round-2 redesign): a soft shadow
+       does the separating, not a hairline border, which is what gives
+       every panel/card on every page in this app that same "floating on
+       the page" feel the reference demo has, instead of a flat bordered
+       box. */
     .panel {
-        @apply rounded-xl border border-ink-100 bg-surface shadow-sm transition-shadow duration-150 hover:shadow-md;
+        @apply rounded-xl border-0 bg-surface shadow-soft transition-shadow duration-150 hover:shadow-lg;
     }
 
     /* Shared input chrome for <x-input>/<x-select>/<x-textarea>. */
     .field-input {
-        @apply block w-full rounded-md border-ink-200 bg-surface text-sm text-ink-900 placeholder:text-ink-400 shadow-sm transition-colors focus:border-accent-500 focus:ring-accent-500;
+        @apply block w-full rounded-lg border-ink-200 bg-surface text-sm text-ink-900 placeholder:text-ink-400 shadow-sm transition-colors focus:border-accent-500 focus:ring-accent-500;
     }
 
     /* Table chrome for <x-table>. Airier padding and a quieter header than
