@@ -60,4 +60,9 @@ class Contract extends Model
     {
         return $this->hasMany(Invoice::class);
     }
+
+    public function scheduleLines(): HasMany
+    {
+        return $this->hasMany(PaymentScheduleLine::class)->orderBy('sort_order')->orderBy('due_date');
+    }
 }
