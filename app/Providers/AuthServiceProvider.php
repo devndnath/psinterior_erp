@@ -9,7 +9,9 @@ use App\Models\Boq;
 use App\Models\ChangeOrder;
 use App\Models\Client;
 use App\Models\Contract;
+use App\Models\Department;
 use App\Models\Design;
+use App\Models\Designation;
 use App\Models\Employee;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
@@ -39,6 +41,7 @@ use App\Models\Subcontractor;
 use App\Models\SubcontractorAssignment;
 use App\Models\SubcontractorPayment;
 use App\Models\Unit;
+use App\Models\User;
 use App\Models\Vendor;
 use App\Models\VendorInvoice;
 use App\Models\VendorQuotation;
@@ -50,6 +53,8 @@ use App\Policies\BoqPolicy;
 use App\Policies\ChangeOrderPolicy;
 use App\Policies\ClientPolicy;
 use App\Policies\ContractPolicy;
+use App\Policies\DepartmentPolicy;
+use App\Policies\DesignationPolicy;
 use App\Policies\DesignPolicy;
 use App\Policies\EmployeePolicy;
 use App\Policies\ExpenseCategoryPolicy;
@@ -70,6 +75,7 @@ use App\Policies\ProjectPolicy;
 use App\Policies\PurchaseOrderPolicy;
 use App\Policies\PurchaseRequestPolicy;
 use App\Policies\QuotationPolicy;
+use App\Policies\RolePolicy;
 use App\Policies\SelectionBoardPolicy;
 use App\Policies\ServiceRequestPolicy;
 use App\Policies\SiteReportPolicy;
@@ -80,6 +86,7 @@ use App\Policies\SubcontractorAssignmentPolicy;
 use App\Policies\SubcontractorPaymentPolicy;
 use App\Policies\SubcontractorPolicy;
 use App\Policies\UnitPolicy;
+use App\Policies\UserPolicy;
 use App\Policies\VendorInvoicePolicy;
 use App\Policies\VendorPolicy;
 use App\Policies\VendorQuotationPolicy;
@@ -88,6 +95,7 @@ use App\Policies\WarrantyPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Spatie\Permission\Models\Role;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -139,6 +147,10 @@ class AuthServiceProvider extends ServiceProvider
         Handover::class => HandoverPolicy::class,
         Warranty::class => WarrantyPolicy::class,
         ServiceRequest::class => ServiceRequestPolicy::class,
+        Department::class => DepartmentPolicy::class,
+        Designation::class => DesignationPolicy::class,
+        User::class => UserPolicy::class,
+        Role::class => RolePolicy::class,
     ];
 
     public function register(): void {}

@@ -98,6 +98,8 @@
                 // reached from a Subcontractor's Show page — so no
                 // standalone entry here.
                 ['label' => 'Employees', 'route' => 'employees.index', 'active' => 'employees.*', 'icon' => 'users', 'permission' => 'view_employees'],
+                ['label' => 'Departments', 'route' => 'departments.index', 'active' => 'departments.*', 'icon' => 'building', 'permission' => 'manage_employees'],
+                ['label' => 'Designations', 'route' => 'designations.index', 'active' => 'designations.*', 'icon' => 'id-badge', 'permission' => 'manage_employees'],
                 ['label' => 'Attendance', 'route' => 'attendance.index', 'active' => 'attendance.*', 'icon' => 'clock', 'permission' => 'view_attendance'],
                 ['label' => 'Leaves', 'route' => 'leaves.index', 'active' => 'leaves.*', 'icon' => 'calendar-off', 'permission' => 'view_leaves'],
                 ['label' => 'Payroll', 'route' => 'payroll.index', 'active' => 'payroll.*', 'icon' => 'banknote', 'permission' => 'view_payroll'],
@@ -128,6 +130,14 @@
             'label' => 'System',
             'items' => [
                 ['label' => 'Settings', 'route' => 'settings.index', 'icon' => 'settings', 'permission' => 'manage_settings'],
+                // Closes the "User management" / "Role & permission
+                // management" audit gap — both use the `users`/`roles`
+                // CRUD permissions RolePermissionSeeder has generated
+                // since Phase 1 but no role was granted until now
+                // (only Admin/Super Admin by default — see
+                // UserPolicy/RolePolicy docblocks).
+                ['label' => 'Users', 'route' => 'users.index', 'active' => 'users.*', 'icon' => 'users', 'permission' => 'view_users'],
+                ['label' => 'Roles', 'route' => 'roles.index', 'active' => 'roles.*', 'icon' => 'shield', 'permission' => 'view_roles'],
                 // Phase 14: backend (ActivityLogService + LogsActivity
                 // trait) has existed since early phases with zero UI —
                 // see App\Livewire\ActivityLogs\Index's docblock for the

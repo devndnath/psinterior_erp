@@ -24,6 +24,10 @@ use App\Livewire\Contracts\Form as ContractForm;
 use App\Livewire\Contracts\Index as ContractIndex;
 use App\Livewire\Contracts\Show as ContractShow;
 use App\Livewire\Dashboard\Index as DashboardIndex;
+use App\Livewire\Departments\Form as DepartmentForm;
+use App\Livewire\Departments\Index as DepartmentIndex;
+use App\Livewire\Designations\Form as DesignationForm;
+use App\Livewire\Designations\Index as DesignationIndex;
 use App\Livewire\Designs\Form as DesignForm;
 use App\Livewire\Designs\Index as DesignIndex;
 use App\Livewire\Designs\Show as DesignShow;
@@ -78,6 +82,8 @@ use App\Livewire\PurchaseRequests\Show as PurchaseRequestShow;
 use App\Livewire\Quotations\Form as QuotationForm;
 use App\Livewire\Quotations\Index as QuotationIndex;
 use App\Livewire\Quotations\Show as QuotationShow;
+use App\Livewire\Roles\Form as RoleForm;
+use App\Livewire\Roles\Index as RoleIndex;
 use App\Livewire\ServiceRequests\Form as ServiceRequestForm;
 use App\Livewire\ServiceRequests\Show as ServiceRequestShow;
 use App\Livewire\Snags\Form as SnagForm;
@@ -115,6 +121,8 @@ use App\Livewire\Subcontractors\Index as SubcontractorIndex;
 use App\Livewire\Subcontractors\Show as SubcontractorShow;
 use App\Livewire\Units\Form as UnitForm;
 use App\Livewire\Units\Index as UnitIndex;
+use App\Livewire\Users\Form as UserForm;
+use App\Livewire\Users\Index as UserIndex;
 use App\Livewire\VendorInvoices\Index as VendorInvoiceIndex;
 use App\Livewire\VendorInvoices\Show as VendorInvoiceShow;
 use App\Livewire\VendorQuotations\Form as VendorQuotationForm;
@@ -163,6 +171,25 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
 
     Route::middleware('can:manage_settings')->group(function () {
         Route::get('/settings', SettingsIndex::class)->name('settings.index');
+    });
+
+    // Closes the "User management" / "Role & permission management"
+    // audit gap — previously the only staff login was the one seeded by
+    // database/seeders/SuperAdminSeeder.php, and roles/permissions only
+    // existed as hand-edited PHP in RolePermissionSeeder. Both use
+    // permission sets ($crudModules 'users'/'roles') that have existed
+    // unused since Phase 1 — see UserPolicy/RolePolicy docblocks for why
+    // only Admin/Super Admin can reach these by default.
+    Route::prefix('users')->name('users.')->group(function () {
+        Route::get('/', UserIndex::class)->name('index')->middleware('can:view_users');
+        Route::get('/create', UserForm::class)->name('create')->middleware('can:create_users');
+        Route::get('/{user}/edit', UserForm::class)->name('edit')->middleware('can:edit_users');
+    });
+
+    Route::prefix('roles')->name('roles.')->group(function () {
+        Route::get('/', RoleIndex::class)->name('index')->middleware('can:view_roles');
+        Route::get('/create', RoleForm::class)->name('create')->middleware('can:create_roles');
+        Route::get('/{role}/edit', RoleForm::class)->name('edit')->middleware('can:edit_roles');
     });
 
     // Phase 14: read-only Audit Log viewer over the existing
@@ -400,6 +427,23 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
         Route::get('/create', EmployeeForm::class)->name('create')->middleware('can:create_employees');
         Route::get('/{employee}/edit', EmployeeForm::class)->name('edit')->middleware('can:edit_employees');
         Route::get('/{employee}', EmployeeShow::class)->name('show')->middleware('can:view_employees');
+    });
+
+    // Closes the "Department/Designation management" audit gap — both
+    // models/migrations have existed since Phase 1 (Employee already
+    // references department_id/designation_id) with no screen to
+    // create one, gated on `manage_employees` like the rest of this
+    // group (see DepartmentPolicy/DesignationPolicy docblocks).
+    Route::prefix('departments')->name('departments.')->group(function () {
+        Route::get('/', DepartmentIndex::class)->name('index')->middleware('can:manage_employees');
+        Route::get('/create', DepartmentForm::class)->name('create')->middleware('can:manage_employees');
+        Route::get('/{department}/edit', DepartmentForm::class)->name('edit')->middleware('can:manage_employees');
+    });
+
+    Route::prefix('designations')->name('designations.')->group(function () {
+        Route::get('/', DesignationIndex::class)->name('index')->middleware('can:manage_employees');
+        Route::get('/create', DesignationForm::class)->name('create')->middleware('can:manage_employees');
+        Route::get('/{designation}/edit', DesignationForm::class)->name('edit')->middleware('can:manage_employees');
     });
 
     Route::prefix('attendance')->name('attendance.')->group(function () {
