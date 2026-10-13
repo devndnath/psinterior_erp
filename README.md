@@ -56,7 +56,13 @@ This runs, in order: `CompanySeeder` (one company row — the app is multi-compa
 
 Re-running `db:seed` is safe: every seeder uses `firstOrCreate`/`updateOrCreate`/`syncPermissions`, so it will not duplicate data or wipe permission customizations an Admin made through the UI, beyond re-syncing the *default* role→permission mapping.
 
-`DemoSeeder` (spec §65 — demo leads/clients/projects/products/vendors/quotations/invoices/expenses) does not exist yet; it is added once the modules it needs exist, starting Phase 2.
+`DemoSeeder` (spec §65 — demo leads/clients/projects/products/vendors/quotations/invoices/expenses) is **not** part of the default `db:seed` stack above — it is opt-in, since it creates fictional clients/projects/vendors that a production install shouldn't carry. Run it explicitly on a fresh/staging database once the stack above has already run:
+
+```bash
+php artisan db:seed --class=DemoSeeder
+```
+
+It builds one interlinked sample record through nearly every module — a lead converted to a client, a project taken all the way to handover/warranty, a BOQ→Quotation→Contract→Invoice→Payment chain, a full procurement cycle (PR→vendor quotation→PO→GRN→vendor invoice), inventory with opening stock, HR (attendance/leave/payroll), a subcontractor assignment, a meeting, an inspection with a snag taken to Closed, a selection board, and a daily site report — entirely through the same Service classes the UI calls, so numbering/totals/stock movements are exercised exactly as a human using the app would trigger them. It prints the demo staff/portal logins it creates (staff password is `password`) to the console, and is safe to re-run: it checks for its own marker client first and does nothing if the demo dataset is already present.
 
 ## 6. Storage Linking
 
