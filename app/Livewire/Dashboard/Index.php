@@ -150,6 +150,26 @@ class Index extends Component
                     $row->status instanceof \BackedEnum ? $row->status->value : $row->status => $row->total,
                 ])
                 ->all() : null,
+            // Phase: branding/dashboard redesign — two more breakdown
+            // charts, same safe GROUP BY + BackedEnum-unwrap pattern as
+            // leadsByStatus above, gated on the same permission as each
+            // metric's own existing KPI card.
+            'projectsByStatus' => $user->can('view_projects') ? Project::query()
+                ->selectRaw('status, count(*) as total')
+                ->groupBy('status')
+                ->get()
+                ->mapWithKeys(fn ($row) => [
+                    $row->status instanceof \BackedEnum ? $row->status->value : $row->status => $row->total,
+                ])
+                ->all() : null,
+            'invoicesByStatus' => $user->can('view_invoices') ? Invoice::query()
+                ->selectRaw('status, count(*) as total')
+                ->groupBy('status')
+                ->get()
+                ->mapWithKeys(fn ($row) => [
+                    $row->status instanceof \BackedEnum ? $row->status->value : $row->status => $row->total,
+                ])
+                ->all() : null,
         ]);
     }
 }

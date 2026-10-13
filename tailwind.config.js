@@ -15,23 +15,28 @@ export default {
                 // Kept as-is (do not rename/remove — ~165 existing usages
                 // across 159 views depend on it). New work should prefer
                 // `accent` below; `brand` stays for backward compat only.
+                // Re-pointed to the same gold ramp as `accent` so legacy
+                // `brand-*` usages pick up the PS Solution branding too
+                // (website analysis — see `accent` below for sourcing).
                 brand: {
-                    50: '#eff6ff',
-                    100: '#dbeafe',
-                    200: '#bfdbfe',
-                    300: '#93c5fd',
-                    400: '#60a5fa',
-                    500: '#3b82f6',
-                    600: '#2563eb',
-                    700: '#1d4ed8',
-                    800: '#1e40af',
-                    900: '#1e3a8a',
+                    50: '#FEFBEA',
+                    100: '#FDF3C4',
+                    200: '#FBE587',
+                    300: '#F7D24A',
+                    400: '#F4C01C',
+                    500: '#F4B400',
+                    600: '#D4A000',
+                    700: '#A67D00',
+                    800: '#785C00',
+                    900: '#4D3A00',
                 },
                 // Phase 13 design-system foundation ------------------------
                 // Page/elevated-surface backgrounds (warm off-white, not
-                // Tailwind's cool gray-50/white pairing).
+                // Tailwind's cool gray-50/white pairing). Tightened slightly
+                // (was #FAF8F4) to sit closer to pssolutionbd.com's own
+                // cream background (#FAFAF7, extracted from the live site).
                 paper: {
-                    DEFAULT: '#FAF8F4',
+                    DEFAULT: '#FAFAF7',
                 },
                 surface: {
                     DEFAULT: '#FFFFFF',
@@ -52,47 +57,59 @@ export default {
                     800: '#2F2D27',
                     900: '#20241F',
                 },
-                // New primary brand color going forward: deep architectural
-                // teal-green, anchored on #2B6157 as the 600 "primary
-                // button" shade.
+                // Primary brand color re-themed to match pssolutionbd.com's
+                // actual branding (extracted via computed-style inspection
+                // of the live site, not guessed): a warm gold anchored on
+                // the site's own CTA/nav-highlight gold `#F4B400` (500) and
+                // its darker hover shade `#D4A000` (600). 700–900 are pulled
+                // noticeably darker/browner than the site's own gold so
+                // `text-accent-700/800` keeps enough contrast on white for
+                // buttons, links and badge text — the site itself never
+                // needs gold text on white, the ERP does.
                 accent: {
-                    50: '#EBF4F1',
-                    100: '#D3E7E1',
-                    200: '#A8CFC3',
-                    300: '#7DB7A5',
-                    400: '#529F87',
-                    500: '#3A8370',
-                    600: '#2B6157',
-                    700: '#224E46',
-                    800: '#1A3B36',
-                    900: '#112825',
+                    50: '#FEFBEA',
+                    100: '#FDF3C4',
+                    200: '#FBE587',
+                    300: '#F7D24A',
+                    400: '#F4C01C',
+                    500: '#F4B400',
+                    600: '#D4A000',
+                    700: '#A67D00',
+                    800: '#785C00',
+                    900: '#4D3A00',
                 },
                 // Optional cleaner semantics for new components (existing
                 // red-*/green-*/yellow-* Tailwind defaults remain in use
-                // elsewhere and are untouched).
+                // elsewhere and are untouched). Retuned to Tailwind's
+                // standard emerald scale, anchored on `#059669` (600) to
+                // match the emerald "success/positive" accent used on
+                // pssolutionbd.com's own site.
                 success: {
-                    50: '#EFF8EF',
-                    100: '#D9EDD9',
-                    200: '#AEDAAF',
-                    300: '#83C684',
-                    400: '#57B259',
-                    500: '#2E9830',
-                    600: '#15803D',
-                    700: '#126A33',
-                    800: '#0E5329',
-                    900: '#0A3D1F',
+                    50: '#ECFDF5',
+                    100: '#D1FAE5',
+                    200: '#A7F3D0',
+                    300: '#6EE7B7',
+                    400: '#34D399',
+                    500: '#10B981',
+                    600: '#059669',
+                    700: '#047857',
+                    800: '#065F46',
+                    900: '#064E3B',
                 },
+                // Shifted from the old yellow-gold ramp to orange — now that
+                // `accent` itself is gold, `warning` needs a hue that stays
+                // visually distinct from "primary brand action" at a glance.
                 warning: {
-                    50: '#FDF4E9',
-                    100: '#FAE4C3',
-                    200: '#F4C987',
-                    300: '#EEAE4B',
-                    400: '#D88F1F',
-                    500: '#C27B0D',
-                    600: '#B45309',
-                    700: '#8F4208',
-                    800: '#6B3106',
-                    900: '#472104',
+                    50: '#FFF7ED',
+                    100: '#FFEDD5',
+                    200: '#FED7AA',
+                    300: '#FDBA74',
+                    400: '#FB923C',
+                    500: '#F97316',
+                    600: '#EA580C',
+                    700: '#C2410C',
+                    800: '#9A3412',
+                    900: '#7C2D12',
                 },
                 danger: {
                     50: '#FBEAE9',
