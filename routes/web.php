@@ -13,6 +13,7 @@ use App\Livewire\Auth\ResetPassword;
 use App\Livewire\Boqs\Form as BoqForm;
 use App\Livewire\Boqs\Index as BoqIndex;
 use App\Livewire\Boqs\Show as BoqShow;
+use App\Livewire\Calendar\Index as CalendarIndex;
 use App\Livewire\ChangeOrders\Form as ChangeOrderForm;
 use App\Livewire\ChangeOrders\Index as ChangeOrderIndex;
 use App\Livewire\ChangeOrders\Show as ChangeOrderShow;
@@ -143,6 +144,14 @@ Route::post('/logout', LogoutController::class)->name('logout')->defaults('guard
 Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
     Route::get('/', fn () => redirect()->route('dashboard'));
     Route::get('/dashboard', DashboardIndex::class)->name('dashboard');
+
+    // Phase 17c: unified calendar aggregating dates from several existing
+    // modules (milestones, tasks, site visits, meetings, invoices,
+    // quotations, warranties). No single permission gate — like
+    // Dashboard, each source is gated inline on that source's own
+    // `view_*` ability, so any authenticated staff user can open the
+    // page even if every section on it happens to be empty for them.
+    Route::get('/calendar', CalendarIndex::class)->name('calendar.index');
 
     Route::middleware('can:manage_settings')->group(function () {
         Route::get('/settings', SettingsIndex::class)->name('settings.index');

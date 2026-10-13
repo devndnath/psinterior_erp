@@ -15,6 +15,10 @@
             'label' => 'Overview',
             'items' => [
                 ['label' => 'Dashboard', 'route' => 'dashboard', 'icon' => 'layout-dashboard'],
+                // No 'permission' key — like Dashboard, every source on
+                // the page is gated individually inside Calendar\Index,
+                // so the nav entry itself stays visible to any staff user.
+                ['label' => 'Calendar', 'route' => 'calendar.index', 'icon' => 'calendar'],
             ],
         ],
         [
