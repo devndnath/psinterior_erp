@@ -36,6 +36,10 @@ class RolePermissionSeeder extends Seeder
         'inventory' => ['manage_inventory'],
         'employees' => ['manage_employees'],
         'payroll' => ['manage_payroll'],
+        // Recording the client's pick on their behalf (staff Show page)
+        // is a managerial action distinct from assembling the options
+        // themselves — same split as designs' approve_design.
+        'material_selections' => ['decide_material_selection'],
     ];
 
     /** Modules that get the standard view/create/edit/delete set. */
@@ -46,7 +50,7 @@ class RolePermissionSeeder extends Seeder
         'material_requisitions', 'vendors', 'purchase_orders', 'goods_receives',
         'employees', 'attendance', 'leaves', 'payroll', 'subcontractors',
         'meetings', 'inspections', 'snags', 'handovers', 'warranties',
-        'users', 'roles',
+        'material_selections', 'users', 'roles',
     ];
 
     /** Stand-alone abilities with no view/create/edit/delete siblings. */
@@ -94,11 +98,11 @@ class RolePermissionSeeder extends Seeder
             'super-admin' => $all, // also bypassed entirely by Gate::before — see AuthServiceProvider
             'admin' => array_values(array_diff($all, ['view_all_companies'])),
 
-            'project-manager' => $this->forModules(['projects', 'milestones', 'tasks', 'boqs', 'change_orders'], ['view', 'create', 'edit'])
+            'project-manager' => $this->forModules(['projects', 'milestones', 'tasks', 'boqs', 'change_orders', 'material_selections'], ['view', 'create', 'edit'])
                 + $this->forModules(['designs', 'quotations', 'contracts', 'documents', 'meetings', 'inspections', 'snags', 'handovers', 'material_requisitions'], ['view', 'create'])
-                + $this->named(['view_finance', 'view_reports', 'approve_change_order']),
+                + $this->named(['view_finance', 'view_reports', 'approve_change_order', 'decide_material_selection']),
 
-            'designer' => $this->forModules(['designs'], ['view', 'create', 'edit'])
+            'designer' => $this->forModules(['designs', 'material_selections'], ['view', 'create', 'edit'])
                 + $this->forModules(['projects', 'documents'], ['view'])
                 + $this->named(['upload_design']),
 

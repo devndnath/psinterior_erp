@@ -15,6 +15,8 @@ use App\Livewire\Client\Projects\Index as ClientProjectIndex;
 use App\Livewire\Client\Projects\Show as ClientProjectShow;
 use App\Livewire\Client\Quotations\Index as ClientQuotationIndex;
 use App\Livewire\Client\Quotations\Show as ClientQuotationShow;
+use App\Livewire\Client\Selections\Index as ClientSelectionIndex;
+use App\Livewire\Client\Selections\Show as ClientSelectionShow;
 use App\Livewire\Client\ServiceRequests\Form as ClientServiceRequestForm;
 use App\Livewire\Client\ServiceRequests\Index as ClientServiceRequestIndex;
 use App\Livewire\Client\ServiceRequests\Show as ClientServiceRequestShow;
@@ -51,6 +53,15 @@ Route::middleware(['auth:client', 'user_type:client'])->group(function () {
     Route::prefix('designs')->name('designs.')->group(function () {
         Route::get('/', ClientDesignIndex::class)->name('index');
         Route::get('/{design}', ClientDesignShow::class)->name('show');
+    });
+
+    // Phase 17e: Material/Finish Selection Board — client-facing side.
+    // Draft boards are never routed here at all from the Index query, and
+    // Show's mount() 404s on one anyway if a stale link is followed, so
+    // there's no route-level state check needed beyond ownership.
+    Route::prefix('selections')->name('selections.')->group(function () {
+        Route::get('/', ClientSelectionIndex::class)->name('index');
+        Route::get('/{board}', ClientSelectionShow::class)->name('show');
     });
 
     Route::prefix('quotations')->name('quotations.')->group(function () {

@@ -20,6 +20,7 @@
             ['label' => 'Dashboard', 'route' => 'client.dashboard'],
             ['label' => 'Projects', 'route' => 'client.projects.index'],
             ['label' => 'Designs', 'route' => 'client.designs.index'],
+            ['label' => 'Selections', 'route' => 'client.selections.index'],
             ['label' => 'Quotations', 'route' => 'client.quotations.index'],
             ['label' => 'Change Orders', 'route' => 'client.change-orders.index'],
             ['label' => 'Invoices', 'route' => 'client.invoices.index'],

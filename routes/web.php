@@ -119,6 +119,9 @@ use App\Livewire\Vendors\Show as VendorShow;
 use App\Livewire\Warehouses\Form as WarehouseForm;
 use App\Livewire\Warehouses\Index as WarehouseIndex;
 use App\Livewire\Warehouses\Show as WarehouseShow;
+use App\Livewire\MaterialSelections\Form as MaterialSelectionForm;
+use App\Livewire\MaterialSelections\Index as MaterialSelectionIndex;
+use App\Livewire\MaterialSelections\Show as MaterialSelectionShow;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -201,6 +204,18 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
         Route::get('/create', DesignForm::class)->name('create')->middleware('can:create_designs');
         Route::get('/{design}/edit', DesignForm::class)->name('edit')->middleware('can:edit_designs');
         Route::get('/{design}', DesignShow::class)->name('show')->middleware('can:view_designs');
+    });
+
+    // Phase 17e: Material/Finish Selection Board — closes the audit's
+    // "single biggest domain-specific gap". {board} rather than
+    // {materialSelection}: Livewire's implicit route-model-binding
+    // resolves the parameter name against the model type-hinted in
+    // mount(), not the URI segment name, so this just needs to read well.
+    Route::prefix('material-selections')->name('material-selections.')->group(function () {
+        Route::get('/', MaterialSelectionIndex::class)->name('index')->middleware('can:view_material_selections');
+        Route::get('/create', MaterialSelectionForm::class)->name('create')->middleware('can:create_material_selections');
+        Route::get('/{board}/edit', MaterialSelectionForm::class)->name('edit')->middleware('can:edit_material_selections');
+        Route::get('/{board}', MaterialSelectionShow::class)->name('show')->middleware('can:view_material_selections');
     });
 
     // Phase 5: BOQ -> Quotation -> Contract -> Change Order (ARCHITECTURE.md §3.6).

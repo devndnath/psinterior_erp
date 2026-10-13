@@ -29,6 +29,7 @@ use App\Models\Project;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseRequest;
 use App\Models\Quotation;
+use App\Models\SelectionBoard;
 use App\Models\ServiceRequest;
 use App\Models\SiteVisit;
 use App\Models\Snag;
@@ -67,6 +68,7 @@ use App\Policies\ProjectPolicy;
 use App\Policies\PurchaseOrderPolicy;
 use App\Policies\PurchaseRequestPolicy;
 use App\Policies\QuotationPolicy;
+use App\Policies\SelectionBoardPolicy;
 use App\Policies\ServiceRequestPolicy;
 use App\Policies\SiteVisitPolicy;
 use App\Policies\SnagPolicy;
@@ -100,6 +102,7 @@ class AuthServiceProvider extends ServiceProvider
         Design::class => DesignPolicy::class,
         Boq::class => BoqPolicy::class,
         Quotation::class => QuotationPolicy::class,
+        SelectionBoard::class => SelectionBoardPolicy::class,
         Contract::class => ContractPolicy::class,
         ChangeOrder::class => ChangeOrderPolicy::class,
         ExpenseCategory::class => ExpenseCategoryPolicy::class,
