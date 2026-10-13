@@ -73,6 +73,19 @@
                             @error('revisionFile') <p class="form-error">{{ $message }}</p> @enderror
                             <div wire:loading wire:target="revisionFile" class="mt-2 text-xs text-gray-400">Uploading…</div>
                         </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="form-label">Drawing No.</label>
+                                <input type="text" wire:model="revisionDrawingNo" placeholder="e.g. DRG-ELV-03" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                                @error('revisionDrawingNo') <p class="form-error">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="form-label">Issue Date</label>
+                                <input type="date" wire:model="revisionIssueDate" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                                @error('revisionIssueDate') <p class="form-error">{{ $message }}</p> @enderror
+                                <p class="mt-1 text-xs text-gray-400">Defaults to today if left blank.</p>
+                            </div>
+                        </div>
                         <div>
                             <label class="form-label">Notes</label>
                             <textarea wire:model="revisionDescription" rows="2" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm"></textarea>
@@ -87,15 +100,29 @@
                 @else
                     <div class="space-y-4">
                         @foreach ($design->revisions as $revision)
-                            <div wire:key="revision-{{ $revision->id }}" class="rounded-lg border border-gray-100 p-4">
+                            @php($isSuperseded = $revision->version < $latestRevisionVersion)
+                            <div wire:key="revision-{{ $revision->id }}" class="rounded-lg border border-gray-100 p-4 {{ $isSuperseded ? 'opacity-70' : '' }}">
                                 <div class="flex items-start justify-between">
                                     <div>
-                                        <p class="text-sm font-semibold text-gray-900">Version {{ $revision->version }}</p>
+                                        <p class="text-sm font-semibold text-gray-900">
+                                            Version {{ $revision->version }}
+                                            @if ($revision->drawing_no)
+                                                <span class="text-gray-500">· {{ $revision->drawing_no }}</span>
+                                            @endif
+                                        </p>
                                         <p class="text-xs text-gray-500">
                                             {{ $revision->uploader?->name ?? '—' }} · {{ $revision->created_at?->format('d M, Y H:i') }}
+                                            @if ($revision->issue_date)
+                                                · Issued {{ $revision->issue_date->format('d M, Y') }}
+                                            @endif
                                         </p>
                                     </div>
-                                    <x-status-badge :label="$revision->status->label()" :color="$revision->status->color()" />
+                                    <div class="flex items-center gap-2">
+                                        @if ($isSuperseded)
+                                            <x-status-badge label="Superseded — do not use on site" color="red" />
+                                        @endif
+                                        <x-status-badge :label="$revision->status->label()" :color="$revision->status->color()" />
+                                    </div>
                                 </div>
 
                                 @if ($revision->description)

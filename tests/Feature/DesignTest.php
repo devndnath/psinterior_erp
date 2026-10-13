@@ -221,4 +221,73 @@ class DesignTest extends TestCase
             ->assertSee('Design For Project A')
             ->assertDontSee('Design For Project B');
     }
+
+    public function test_uploading_a_revision_can_record_a_drawing_number_and_issue_date(): void
+    {
+        $project = Project::factory()->create();
+        $design = Design::factory()->for($project)->create(['status' => DesignStatus::Draft->value]);
+        $file = UploadedFile::fake()->create('elevation.pdf', 200, 'application/pdf');
+
+        Livewire::actingAs($this->staff)->test(DesignShow::class, ['design' => $design])
+            ->call('toggleRevisionForm')
+            ->set('revisionFile', $file)
+            ->set('revisionDrawingNo', 'DRG-ELV-03')
+            ->set('revisionIssueDate', '2026-02-10')
+            ->call('addRevision')
+            ->assertHasNoErrors();
+
+        $revision = $design->revisions()->first();
+        $this->assertSame('DRG-ELV-03', $revision->drawing_no);
+        $this->assertSame('2026-02-10', $revision->issue_date->toDateString());
+    }
+
+    public function test_a_revision_uploaded_without_an_issue_date_defaults_to_today(): void
+    {
+        $project = Project::factory()->create();
+        $design = Design::factory()->for($project)->create(['status' => DesignStatus::Draft->value]);
+        $file = UploadedFile::fake()->create('elevation.pdf', 200, 'application/pdf');
+
+        Livewire::actingAs($this->staff)->test(DesignShow::class, ['design' => $design])
+            ->call('toggleRevisionForm')
+            ->set('revisionFile', $file)
+            ->call('addRevision')
+            ->assertHasNoErrors();
+
+        $revision = $design->revisions()->first();
+        $this->assertSame(now()->toDateString(), $revision->issue_date->toDateString());
+    }
+
+    public function test_only_the_latest_revision_is_not_marked_superseded(): void
+    {
+        $project = Project::factory()->create();
+        $design = Design::factory()->for($project)->create(['status' => DesignStatus::Draft->value]);
+
+        $v1 = $design->revisions()->create(['version' => 1, 'status' => DesignRevisionStatus::Submitted->value]);
+        $v2 = $design->revisions()->create(['version' => 2, 'status' => DesignRevisionStatus::Submitted->value]);
+
+        $this->assertTrue($v1->fresh()->isSuperseded());
+        $this->assertFalse($v2->fresh()->isSuperseded());
+    }
+
+    public function test_a_single_revision_design_is_not_marked_superseded(): void
+    {
+        $project = Project::factory()->create();
+        $design = Design::factory()->for($project)->create(['status' => DesignStatus::Draft->value]);
+        $revision = $design->revisions()->create(['version' => 1, 'status' => DesignRevisionStatus::Submitted->value]);
+
+        $this->assertFalse($revision->fresh()->isSuperseded());
+    }
+
+    public function test_the_show_page_marks_an_older_revision_as_superseded(): void
+    {
+        $project = Project::factory()->create();
+        $design = Design::factory()->for($project)->create(['status' => DesignStatus::Draft->value]);
+        $design->revisions()->create(['version' => 1, 'drawing_no' => 'DRG-01', 'status' => DesignRevisionStatus::Submitted->value]);
+        $design->revisions()->create(['version' => 2, 'drawing_no' => 'DRG-02', 'status' => DesignRevisionStatus::Submitted->value]);
+
+        Livewire::actingAs($this->staff)->test(DesignShow::class, ['design' => $design])
+            ->assertSee('Superseded — do not use on site')
+            ->assertSee('DRG-01')
+            ->assertSee('DRG-02');
+    }
 }

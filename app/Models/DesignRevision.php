@@ -13,7 +13,7 @@ class DesignRevision extends Model
     use HasFactory;
 
     protected $fillable = [
-        'design_id', 'version', 'file_document_id', 'uploaded_by',
+        'design_id', 'version', 'drawing_no', 'issue_date', 'file_document_id', 'uploaded_by',
         'description', 'client_feedback', 'status',
     ];
 
@@ -21,6 +21,7 @@ class DesignRevision extends Model
     {
         return [
             'status' => DesignRevisionStatus::class,
+            'issue_date' => 'date',
         ];
     }
 
@@ -42,5 +43,20 @@ class DesignRevision extends Model
     public function approvals(): HasMany
     {
         return $this->hasMany(DesignApproval::class)->latest('decided_at');
+    }
+
+    /**
+     * True once a later version of the same design exists — meaning this
+     * file is no longer the one to build from on site. Derived, not
+     * stored, so it can never fall out of sync with the append-only
+     * revision history the way a manually-set flag could.
+     */
+    public function isSuperseded(): bool
+    {
+        $maxVersion = $this->relationLoaded('design') && $this->design->relationLoaded('revisions')
+            ? $this->design->revisions->max('version')
+            : $this->design()->first()?->revisions()->max('version');
+
+        return ($maxVersion ?? $this->version) > $this->version;
     }
 }

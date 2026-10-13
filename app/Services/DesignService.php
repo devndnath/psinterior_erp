@@ -52,15 +52,26 @@ class DesignService
      * bumps the design out of Draft into Submitted — uploading something
      * for review is what "submitted" means here.
      */
-    public function addRevision(Design $design, UploadedFile $file, ?string $description = null, ?User $uploadedBy = null): DesignRevision
-    {
-        return DB::transaction(function () use ($design, $file, $description, $uploadedBy) {
+    public function addRevision(
+        Design $design,
+        UploadedFile $file,
+        ?string $description = null,
+        ?User $uploadedBy = null,
+        ?string $drawingNo = null,
+        ?string $issueDate = null,
+    ): DesignRevision {
+        return DB::transaction(function () use ($design, $file, $description, $uploadedBy, $drawingNo, $issueDate) {
             $document = $this->files->store($file, $design, 'design_revision');
 
             $nextVersion = (int) $design->revisions()->max('version') + 1;
 
             $revision = $design->revisions()->create([
                 'version' => $nextVersion,
+                'drawing_no' => $drawingNo,
+                // Defaults to today — every revision is issued on the day
+                // it's uploaded unless told otherwise, so the drawing
+                // register never has a blank issue date to chase down.
+                'issue_date' => $issueDate ?: now()->toDateString(),
                 'file_document_id' => $document->id,
                 'uploaded_by' => $uploadedBy?->id,
                 'description' => $description,

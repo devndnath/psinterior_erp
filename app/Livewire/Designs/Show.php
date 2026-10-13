@@ -31,6 +31,10 @@ class Show extends Component
 
     public string $revisionDescription = '';
 
+    public string $revisionDrawingNo = '';
+
+    public string $revisionIssueDate = '';
+
     public ?int $decisionRevisionId = null;
 
     public string $decision = '';
@@ -49,7 +53,7 @@ class Show extends Component
         Gate::authorize('uploadRevision', $this->design);
 
         $this->showRevisionForm = ! $this->showRevisionForm;
-        $this->reset(['revisionFile', 'revisionDescription']);
+        $this->reset(['revisionFile', 'revisionDescription', 'revisionDrawingNo', 'revisionIssueDate']);
     }
 
     public function addRevision(DesignService $service): void
@@ -59,6 +63,8 @@ class Show extends Component
         $this->validate([
             'revisionFile' => ['required', 'file', 'max:51200'],
             'revisionDescription' => ['nullable', 'string', 'max:2000'],
+            'revisionDrawingNo' => ['nullable', 'string', 'max:100'],
+            'revisionIssueDate' => ['nullable', 'date'],
         ]);
 
         $service->addRevision(
@@ -66,11 +72,13 @@ class Show extends Component
             $this->revisionFile,
             $this->revisionDescription ?: null,
             auth()->user(),
+            $this->revisionDrawingNo ?: null,
+            $this->revisionIssueDate ?: null,
         );
 
         $this->design = $this->design->fresh();
         $this->showRevisionForm = false;
-        $this->reset(['revisionFile', 'revisionDescription']);
+        $this->reset(['revisionFile', 'revisionDescription', 'revisionDrawingNo', 'revisionIssueDate']);
 
         $this->dispatch('toast', message: 'Revision uploaded.', type: 'success');
     }
@@ -138,6 +146,11 @@ class Show extends Component
 
         return view('livewire.designs.show', [
             'decisionOptions' => ApprovalDecision::options(),
+            // Computed once here rather than calling DesignRevision::isSuperseded()
+            // per row in the Blade loop below — that method's fallback path issues
+            // a fresh query per call when the inverse `design` relation isn't
+            // loaded, which it isn't for items pulled via `revisions.*` eager loads.
+            'latestRevisionVersion' => $this->design->revisions->max('version'),
         ]);
     }
 }
