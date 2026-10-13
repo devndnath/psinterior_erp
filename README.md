@@ -144,11 +144,7 @@ See **`TESTING.md`** for the full first-run validation sequence (this is the sin
 
 ## 12. Backup
 
-Not automated in Phase 1 (spec §68 explicitly rules out building dangerous automatic deletion). Recommended strategy for later phases to formalize:
-
-- **Database:** nightly `mysqldump` (or your managed MySQL provider's automated snapshot), retained on a rolling window, stored off-server
-- **Files:** the `storage/app/public/uploads` tree (or the S3 bucket, once cloud storage is enabled) backed up on the same schedule as the database so a restore keeps documents and their database references in sync
-- Test the restore procedure periodically — a backup that has never been restored is unverified
+Automated as of Phase 17b via `spatie/laravel-backup` — nightly database dump plus the `storage/app/public` and `storage/app/private` trees, cleaned up on a rolling retention window (`config/backup.php`), scheduled in `routes/console.php`. **See `BACKUP.md`** for the one-time server setup this still requires (installing the package, confirming `mysqldump` is on PATH, registering the Laravel scheduler's cron entry, setting a notification email) and the manual restore procedure — restoration is deliberately not an artisan command, so a backup can never be overwritten by accident.
 
 ## 13. Troubleshooting
 

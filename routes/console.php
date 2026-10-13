@@ -32,3 +32,17 @@ Artisan::command('inspire', function () {
 // scheduler/cron here), but the command and its registration are both
 // correct.
 Schedule::command('invoices:flag-overdue')->dailyAt('07:00');
+
+// Phase 17b: closes the "no automated backups" audit gap (Section F).
+// `backup:run` dumps the database and the private/public storage trees
+// into storage/app/backups (see config/backup.php); `backup:clean` then
+// prunes old archives per the retention policy in that same file;
+// `backup:monitor` checks freshness/size and fires the failure
+// notification config has wired up if either drifts out of range. Order
+// matters — clean, then run, then monitor what's left — and `withoutOverlapping()`
+// stops a slow run stacking with the next day's if the server is ever
+// under load. Requires `composer require spatie/laravel-backup` (added
+// to composer.json) to actually be runnable — see BACKUP.md.
+Schedule::command('backup:clean')->daily()->at('01:30')->withoutOverlapping();
+Schedule::command('backup:run')->daily()->at('02:00')->withoutOverlapping();
+Schedule::command('backup:monitor')->daily()->at('03:00')->withoutOverlapping();
