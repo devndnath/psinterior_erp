@@ -33,6 +33,21 @@
 
     <p class="-mt-4 mb-6 text-sm text-ink-500">{{ $employee->employee_id }} — {{ $employee->designation?->name ?? 'No designation' }}, {{ $employee->department?->name ?? 'No department' }}</p>
 
+    @if ($generatedPassword)
+        <div x-data="{ open: true }" x-show="open" class="panel mb-6 border border-success-200 bg-success-50 p-4">
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <p class="text-sm font-semibold text-success-800">Login created for {{ $employee->user?->email }}</p>
+                    <p class="mt-1 text-sm text-success-700">
+                        Temporary password: <code class="rounded bg-white px-2 py-0.5 font-mono">{{ $generatedPassword }}</code>
+                        — this app doesn't send login emails, so copy it now and share it with {{ $employee->name }}. It won't be shown again.
+                    </p>
+                </div>
+                <button type="button" x-on:click="open = false" class="shrink-0 text-success-600 hover:text-success-800">&times;</button>
+            </div>
+        </div>
+    @endif
+
     <div class="grid grid-cols-3 gap-6">
         <div class="col-span-2 space-y-6">
             <div class="panel p-6">
@@ -143,8 +158,24 @@
                 @if ($employee->user)
                     <p class="text-sm text-ink-900">{{ $employee->user->name }}</p>
                     <p class="text-sm text-ink-500">{{ $employee->user->email }}</p>
+                    <div class="mt-2">
+                        <x-status-badge :label="$employee->user->is_active ? 'Active' : 'Inactive'" :color="$employee->user->is_active ? 'green' : 'gray'" />
+                    </div>
+                    <p class="mt-2 text-xs text-ink-400">
+                        @forelse ($employee->user->getRoleNames() as $roleName)
+                            {{ $roleName }}@if (! $loop->last), @endif
+                        @empty
+                            No roles assigned.
+                        @endforelse
+                    </p>
+                    @can('update', $employee->user)
+                        <a href="{{ route('users.edit', $employee->user) }}" wire:navigate class="mt-2 inline-block text-xs text-accent-600 hover:underline">Manage from Users →</a>
+                    @endcan
                 @else
                     <p class="text-sm text-ink-500">No linked user account.</p>
+                    @can('create', \App\Models\User::class)
+                        <a href="{{ route('employees.edit', $employee) }}" wire:navigate class="mt-2 inline-block text-xs text-accent-600 hover:underline">Create one from Edit →</a>
+                    @endcan
                 @endif
             </div>
         </div>

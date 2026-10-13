@@ -3,9 +3,12 @@
 namespace App\Livewire\Clients;
 
 use App\Enums\ClientType;
+use App\Enums\UserType;
 use App\Models\Client;
 use App\Models\User;
 use App\Services\ClientService;
+use App\Services\UserService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -27,6 +30,17 @@ class Form extends Component
     public string $tax_id = '';
     public string $assigned_to = '';
     public string $notes = '';
+
+    /**
+     * "Give this client portal access" — only offered when there's no
+     * linked login yet (Client.user_id). Unlike the same checkbox on
+     * Employees\Form, this needs no extra `create_users` gate: a
+     * client-portal account never holds a Spatie role (it's ownership-
+     * based access, ARCHITECTURE.md §5/§7), so the privilege it grants
+     * is exactly "this one client can see their own records" — already
+     * covered by the create/update permission this form requires below.
+     */
+    public bool $create_account = false;
 
     public function mount(?Client $client = null): void
     {
@@ -57,7 +71,9 @@ class Form extends Component
             'name' => ['required', 'string', 'max:255'],
             'type' => ['required', 'string', 'in:'.implode(',', array_column(ClientType::cases(), 'value'))],
             'phone' => ['nullable', 'string', 'max:50'],
-            'email' => ['nullable', 'email', 'max:255'],
+            'email' => $this->create_account
+                ? ['required', 'email', 'max:255', 'unique:users,email']
+                : ['nullable', 'email', 'max:255'],
             'company_name' => ['nullable', 'string', 'max:255'],
             'address' => ['nullable', 'string', 'max:500'],
             'billing_address' => ['nullable', 'string', 'max:500'],
@@ -68,21 +84,44 @@ class Form extends Component
         ];
     }
 
-    public function save(ClientService $service): void
+    public function save(ClientService $service, UserService $users): void
     {
         $data = $this->validate();
         $data['assigned_to'] = $data['assigned_to'] !== '' ? $data['assigned_to'] : null;
 
-        if ($this->client) {
-            $service->update($this->client, $data);
-            $this->dispatch('toast', message: 'Client updated.', type: 'success');
-            $this->redirectRoute('clients.show', ['client' => $this->client->id], navigate: true);
+        $wantsAccount = $this->create_account && ! $this->client?->user_id;
 
-            return;
+        $client = DB::transaction(function () use ($service, $users, $data, $wantsAccount) {
+            $client = $this->client
+                ? $service->update($this->client, $data)
+                : $service->create($data);
+
+            if ($wantsAccount) {
+                ['user' => $user, 'password' => $password] = $users->createLinkedAccount(
+                    $client->name,
+                    $client->email,
+                    UserType::Client,
+                );
+
+                $client->update(['user_id' => $user->id]);
+
+                // No outbound email in this app — handed back once, in
+                // the session, so the Client Show page can display it
+                // exactly once right after the redirect below.
+                session()->flash('generated_password', $password);
+                session()->flash('generated_password_for', $user->email);
+            }
+
+            return $client;
+        });
+
+        if ($this->client) {
+            $message = 'Client updated.'.($wantsAccount ? ' Portal login created.' : '');
+        } else {
+            $message = "Client {$client->client_no} created.".($wantsAccount ? ' Portal login created.' : '');
         }
 
-        $client = $service->create($data);
-        $this->dispatch('toast', message: "Client {$client->client_no} created.", type: 'success');
+        $this->dispatch('toast', message: $message, type: 'success');
         $this->redirectRoute('clients.show', ['client' => $client->id], navigate: true);
     }
 

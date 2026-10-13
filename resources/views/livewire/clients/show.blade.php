@@ -13,6 +13,21 @@
 
     <p class="-mt-4 mb-6 font-mono text-sm text-ink-500">{{ $client->client_no }}</p>
 
+    @if ($generatedPassword)
+        <div x-data="{ open: true }" x-show="open" class="panel mb-6 border border-success-200 bg-success-50 p-4">
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <p class="text-sm font-semibold text-success-800">Portal login created for {{ $client->portalUser?->email }}</p>
+                    <p class="mt-1 text-sm text-success-700">
+                        Temporary password: <code class="rounded bg-white px-2 py-0.5 font-mono">{{ $generatedPassword }}</code>
+                        — this app doesn't send login emails, so copy it now and share it with {{ $client->name }}. It won't be shown again.
+                    </p>
+                </div>
+                <button type="button" x-on:click="open = false" class="shrink-0 text-success-600 hover:text-success-800">&times;</button>
+            </div>
+        </div>
+    @endif
+
     <div class="grid grid-cols-3 gap-6">
         <div class="col-span-2 space-y-6">
             <div class="panel p-6">
@@ -23,7 +38,20 @@
                     <div><dt class="text-ink-500">Company</dt><dd class="font-medium text-ink-900">{{ $client->company_name ?: '—' }}</dd></div>
                     <div><dt class="text-ink-500">Tax ID</dt><dd class="font-medium text-ink-900">{{ $client->tax_id ?: '—' }}</dd></div>
                     <div><dt class="text-ink-500">Assigned to</dt><dd class="font-medium text-ink-900">{{ $client->assignee?->name ?? '—' }}</dd></div>
-                    <div><dt class="text-ink-500">Portal login</dt><dd class="font-medium text-ink-900">{{ $client->portalUser?->email ?? 'Not set up' }}</dd></div>
+                    <div>
+                        <dt class="text-ink-500">Portal login</dt>
+                        <dd class="font-medium text-ink-900">
+                            @if ($client->portalUser)
+                                {{ $client->portalUser->email }}
+                                <x-status-badge :label="$client->portalUser->is_active ? 'Active' : 'Inactive'" :color="$client->portalUser->is_active ? 'green' : 'gray'" class="ml-1" />
+                            @else
+                                Not set up
+                                @can('update', $client)
+                                    <a href="{{ route('clients.edit', $client) }}" wire:navigate class="ml-1 text-xs text-accent-600 hover:underline">Create one →</a>
+                                @endcan
+                            @endif
+                        </dd>
+                    </div>
                     <div class="col-span-2"><dt class="text-ink-500">Address</dt><dd class="font-medium text-ink-900">{{ $client->address ?: '—' }}</dd></div>
                     <div><dt class="text-ink-500">Billing address</dt><dd class="font-medium text-ink-900">{{ $client->billing_address ?: '—' }}</dd></div>
                     <div><dt class="text-ink-500">Site address</dt><dd class="font-medium text-ink-900">{{ $client->site_address ?: '—' }}</dd></div>

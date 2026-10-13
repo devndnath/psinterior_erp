@@ -28,10 +28,28 @@ class Show extends Component
     public string $contact_email = '';
     public bool $contact_is_primary = false;
 
+    /**
+     * Set only immediately after Clients\Form creates a portal login
+     * for this client — see Employees\Show's matching property for why
+     * this is shown on screen once instead of emailed.
+     */
+    public ?string $generatedPassword = null;
+
     public function mount(Client $client): void
     {
         Gate::authorize('view', $client);
-        $this->client = $client;
+
+        // Loaded here (not just render()) because mount() needs
+        // $client->portalUser below, and Model::shouldBeStrict() outside
+        // production throws on an unloaded lazy relation. Named
+        // portalUser(), not user() — Client already has an unrelated
+        // assignee() BelongsTo(User::class, 'assigned_to').
+        $this->client = $client->load('portalUser');
+
+        if (session('generated_password_for') === $this->client->portalUser?->email) {
+            $this->generatedPassword = session()->pull('generated_password');
+            session()->forget('generated_password_for');
+        }
     }
 
     public function addContact(ClientService $service): void
@@ -73,6 +91,11 @@ class Show extends Component
     #[Title('Client')]
     public function render()
     {
+        // Re-loaded on every render (not just in mount()), matching
+        // Employees\Show's convention — see Vendors\Show::render()'s
+        // comment for why.
+        $this->client->load('portalUser');
+
         return view('livewire.clients.show', [
             'contacts' => $this->client->contacts,
             'leads' => $this->client->leads()->latest()->get(),

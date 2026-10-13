@@ -85,6 +85,20 @@ class User extends Authenticatable
         return $this->hasOne(Vendor::class, 'user_id');
     }
 
+    /**
+     * Inverse of `employees.user_id`, same reasoning as client()/vendor()
+     * above, for a logged-in `web`-guard staff user who is also tracked
+     * as an Employee (e.g. "what's my own employee record" for a future
+     * self-service screen). Added alongside the "create a login for this
+     * employee" checkbox on Employees\Form for symmetry with the other
+     * two inverse relations — Employee::user() (the other direction) has
+     * existed since Phase 1.
+     */
+    public function employee(): HasOne
+    {
+        return $this->hasOne(Employee::class, 'user_id');
+    }
+
     public function isStaff(): bool
     {
         return $this->user_type === UserType::Staff;
