@@ -115,6 +115,8 @@ use App\Livewire\Subcontractors\Index as SubcontractorIndex;
 use App\Livewire\Subcontractors\Show as SubcontractorShow;
 use App\Livewire\Units\Form as UnitForm;
 use App\Livewire\Units\Index as UnitIndex;
+use App\Livewire\VendorInvoices\Index as VendorInvoiceIndex;
+use App\Livewire\VendorInvoices\Show as VendorInvoiceShow;
 use App\Livewire\VendorQuotations\Form as VendorQuotationForm;
 use App\Livewire\Vendors\Form as VendorForm;
 use App\Livewire\Vendors\Index as VendorIndex;
@@ -378,6 +380,14 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
     // a GRN is an immutable receiving record once created.
     Route::get('/goods-receives/create', GoodsReceiveForm::class)->name('goods-receives.create')->middleware('can:create_goods_receives');
     Route::get('/goods-receives/{goodsReceive}', GoodsReceiveShow::class)->name('goods-receives.show')->middleware('can:view_goods_receives');
+
+    // Phase 17h: vendor-submitted invoices, reviewed here. No create/edit
+    // route — a vendor files these from the vendor portal, staff only
+    // view and review (approve/reject) them.
+    Route::prefix('vendor-invoices')->name('vendor-invoices.')->group(function () {
+        Route::get('/', VendorInvoiceIndex::class)->name('index')->middleware('can:view_vendor_invoices');
+        Route::get('/{vendorInvoice}', VendorInvoiceShow::class)->name('show')->middleware('can:view_vendor_invoices');
+    });
 
     // Phase 9: Employees, Attendance, Leave, Payroll, Subcontractors
     // (ARCHITECTURE.md §3.9). `edit_leaves` gates both leave approval

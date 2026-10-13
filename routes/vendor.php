@@ -4,9 +4,14 @@ use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Vendor\PurchaseOrderPdfController;
 use App\Livewire\Auth\VendorLogin;
 use App\Livewire\Vendor\Dashboard as VendorDashboard;
+use App\Livewire\Vendor\Invoices\Form as VendorInvoiceForm;
+use App\Livewire\Vendor\Invoices\Index as VendorInvoiceIndex;
+use App\Livewire\Vendor\Invoices\Show as VendorInvoiceShow;
 use App\Livewire\Vendor\Ledger\Index as VendorLedgerIndex;
 use App\Livewire\Vendor\PurchaseOrders\Index as VendorPurchaseOrderIndex;
 use App\Livewire\Vendor\PurchaseOrders\Show as VendorPurchaseOrderShow;
+use App\Livewire\Vendor\Rfqs\Index as VendorRfqIndex;
+use App\Livewire\Vendor\Rfqs\Show as VendorRfqShow;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -40,4 +45,18 @@ Route::middleware(['auth:vendor', 'user_type:vendor'])->group(function () {
     });
 
     Route::get('/ledger', VendorLedgerIndex::class)->name('ledger.index');
+
+    // Phase 17h: respond to RFQs (quote against an open purchase
+    // request) and submit invoices against your own purchase orders —
+    // closes the "vendors can't do either themselves" audit gap.
+    Route::prefix('rfqs')->name('rfqs.')->group(function () {
+        Route::get('/', VendorRfqIndex::class)->name('index');
+        Route::get('/{purchaseRequest}', VendorRfqShow::class)->name('show');
+    });
+
+    Route::prefix('invoices')->name('invoices.')->group(function () {
+        Route::get('/', VendorInvoiceIndex::class)->name('index');
+        Route::get('/create', VendorInvoiceForm::class)->name('create');
+        Route::get('/{vendorInvoice}', VendorInvoiceShow::class)->name('show');
+    });
 });

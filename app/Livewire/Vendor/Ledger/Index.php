@@ -10,14 +10,14 @@ use Livewire\Component;
 use Livewire\WithPagination;
 
 /**
- * Read-only list of Expense rows against this vendor (closes the
- * Phase 8 `expenses.vendor_id` link with an actual consumer). This is
- * NOT a true vendor invoicing/payment-status system — there is no
- * vendor-invoice entity anywhere in this schema, so this is the
- * closest honest approximation to ARCHITECTURE.md's "invoices, payment
- * status" vendor-portal description available without inventing one;
- * see "Known issues" in PHASE11_SUMMARY.md. Ownership check, not a
- * staff Policy — see "Portal authorization model" there too.
+ * Read-only list of posted Expense rows against this vendor (closes the
+ * Phase 8 `expenses.vendor_id` link with an actual consumer) — this is
+ * "what's actually been paid or posted," not "what's pending." As of
+ * Phase 17h there is a real vendor-invoice entity (App\Models\VendorInvoice,
+ * reachable from this portal's "Invoices" screen) for invoices a vendor
+ * has submitted and is still awaiting review; approving one is what
+ * posts the Expense row that then shows up here. Ownership check, not a
+ * staff Policy — see "Portal authorization model" in PHASE11_SUMMARY.md.
  */
 #[Layout('layouts.vendor-portal', ['title' => 'Ledger'])]
 #[Title('Ledger')]

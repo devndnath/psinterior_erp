@@ -40,6 +40,10 @@ class RolePermissionSeeder extends Seeder
         // is a managerial action distinct from assembling the options
         // themselves — same split as designs' approve_design.
         'material_selections' => ['decide_material_selection'],
+        // Approving/rejecting a vendor's own submitted invoice is a
+        // managerial decision distinct from just viewing the list —
+        // same split as approve_invoice/approve_change_order.
+        'vendor_invoices' => ['approve_vendor_invoice'],
     ];
 
     /** Modules that get the standard view/create/edit/delete set. */
@@ -50,7 +54,7 @@ class RolePermissionSeeder extends Seeder
         'material_requisitions', 'vendors', 'purchase_orders', 'goods_receives',
         'employees', 'attendance', 'leaves', 'payroll', 'subcontractors',
         'meetings', 'inspections', 'snags', 'handovers', 'warranties',
-        'material_selections', 'site_reports', 'users', 'roles',
+        'material_selections', 'site_reports', 'vendor_invoices', 'users', 'roles',
     ];
 
     /** Stand-alone abilities with no view/create/edit/delete siblings. */
@@ -113,11 +117,12 @@ class RolePermissionSeeder extends Seeder
                 + $this->forModules(['projects', 'milestones', 'snags', 'inspections'], ['view']),
 
             'accountant' => $this->forModules(['invoices', 'payments', 'expenses'], ['view', 'create', 'edit'])
-                + $this->forModules(['quotations', 'contracts', 'change_orders'], ['view'])
+                + $this->forModules(['quotations', 'contracts', 'change_orders', 'vendor_invoices'], ['view'])
                 + $this->named(['approve_invoice', 'view_finance', 'view_reports']),
 
             'procurement-officer' => $this->forModules(['purchase_orders', 'goods_receives', 'material_requisitions', 'vendors'], ['view', 'create', 'edit'])
-                + $this->forModules(['inventory', 'warehouses'], ['view']),
+                + $this->forModules(['inventory', 'warehouses', 'vendor_invoices'], ['view'])
+                + $this->named(['approve_vendor_invoice']),
 
             'store-manager' => $this->forModules(['inventory', 'warehouses', 'goods_receives', 'material_requisitions'], ['view', 'create', 'edit'])
                 + $this->named(['manage_inventory']),

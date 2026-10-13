@@ -40,6 +40,7 @@ use App\Models\SubcontractorAssignment;
 use App\Models\SubcontractorPayment;
 use App\Models\Unit;
 use App\Models\Vendor;
+use App\Models\VendorInvoice;
 use App\Models\VendorQuotation;
 use App\Models\Warehouse;
 use App\Models\Warranty;
@@ -79,6 +80,7 @@ use App\Policies\SubcontractorAssignmentPolicy;
 use App\Policies\SubcontractorPaymentPolicy;
 use App\Policies\SubcontractorPolicy;
 use App\Policies\UnitPolicy;
+use App\Policies\VendorInvoicePolicy;
 use App\Policies\VendorPolicy;
 use App\Policies\VendorQuotationPolicy;
 use App\Policies\WarehousePolicy;
@@ -123,6 +125,7 @@ class AuthServiceProvider extends ServiceProvider
         VendorQuotation::class => VendorQuotationPolicy::class,
         PurchaseOrder::class => PurchaseOrderPolicy::class,
         GoodsReceive::class => GoodsReceivePolicy::class,
+        VendorInvoice::class => VendorInvoicePolicy::class,
         Employee::class => EmployeePolicy::class,
         Attendance::class => AttendancePolicy::class,
         Leave::class => LeavePolicy::class,

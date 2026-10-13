@@ -42,6 +42,32 @@ class VendorQuotationService
     }
 
     /**
+     * Revises an already-submitted quotation's items/total — added for
+     * Phase 17h's vendor-portal self-service RFQ response, where a
+     * vendor may want to correct a quote before anyone has acted on it.
+     * Guarded the same way create() is: only while the quotation itself
+     * is still Received (nobody has selected or rejected it yet) and its
+     * parent request hasn't moved past being open for quotation.
+     */
+    public function update(VendorQuotation $vq, array $items): VendorQuotation
+    {
+        if ($vq->status !== VendorQuotationStatus::Received) {
+            throw new \RuntimeException('This quotation has already been decided and can no longer be revised.');
+        }
+
+        if ($vq->purchaseRequest->status !== PurchaseRequestStatus::SentForQuotation) {
+            throw new \RuntimeException('This request is no longer open for quotation.');
+        }
+
+        return DB::transaction(function () use ($vq, $items) {
+            $this->syncItems($vq, $items);
+            $this->recalculateTotal($vq);
+
+            return $vq->fresh(['items']);
+        });
+    }
+
+    /**
      * Selects this quotation as the winner: rejects every other
      * quotation on the same purchase request and flips the request to
      * VendorSelected, all inside one transaction — mirrors

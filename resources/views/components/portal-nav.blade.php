@@ -30,7 +30,9 @@
         ],
         'vendor' => [
             ['label' => 'Dashboard', 'route' => 'vendor.dashboard'],
+            ['label' => 'RFQs', 'route' => 'vendor.rfqs.index'],
             ['label' => 'Purchase Orders', 'route' => 'vendor.purchase-orders.index'],
+            ['label' => 'Invoices', 'route' => 'vendor.invoices.index'],
             ['label' => 'Ledger', 'route' => 'vendor.ledger.index'],
         ],
         default => [],

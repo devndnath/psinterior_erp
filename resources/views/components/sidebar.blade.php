@@ -69,6 +69,7 @@
                 ['label' => 'Vendors', 'route' => 'vendors.index', 'active' => 'vendors.*', 'icon' => 'truck', 'permission' => 'view_vendors'],
                 ['label' => 'Purchase Requests', 'route' => 'purchase-requests.index', 'active' => 'purchase-requests.*', 'icon' => 'file-plus', 'permission' => 'view_purchase_orders'],
                 ['label' => 'Purchase Orders', 'route' => 'purchase-orders.index', 'active' => 'purchase-orders.*', 'icon' => 'shopping-cart', 'permission' => 'view_purchase_orders'],
+                ['label' => 'Vendor Invoices', 'route' => 'vendor-invoices.index', 'active' => 'vendor-invoices.*', 'icon' => 'receipt', 'permission' => 'view_vendor_invoices'],
             ],
         ],
         [
