@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\MaterialRequisitionStatus;
 use App\Enums\StockMovementType;
 use App\Models\MaterialRequisition;
+use App\Models\MaterialRequisitionItem;
 use App\Models\Project;
 use App\Models\Warehouse;
 use Illuminate\Support\Facades\DB;
@@ -12,11 +13,15 @@ use Illuminate\Support\Facades\DB;
 /**
  * Owns the Material Requisition aggregate and its approval chain:
  * Pending -> ManagerApproved -> StoreApproved -> Issued, with Rejected
- * reachable from Pending or ManagerApproved. Only issue() moves stock —
- * every earlier step is a pure status transition.
+ * reachable from Pending or ManagerApproved. issue() and returnItem()
+ * are the only two methods that move stock — every status-transition
+ * method is a pure status change.
  *
  * Partial issuance is out of scope for this phase: issue() always issues
  * an item's full requested quantity (documented as a simplification).
+ * Partial/multiple *returns* against one issued item ARE supported —
+ * returnItem() can be called more than once per item as material trickles
+ * back from site, capped at what's still outstanding.
  */
 class MaterialRequisitionService
 {
@@ -146,6 +151,55 @@ class MaterialRequisitionService
             ]);
 
             return $mr->fresh(['items']);
+        });
+    }
+
+    /**
+     * Records material coming back from site against one already-issued
+     * line item: posts a positive Return stock movement into the
+     * requisition's warehouse (reversing part of the original negative
+     * Issue movement) and accumulates `returned_quantity` on the item.
+     * Can be called repeatedly for the same item (multiple partial
+     * returns) but never beyond what's still outstanding — the same
+     * "cap at what's actually there" discipline InventoryService itself
+     * enforces on every movement.
+     */
+    public function returnItem(MaterialRequisitionItem $item, float $quantity, ?int $userId = null, ?string $notes = null): MaterialRequisitionItem
+    {
+        $mr = $item->materialRequisition()->firstOrFail();
+
+        if ($mr->status !== MaterialRequisitionStatus::Issued) {
+            throw new \RuntimeException('Only items on an issued requisition can be returned.');
+        }
+
+        if ($quantity <= 0) {
+            throw new \RuntimeException('Return quantity must be greater than zero.');
+        }
+
+        if ($quantity > $item->returnableQuantity()) {
+            throw new \RuntimeException('Cannot return more than what is still outstanding for this item.');
+        }
+
+        if (! $mr->warehouse_id) {
+            throw new \RuntimeException('This requisition has no warehouse to return stock into.');
+        }
+
+        return DB::transaction(function () use ($item, $mr, $quantity, $userId) {
+            $item->load('product');
+            $warehouse = Warehouse::findOrFail($mr->warehouse_id);
+
+            $this->inventory->recordMovement(
+                $item->product,
+                $warehouse,
+                StockMovementType::ReturnStock,
+                $quantity,
+                reference: $mr,
+                createdBy: $userId,
+            );
+
+            $item->update(['returned_quantity' => (float) $item->returned_quantity + $quantity]);
+
+            return $item->fresh();
         });
     }
 

@@ -17,12 +17,22 @@ use Illuminate\Support\Collection;
  * contract value is what the project actually promised to deliver for —
  * the two can legitimately differ mid-project without that meaning the
  * job became more or less profitable.
+ *
+ * `estimated_budget` (set at project creation, independent of the signed
+ * contract value) is a *separate* figure this service also reports
+ * against: `budget_variance = estimated_budget - total_expenses` answers
+ * "are we spending more than we planned to," which `profit` (measured
+ * against what the client is being charged) cannot answer on its own —
+ * a project can be within budget and still unprofitable, or over budget
+ * and still profitable, if the contract value was generous. Both figures
+ * are shown side by side rather than one replacing the other.
  */
 class ProfitabilityService
 {
     public function forProject(Project $project): array
     {
         $contractValue = (float) ($project->contract_value ?? 0);
+        $estimatedBudget = $project->estimated_budget !== null ? (float) $project->estimated_budget : null;
 
         $totalInvoiced = (float) Invoice::where('project_id', $project->id)
             ->where('status', '!=', InvoiceStatus::Cancelled->value)
@@ -33,14 +43,21 @@ class ProfitabilityService
         $totalExpenses = (float) Expense::where('project_id', $project->id)->sum('amount');
 
         $profit = $contractValue - $totalExpenses;
+        $budgetVariance = $estimatedBudget !== null ? $estimatedBudget - $totalExpenses : null;
 
         return [
             'contract_value' => $contractValue,
+            'estimated_budget' => $estimatedBudget,
             'total_invoiced' => $totalInvoiced,
             'total_received' => $totalReceived,
             'total_expenses' => $totalExpenses,
             'profit' => $profit,
             'margin_percent' => $contractValue > 0 ? round($profit / $contractValue * 100, 2) : null,
+            'budget_variance' => $budgetVariance,
+            'budget_variance_percent' => ($estimatedBudget !== null && $estimatedBudget > 0)
+                ? round($budgetVariance / $estimatedBudget * 100, 2)
+                : null,
+            'is_over_budget' => $budgetVariance !== null ? $budgetVariance < 0 : null,
         ];
     }
 
@@ -69,17 +86,25 @@ class ProfitabilityService
             $invoicedByProject, $receivedByProject, $expensesByProject
         ) {
             $contractValue = (float) ($project->contract_value ?? 0);
+            $estimatedBudget = $project->estimated_budget !== null ? (float) $project->estimated_budget : null;
             $totalExpenses = (float) ($expensesByProject[$project->id] ?? 0);
             $profit = $contractValue - $totalExpenses;
+            $budgetVariance = $estimatedBudget !== null ? $estimatedBudget - $totalExpenses : null;
 
             return [
                 'project' => $project,
                 'contract_value' => $contractValue,
+                'estimated_budget' => $estimatedBudget,
                 'total_invoiced' => (float) ($invoicedByProject[$project->id] ?? 0),
                 'total_received' => (float) ($receivedByProject[$project->id] ?? 0),
                 'total_expenses' => $totalExpenses,
                 'profit' => $profit,
                 'margin_percent' => $contractValue > 0 ? round($profit / $contractValue * 100, 2) : null,
+                'budget_variance' => $budgetVariance,
+                'budget_variance_percent' => ($estimatedBudget !== null && $estimatedBudget > 0)
+                    ? round($budgetVariance / $estimatedBudget * 100, 2)
+                    : null,
+                'is_over_budget' => $budgetVariance !== null ? $budgetVariance < 0 : null,
             ];
         });
     }

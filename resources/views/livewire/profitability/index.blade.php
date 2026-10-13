@@ -23,6 +23,8 @@
                     <th class="text-right">Expenses</th>
                     <th class="text-right">Profit</th>
                     <th class="text-right">Margin %</th>
+                    <th class="text-right">Budget</th>
+                    <th class="text-right">Budget Variance</th>
                 </tr>
             </thead>
             <tbody>
@@ -38,6 +40,17 @@
                         <td class="text-right">{{ number_format($row['total_expenses'], 2) }}</td>
                         <td class="text-right font-medium {{ $row['profit'] >= 0 ? 'text-success-700' : 'text-danger-600' }}">{{ number_format($row['profit'], 2) }}</td>
                         <td class="text-right">{{ $row['margin_percent'] === null ? '—' : number_format($row['margin_percent'], 2).'%' }}</td>
+                        <td class="text-right">{{ $row['estimated_budget'] === null ? '—' : number_format($row['estimated_budget'], 2) }}</td>
+                        <td class="text-right font-medium {{ $row['is_over_budget'] === true ? 'text-danger-600' : ($row['is_over_budget'] === false ? 'text-success-700' : '') }}">
+                            @if ($row['budget_variance'] === null)
+                                —
+                            @else
+                                {{ number_format($row['budget_variance'], 2) }}
+                                @if ($row['budget_variance_percent'] !== null)
+                                    <span class="text-ink-400">({{ number_format($row['budget_variance_percent'], 1) }}%)</span>
+                                @endif
+                            @endif
+                        </td>
                     </tr>
                 @endforeach
             </tbody>

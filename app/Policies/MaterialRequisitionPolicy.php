@@ -71,6 +71,17 @@ class MaterialRequisitionPolicy
         return $user->isStaff() && $user->can('manage_inventory');
     }
 
+    /**
+     * Returning material back into stock is itself a stock-moving action,
+     * so it's gated on the same `manage_inventory` ability as issue() —
+     * never general edit — matching every other stock-mutating action in
+     * this codebase (StockTransferPolicy::complete(), etc.).
+     */
+    public function returnItems(User $user, MaterialRequisition $materialRequisition): bool
+    {
+        return $user->isStaff() && $user->can('manage_inventory');
+    }
+
     public function reject(User $user, MaterialRequisition $materialRequisition): bool
     {
         return $user->isStaff() && $user->can('edit_material_requisitions');

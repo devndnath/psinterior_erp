@@ -3,6 +3,7 @@
 namespace App\Livewire\MaterialRequisitions;
 
 use App\Models\MaterialRequisition;
+use App\Models\MaterialRequisitionItem;
 use App\Models\Warehouse;
 use App\Services\MaterialRequisitionService;
 use Illuminate\Support\Facades\Auth;
@@ -17,6 +18,9 @@ class Show extends Component
     public MaterialRequisition $materialRequisition;
 
     public string $issue_warehouse_id = '';
+
+    /** @var array<int, string> item id => quantity-to-return input */
+    public array $return_quantity = [];
 
     public function mount(MaterialRequisition $materialRequisition): void
     {
@@ -71,6 +75,27 @@ class Show extends Component
             );
 
             $this->dispatch('toast', message: "Requisition {$this->materialRequisition->mr_no} issued.", type: 'success');
+        } catch (\RuntimeException $e) {
+            $this->dispatch('toast', message: $e->getMessage(), type: 'error');
+        }
+    }
+
+    public function returnItem(int $itemId, MaterialRequisitionService $service): void
+    {
+        Gate::authorize('returnItems', $this->materialRequisition);
+
+        $item = MaterialRequisitionItem::where('material_requisition_id', $this->materialRequisition->id)
+            ->findOrFail($itemId);
+
+        $quantity = (float) ($this->return_quantity[$itemId] ?? 0);
+
+        try {
+            $service->returnItem($item, $quantity, Auth::id());
+
+            unset($this->return_quantity[$itemId]);
+            $this->materialRequisition->refresh();
+
+            $this->dispatch('toast', message: 'Return recorded and stock updated.', type: 'success');
         } catch (\RuntimeException $e) {
             $this->dispatch('toast', message: $e->getMessage(), type: 'error');
         }

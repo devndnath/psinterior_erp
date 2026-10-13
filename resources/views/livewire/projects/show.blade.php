@@ -619,6 +619,23 @@
                             </div>
                             <div class="flex justify-between"><dt class="text-ink-500">Margin</dt><dd class="font-medium text-ink-900">{{ $profitability['margin_percent'] === null ? '—' : number_format($profitability['margin_percent'], 2).'%' }}</dd></div>
                         </dl>
+                        <dl class="mt-4 space-y-2 border-t border-ink-100 pt-4 text-sm">
+                            <div class="flex justify-between"><dt class="text-ink-500">Budget</dt><dd class="font-medium text-ink-900">{{ $profitability['estimated_budget'] === null ? 'Not set' : number_format($profitability['estimated_budget'], 2) }}</dd></div>
+                            @if ($profitability['budget_variance'] !== null)
+                                <div class="flex justify-between border-t border-ink-100 pt-2">
+                                    <dt class="font-medium text-ink-700">Budget variance</dt>
+                                    <dd class="font-semibold {{ $profitability['is_over_budget'] ? 'text-danger-600' : 'text-success-700' }}">
+                                        {{ number_format($profitability['budget_variance'], 2) }}
+                                        @if ($profitability['budget_variance_percent'] !== null)
+                                            <span class="font-normal text-ink-400">({{ number_format($profitability['budget_variance_percent'], 1) }}%)</span>
+                                        @endif
+                                    </dd>
+                                </div>
+                                @if ($profitability['is_over_budget'])
+                                    <p class="text-xs text-danger-600">Spending has exceeded the estimated budget.</p>
+                                @endif
+                            @endif
+                        </dl>
                     </div>
                 @endif
             @endcan

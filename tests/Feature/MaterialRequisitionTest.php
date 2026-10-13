@@ -117,4 +117,97 @@ class MaterialRequisitionTest extends TestCase
 
         $this->assertNull($mr->fresh());
     }
+
+    public function test_returning_part_of_an_issued_item_restores_stock_and_tracks_consumption(): void
+    {
+        $project = Project::factory()->create();
+        $warehouse = Warehouse::factory()->create();
+        $product = Product::factory()->create();
+
+        $inventory = app(InventoryService::class);
+        $inventory->openingStock($product, $warehouse, 100);
+
+        $service = app(MaterialRequisitionService::class);
+        $mr = $service->create($project, ['date' => now()->toDateString()], [
+            ['product_id' => $product->id, 'quantity' => 30],
+        ]);
+        $mr = $service->approveByManager($mr);
+        $mr = $service->approveByStore($mr);
+        $mr = $service->issue($mr, $warehouse->id, $this->staff->id);
+
+        $this->assertEquals(70, $inventory->currentStock($product, $warehouse));
+
+        $item = $mr->items->first();
+        $item = $service->returnItem($item, 12, $this->staff->id);
+
+        $this->assertEquals(12, $item->returned_quantity);
+        $this->assertEquals(18, $item->consumedQuantity()); // 30 issued - 12 returned
+        $this->assertEquals(82, $inventory->currentStock($product, $warehouse)); // 70 + 12 back
+
+        // A second partial return is allowed, capped at what's outstanding.
+        $item = $service->returnItem($item, 18, $this->staff->id);
+        $this->assertEquals(30, $item->returned_quantity);
+        $this->assertEquals(0, $item->consumedQuantity());
+        $this->assertEquals(0, $item->returnableQuantity());
+        $this->assertEquals(100, $inventory->currentStock($product, $warehouse));
+    }
+
+    public function test_cannot_return_more_than_what_is_outstanding(): void
+    {
+        $project = Project::factory()->create();
+        $warehouse = Warehouse::factory()->create();
+        $product = Product::factory()->create();
+        app(InventoryService::class)->openingStock($product, $warehouse, 50);
+
+        $service = app(MaterialRequisitionService::class);
+        $mr = $service->create($project, ['date' => now()->toDateString()], [
+            ['product_id' => $product->id, 'quantity' => 10],
+        ]);
+        $mr = $service->approveByManager($mr);
+        $mr = $service->approveByStore($mr);
+        $mr = $service->issue($mr, $warehouse->id, $this->staff->id);
+
+        $this->expectException(\RuntimeException::class);
+        $service->returnItem($mr->items->first(), 11, $this->staff->id);
+    }
+
+    public function test_returning_before_issue_is_refused(): void
+    {
+        $project = Project::factory()->create();
+        $product = Product::factory()->create();
+
+        $service = app(MaterialRequisitionService::class);
+        $mr = $service->create($project, ['date' => now()->toDateString()], [
+            ['product_id' => $product->id, 'quantity' => 10],
+        ]);
+
+        $this->expectException(\RuntimeException::class);
+        $service->returnItem($mr->items->first(), 1, $this->staff->id);
+    }
+
+    public function test_a_user_without_manage_inventory_cannot_return_items_via_livewire(): void
+    {
+        $project = Project::factory()->create();
+        $warehouse = Warehouse::factory()->create();
+        $product = Product::factory()->create();
+        app(InventoryService::class)->openingStock($product, $warehouse, 50);
+
+        $service = app(MaterialRequisitionService::class);
+        $mr = $service->create($project, ['date' => now()->toDateString()], [
+            ['product_id' => $product->id, 'quantity' => 10],
+        ]);
+        $mr = $service->approveByManager($mr);
+        $mr = $service->approveByStore($mr);
+        $mr = $service->issue($mr, $warehouse->id, $this->staff->id);
+
+        $viewOnlyUser = User::factory()->create();
+        $viewOnlyUser->givePermissionTo(['view_material_requisitions']);
+
+        $itemId = $mr->items->first()->id;
+
+        Livewire::actingAs($viewOnlyUser)->test(MaterialRequisitionShow::class, ['materialRequisition' => $mr])
+            ->set("return_quantity.{$itemId}", 5)
+            ->call('returnItem', $itemId)
+            ->assertForbidden();
+    }
 }

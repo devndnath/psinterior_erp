@@ -51,14 +51,45 @@
                             <th>Product</th>
                             <th class="text-right">Requested</th>
                             <th class="text-right">Issued</th>
+                            @if ($materialRequisition->status->value === 'issued')
+                                <th class="text-right">Returned</th>
+                                <th class="text-right">Consumed</th>
+                                @can('returnItems', $materialRequisition)
+                                    <th class="text-right">Record Return</th>
+                                @endcan
+                            @endif
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($materialRequisition->items as $item)
-                            <tr>
+                            <tr wire:key="mr-item-{{ $item->id }}">
                                 <td class="text-ink-900">{{ $item->product?->name }} <span class="text-ink-400">({{ $item->product?->sku }})</span></td>
                                 <td class="text-right text-ink-500">{{ number_format($item->quantity, 2) }}</td>
                                 <td class="text-right font-medium text-ink-900">{{ number_format($item->issued_quantity, 2) }}</td>
+                                @if ($materialRequisition->status->value === 'issued')
+                                    <td class="text-right text-ink-500">{{ number_format($item->returned_quantity, 2) }}</td>
+                                    <td class="text-right font-medium text-ink-900">{{ number_format($item->consumedQuantity(), 2) }}</td>
+                                    @can('returnItems', $materialRequisition)
+                                        <td class="text-right">
+                                            @if ($item->returnableQuantity() > 0)
+                                                <div class="flex items-center justify-end gap-2">
+                                                    <input
+                                                        type="number" step="0.01" min="0" max="{{ $item->returnableQuantity() }}"
+                                                        wire:model="return_quantity.{{ $item->id }}"
+                                                        placeholder="Qty"
+                                                        class="w-20 rounded-md border-ink-200 bg-surface text-sm text-ink-900 shadow-sm focus:border-accent-500 focus:ring-accent-500"
+                                                    >
+                                                    <button type="button" wire:click="returnItem({{ $item->id }})" class="btn-secondary px-2 py-1 text-xs">Return</button>
+                                                </div>
+                                                @error('return_quantity.'.$item->id)
+                                                    <p class="mt-1 text-xs text-danger-600">{{ $message }}</p>
+                                                @enderror
+                                            @else
+                                                <span class="text-ink-400">Fully returned</span>
+                                            @endif
+                                        </td>
+                                    @endcan
+                                @endif
                             </tr>
                         @endforeach
                     </tbody>
