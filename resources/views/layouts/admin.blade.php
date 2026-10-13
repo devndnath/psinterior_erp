@@ -17,7 +17,7 @@
 
         {{-- Mobile backdrop --}}
         <div x-show="sidebarOpen" x-cloak @click="sidebarOpen = false"
-             class="fixed inset-0 z-30 bg-gray-900/50 lg:hidden"></div>
+             class="fixed inset-0 z-30 bg-ink-900/60 backdrop-blur-[2px] lg:hidden"></div>
 
         <x-sidebar />
 

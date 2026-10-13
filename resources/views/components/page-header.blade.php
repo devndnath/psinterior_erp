@@ -19,7 +19,10 @@
 --}}
 @props(['title', 'description' => null])
 
-<div {{ $attributes->merge(['class' => 'mb-6']) }}>
+{{-- Minimalist redesign pass: a hairline bottom border separates the
+     header from the content below it on every page that uses this
+     component, instead of relying on margin alone to imply the break. --}}
+<div {{ $attributes->merge(['class' => 'mb-7 border-b border-ink-100 pb-5']) }}>
     @isset($breadcrumbs)
         <div class="mb-4">{{ $breadcrumbs }}</div>
     @endisset
@@ -28,7 +31,7 @@
         <div>
             <h1 class="page-title">{{ $title }}</h1>
             @if ($description)
-                <p class="mt-1 text-sm text-ink-500">{{ $description }}</p>
+                <p class="mt-1.5 text-sm text-ink-500">{{ $description }}</p>
             @endif
         </div>
 

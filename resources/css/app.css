@@ -16,38 +16,36 @@
 
 @layer components {
     .btn {
-        @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+        @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100;
     }
-    /* Phase 16: moved off the pre-Phase-13 default brand, gray and red
-       tones onto the ink, accent and danger design-system scale, so every
-       button — raw .btn-* usage and the <x-button> component alike, since
-       button.blade.php is just a wrapper around these same three classes —
-       matches the panels, badges and tables already migrated in Phase 15
-       instead of standing out as the one piece of old-palette chrome left
-       on every page. */
+    /* Minimalist redesign pass: every button now carries a soft shadow
+       that firms up on hover (depth without clutter) plus the
+       active:scale press-feedback on .btn above — small, standard
+       micro-interactions that read as "polished" rather than flat. Color
+       tokens themselves are unchanged from Phase 16. */
     .btn-primary {
-        @apply btn bg-accent-600 text-white hover:bg-accent-700 focus:ring-accent-500;
+        @apply btn bg-accent-600 text-white shadow-sm hover:bg-accent-700 hover:shadow focus:ring-accent-500;
     }
     .btn-secondary {
-        @apply btn bg-surface text-ink-700 ring-1 ring-inset ring-ink-200 hover:bg-ink-50 focus:ring-accent-500;
+        @apply btn bg-surface text-ink-700 shadow-sm ring-1 ring-inset ring-ink-200 hover:border-ink-300 hover:bg-ink-50 focus:ring-accent-500;
     }
     .btn-danger {
-        @apply btn bg-danger-600 text-white hover:bg-danger-700 focus:ring-danger-500;
+        @apply btn bg-danger-600 text-white shadow-sm hover:bg-danger-700 hover:shadow focus:ring-danger-500;
     }
     .form-label {
-        @apply block text-sm font-medium text-gray-700 mb-1;
+        @apply block text-sm font-medium text-ink-700 mb-1;
     }
     .form-error {
-        @apply mt-1 text-sm text-red-600;
+        @apply mt-1 text-sm text-danger-600;
     }
     .card {
-        @apply rounded-xl bg-white shadow-sm ring-1 ring-gray-200;
+        @apply rounded-xl bg-surface shadow-sm ring-1 ring-ink-100;
     }
     .badge {
-        @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+        @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ring-black/[0.04];
     }
     .th-sortable {
-        @apply cursor-pointer select-none whitespace-nowrap px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500 hover:text-gray-700;
+        @apply cursor-pointer select-none whitespace-nowrap px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-ink-500 hover:text-ink-700;
     }
 
     /* ---- Phase 13 design-system foundation additions (additive only —
@@ -58,37 +56,43 @@
 
     /* Serif page heading, used by <x-page-header>. */
     .page-title {
-        @apply font-serif text-2xl font-semibold text-ink-900 sm:text-3xl;
+        @apply font-serif text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl;
     }
 
     /* Hairline-bordered flat panel — a lighter-weight alternative to the
-       heavier shadow .card, for primary content areas in new components. */
+       heavier shadow .card, for primary content areas in new components.
+       Minimalist redesign pass: softened the border to ink-100, rounded
+       the corners up to rounded-xl, and added a barely-there shadow plus
+       a hover lift — subtle enough to stay "minimalist" at rest, but
+       gives every panel/card on every page a sense of depth instead of
+       sitting perfectly flat on the paper background. */
     .panel {
-        @apply rounded-lg border border-ink-200 bg-surface;
+        @apply rounded-xl border border-ink-100 bg-surface shadow-sm transition-shadow duration-150 hover:shadow-md;
     }
 
     /* Shared input chrome for <x-input>/<x-select>/<x-textarea>. */
     .field-input {
-        @apply block w-full rounded-md border-ink-200 bg-surface text-sm text-ink-900 placeholder:text-ink-400 shadow-sm focus:border-accent-500 focus:ring-accent-500;
+        @apply block w-full rounded-md border-ink-200 bg-surface text-sm text-ink-900 placeholder:text-ink-400 shadow-sm transition-colors focus:border-accent-500 focus:ring-accent-500;
     }
 
-    /* Table chrome for <x-table>. */
+    /* Table chrome for <x-table>. Airier padding and a quieter header than
+       before — minimalist redesign pass. */
     .table-base {
         @apply min-w-full divide-y divide-ink-100;
     }
     .table-base thead {
-        @apply bg-ink-50;
+        @apply bg-ink-50/60;
     }
     .table-base thead th {
-        @apply px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-ink-500;
+        @apply px-4 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-500;
     }
     .table-base tbody {
         @apply divide-y divide-ink-100 bg-surface;
     }
     .table-base tbody tr {
-        @apply hover:bg-ink-50;
+        @apply transition-colors hover:bg-accent-50/40;
     }
     .table-base tbody td {
-        @apply px-4 py-3 text-sm text-ink-700;
+        @apply px-4 py-3.5 text-sm text-ink-700;
     }
 }

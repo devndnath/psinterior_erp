@@ -149,28 +149,28 @@
 @endphp
 
 {{--
-    Phase 16: the shell moves off the cool bg-gray-900 and bg-gray-800
-    tones and the old blue brand-600 badge onto the warm ink-900 and
-    ink-800 scale plus the accent-600 teal — this was the one piece of
-    chrome Phase 13-15 never touched (see UI_UX_AUDIT_AND_REDESIGN_PLAN
-    .md), so it previously sat next to the paper and ink content area
-    looking like a different, older product. Every class below changed
-    only its color token; the $groups
-    data, permission gating, active-route logic and Alpine behavior are
-    byte-for-byte what they were before this phase.
+    Minimalist-but-attractive UI/UX redesign pass: the shell stays on the
+    warm ink-900 dark scale (Phase 16) but the active-item treatment moves
+    from a flat bg-fill to a left accent bar + soft tint (the gold brand
+    accent used sparingly, only on the thing the user is looking at, is
+    what makes a dark minimal sidebar feel premium rather than flat), and
+    spacing/typography are tightened for a calmer, more scannable rail.
+    The $groups data, permission gating, active-route logic and Alpine
+    behavior are byte-for-byte unchanged — only presentational classes
+    moved.
 --}}
 <aside
     :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
     class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-ink-900 transition-transform duration-200 ease-in-out lg:static lg:translate-x-0"
 >
-    <div class="flex h-16 shrink-0 items-center gap-2 px-6">
-        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-600 text-sm font-bold text-white">
+    <div class="flex h-16 shrink-0 items-center gap-2.5 border-b border-white/5 px-6">
+        <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-accent-400 to-accent-600 text-sm font-bold text-ink-900 shadow-sm ring-1 ring-white/10">
             {{ substr(config('app.name'), 0, 1) }}
         </div>
-        <span class="truncate text-sm font-semibold text-white">{{ config('app.name') }}</span>
+        <span class="truncate text-sm font-semibold tracking-tight text-white">{{ config('app.name') }}</span>
     </div>
 
-    <nav class="flex-1 space-y-1 overflow-y-auto px-3 py-4">
+    <nav class="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
         @foreach ($groups as $group)
             @php
                 $visibleItems = array_values(array_filter(
@@ -225,28 +225,34 @@
                     <button
                         type="button"
                         @click="toggle()"
-                        class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-wide text-ink-400 hover:text-ink-100"
+                        class="flex w-full items-center justify-between rounded-md px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-ink-500 transition hover:bg-white/5 hover:text-ink-200"
                     >
                         <span>{{ $group['label'] }}</span>
                         <x-icon
                             name="chevron-down"
-                            class="h-4 w-4 shrink-0 transition-transform duration-150"
+                            class="h-3.5 w-3.5 shrink-0 transition-transform duration-150"
                             x-bind:class="open ? 'rotate-180' : ''"
                         />
                     </button>
 
-                    <div x-show="open" x-cloak class="space-y-1">
+                    <div x-show="open" x-cloak class="space-y-0.5 pb-1">
                         @foreach ($visibleItems as $item)
                             <a
                                 href="{{ route($item['route']) }}"
                                 wire:navigate
                                 @class([
-                                    'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition',
-                                    'bg-ink-800 text-white' => request()->routeIs($item['active'] ?? $item['route'].'*'),
-                                    'text-ink-300 hover:bg-ink-800 hover:text-white' => ! request()->routeIs($item['active'] ?? $item['route'].'*'),
+                                    'flex items-center gap-3 rounded-r-md border-l-2 px-3 py-2 text-sm font-medium transition-colors',
+                                    'border-accent-500 bg-white/[0.06] text-white' => request()->routeIs($item['active'] ?? $item['route'].'*'),
+                                    'border-transparent text-ink-300 hover:border-white/10 hover:bg-white/[0.04] hover:text-white' => ! request()->routeIs($item['active'] ?? $item['route'].'*'),
                                 ])
                             >
-                                <x-icon :name="$item['icon']" class="h-5 w-5 shrink-0" />
+                                <x-icon
+                                    :name="$item['icon']"
+                                    @class([
+                                        'h-[18px] w-[18px] shrink-0',
+                                        'text-accent-400' => request()->routeIs($item['active'] ?? $item['route'].'*'),
+                                    ])
+                                />
                                 <span class="truncate">{{ $item['label'] }}</span>
                             </a>
                         @endforeach
@@ -256,9 +262,9 @@
         @endforeach
     </nav>
 
-    <div class="border-t border-ink-800 p-3">
-        <div class="flex items-center gap-3 rounded-lg px-3 py-2">
-            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ink-700 text-xs font-medium text-white">
+    <div class="border-t border-white/5 p-3">
+        <div class="flex items-center gap-3 rounded-lg p-2 transition hover:bg-white/5">
+            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent-500 to-accent-700 text-xs font-semibold text-ink-900 ring-1 ring-white/10">
                 {{ strtoupper(substr(auth()->user()->name ?? '?', 0, 1)) }}
             </div>
             <div class="min-w-0 flex-1">
@@ -266,9 +272,9 @@
                 <p class="truncate text-xs text-ink-400">{{ auth()->user()->getRoleNames()->first() ?? 'User' }}</p>
             </div>
         </div>
-        <form method="POST" action="{{ route('logout') }}" class="mt-1">
+        <form method="POST" action="{{ route('logout') }}" class="mt-0.5">
             @csrf
-            <button type="submit" class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-ink-300 hover:bg-ink-800 hover:text-white">
+            <button type="submit" class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-ink-400 transition hover:bg-danger-500/10 hover:text-danger-300">
                 Log out
             </button>
         </form>
