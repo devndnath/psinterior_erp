@@ -4,6 +4,7 @@ namespace App\Livewire\Clients;
 
 use App\Models\Client;
 use App\Services\ClientService;
+use App\Services\UserService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Layout;
@@ -34,6 +35,13 @@ class Show extends Component
      * this is shown on screen once instead of emailed.
      */
     public ?string $generatedPassword = null;
+
+    /**
+     * Distinguishes "a brand-new portal login was just created" from "an
+     * existing one's password was just reset" so the on-screen banner
+     * below can word itself correctly — both reuse $generatedPassword.
+     */
+    public bool $passwordJustReset = false;
 
     public function mount(Client $client): void
     {
@@ -86,6 +94,51 @@ class Show extends Component
         $this->client->refresh();
 
         $this->dispatch('toast', message: 'Contact removed.', type: 'success');
+    }
+
+    /**
+     * Suspend/restore this client's portal login — same `update`
+     * permission (edit_clients) as every other action on this page, not
+     * a separate user-management permission, since it's really "edit
+     * this client's own portal access" rather than general user admin
+     * (Client/Vendor logins are deliberately kept out of the staff-only
+     * Users screen — see Users\Index's docblock).
+     */
+    public function togglePortalActive(UserService $service): void
+    {
+        Gate::authorize('update', $this->client);
+
+        $portalUser = $this->client->portalUser;
+
+        if (! $portalUser) {
+            return;
+        }
+
+        $service->setActive($portalUser, ! $portalUser->is_active);
+        $this->client->refresh();
+
+        $this->dispatch('toast', message: $portalUser->is_active ? 'Portal access re-activated.' : 'Portal access deactivated.', type: 'success');
+    }
+
+    /**
+     * Generates a fresh password for this client's portal login and
+     * shows it on screen once — same no-outbound-email pattern as the
+     * password shown right after Clients\Form first creates the login.
+     */
+    public function resetPortalPassword(UserService $service): void
+    {
+        Gate::authorize('update', $this->client);
+
+        $portalUser = $this->client->portalUser;
+
+        if (! $portalUser) {
+            return;
+        }
+
+        $this->generatedPassword = $service->resetPassword($portalUser);
+        $this->passwordJustReset = true;
+
+        $this->dispatch('toast', message: 'Portal password reset.', type: 'success');
     }
 
     #[Title('Client')]

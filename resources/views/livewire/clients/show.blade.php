@@ -17,9 +17,9 @@
         <div x-data="{ open: true }" x-show="open" class="panel mb-6 border border-success-200 bg-success-50 p-4">
             <div class="flex items-start justify-between gap-4">
                 <div>
-                    <p class="text-sm font-semibold text-success-800">Portal login created for {{ $client->portalUser?->email }}</p>
+                    <p class="text-sm font-semibold text-success-800">{{ $passwordJustReset ? 'Portal password reset for' : 'Portal login created for' }} {{ $client->portalUser?->email }}</p>
                     <p class="mt-1 text-sm text-success-700">
-                        Temporary password: <code class="rounded bg-white px-2 py-0.5 font-mono">{{ $generatedPassword }}</code>
+                        {{ $passwordJustReset ? 'New password' : 'Temporary password' }}: <code class="rounded bg-white px-2 py-0.5 font-mono">{{ $generatedPassword }}</code>
                         — this app doesn't send login emails, so copy it now and share it with {{ $client->name }}. It won't be shown again.
                     </p>
                 </div>
@@ -42,8 +42,24 @@
                         <dt class="text-ink-500">Portal login</dt>
                         <dd class="font-medium text-ink-900">
                             @if ($client->portalUser)
-                                {{ $client->portalUser->email }}
-                                <x-status-badge :label="$client->portalUser->is_active ? 'Active' : 'Inactive'" :color="$client->portalUser->is_active ? 'green' : 'gray'" class="ml-1" />
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span>{{ $client->portalUser->email }}</span>
+                                    <x-status-badge :label="$client->portalUser->is_active ? 'Active' : 'Inactive'" :color="$client->portalUser->is_active ? 'green' : 'gray'" />
+                                    @can('update', $client)
+                                        <button type="button" wire:click="resetPortalPassword" wire:confirm="Reset this client's portal password? The old password stops working immediately." class="text-xs font-medium text-accent-600 hover:underline">Reset password</button>
+                                        <span class="text-ink-300">·</span>
+                                        <button
+                                            type="button"
+                                            wire:click="togglePortalActive"
+                                            @if ($client->portalUser->is_active)
+                                                wire:confirm="Deactivate this client's portal access? They won't be able to log in until it's reactivated."
+                                            @endif
+                                            class="text-xs font-medium {{ $client->portalUser->is_active ? 'text-danger-600' : 'text-success-600' }} hover:underline"
+                                        >
+                                            {{ $client->portalUser->is_active ? 'Deactivate' : 'Activate' }}
+                                        </button>
+                                    @endcan
+                                </div>
                             @else
                                 Not set up
                                 @can('update', $client)

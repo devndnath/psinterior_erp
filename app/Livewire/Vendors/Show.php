@@ -3,6 +3,7 @@
 namespace App\Livewire\Vendors;
 
 use App\Models\Vendor;
+use App\Services\UserService;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -19,6 +20,13 @@ class Show extends Component
      * this is shown on screen once instead of emailed.
      */
     public ?string $generatedPassword = null;
+
+    /**
+     * Distinguishes "a brand-new portal login was just created" from "an
+     * existing one's password was just reset" so the on-screen banner
+     * below can word itself correctly — both reuse $generatedPassword.
+     */
+    public bool $passwordJustReset = false;
 
     public function mount(Vendor $vendor): void
     {
@@ -44,6 +52,49 @@ class Show extends Component
 
         $this->dispatch('toast', message: "Vendor {$code} deleted.", type: 'success');
         $this->redirectRoute('vendors.index', navigate: true);
+    }
+
+    /**
+     * Suspend/restore this vendor's portal login — same `update`
+     * permission (edit_vendors) as every other action on this page; see
+     * Clients\Show::togglePortalActive()'s matching docblock for why
+     * this isn't routed through the staff-only Users screen instead.
+     */
+    public function togglePortalActive(UserService $service): void
+    {
+        Gate::authorize('update', $this->vendor);
+
+        $portalUser = $this->vendor->user;
+
+        if (! $portalUser) {
+            return;
+        }
+
+        $service->setActive($portalUser, ! $portalUser->is_active);
+        $this->vendor->refresh();
+
+        $this->dispatch('toast', message: $portalUser->is_active ? 'Portal access re-activated.' : 'Portal access deactivated.', type: 'success');
+    }
+
+    /**
+     * Generates a fresh password for this vendor's portal login and
+     * shows it on screen once — same no-outbound-email pattern as the
+     * password shown right after Vendors\Form first creates the login.
+     */
+    public function resetPortalPassword(UserService $service): void
+    {
+        Gate::authorize('update', $this->vendor);
+
+        $portalUser = $this->vendor->user;
+
+        if (! $portalUser) {
+            return;
+        }
+
+        $this->generatedPassword = $service->resetPassword($portalUser);
+        $this->passwordJustReset = true;
+
+        $this->dispatch('toast', message: 'Portal password reset.', type: 'success');
     }
 
     #[Title('Vendor')]

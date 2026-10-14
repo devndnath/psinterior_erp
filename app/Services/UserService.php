@@ -112,4 +112,37 @@ class UserService
             return ['user' => $user, 'password' => $password];
         });
     }
+
+    /**
+     * Activate/deactivate any login — staff, client-portal or
+     * vendor-portal alike. A deactivated account's credentials still
+     * exist but can no longer authenticate (guarded by each guard's
+     * login check against `is_active`, the same flag the Users screen
+     * already toggles via update() above), so this is the fast path
+     * for "suspend this client/vendor's portal access" without routing
+     * through the full staff-only Users\Form.
+     */
+    public function setActive(User $user, bool $active): User
+    {
+        $user->update(['is_active' => $active]);
+
+        return $user;
+    }
+
+    /**
+     * Resets any login's password to a fresh random one and returns it
+     * in plain text — there is no outbound email in this app (see
+     * createLinkedAccount()'s docblock above), so the caller is
+     * responsible for showing it on screen exactly once, the same
+     * pattern Clients\Form/Vendors\Form already use for the
+     * account-creation password.
+     */
+    public function resetPassword(User $user): string
+    {
+        $password = Str::password(12);
+
+        $user->update(['password' => Hash::make($password)]);
+
+        return $password;
+    }
 }
