@@ -69,12 +69,15 @@
                         </td>
                         <td>{{ $project->projectManager?->name ?? '—' }}</td>
                         <td class="text-right">
-                            <a href="{{ route('projects.show', $project) }}" wire:navigate class="text-ink-500 hover:text-ink-700">View</a>
-                            @can('update', $project)
-                                <a href="{{ route('projects.edit', $project) }}" wire:navigate class="ml-3 text-ink-500 hover:text-ink-700">Edit</a>
-                            @endcan
-                            @can('delete', $project)
-                                <span class="ml-3 inline-block">
+                            {{-- Phase 5 (premium-SaaS redesign): a single
+                                 "..." action menu instead of several
+                                 separate text links in every row. --}}
+                            <x-dropdown>
+                                <a href="{{ route('projects.show', $project) }}" wire:navigate class="dropdown-item">View</a>
+                                @can('update', $project)
+                                    <a href="{{ route('projects.edit', $project) }}" wire:navigate class="dropdown-item">Edit</a>
+                                @endcan
+                                @can('delete', $project)
                                     <x-confirm-dialog
                                         title="Delete this project?"
                                         :message='"This will remove {$project->name} ({$project->project_code}) and its milestones/tasks. This cannot be undone."'
@@ -82,11 +85,11 @@
                                         :params="[$project->id]"
                                     >
                                         <x-slot:trigger>
-                                            <button type="button" class="text-danger-600 hover:text-danger-700">Delete</button>
+                                            <button type="button" class="dropdown-item-danger">Delete</button>
                                         </x-slot:trigger>
                                     </x-confirm-dialog>
-                                </span>
-                            @endcan
+                                @endcan
+                            </x-dropdown>
                         </td>
                     </tr>
                 @endforeach

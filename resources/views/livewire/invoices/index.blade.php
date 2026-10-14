@@ -81,12 +81,15 @@
                             <x-status-badge :label="$invoice->status->label()" :color="$invoice->status->color()" />
                         </td>
                         <td class="text-right">
-                            <a href="{{ route('invoices.show', $invoice) }}" wire:navigate class="text-ink-500 hover:text-ink-700">View</a>
-                            @can('update', $invoice)
-                                <a href="{{ route('invoices.edit', $invoice) }}" wire:navigate class="ml-3 text-ink-500 hover:text-ink-700">Edit</a>
-                            @endcan
-                            @can('delete', $invoice)
-                                <span class="ml-3 inline-block">
+                            {{-- Phase 5 (premium-SaaS redesign): a single
+                                 "..." action menu instead of several
+                                 separate text links in every row. --}}
+                            <x-dropdown>
+                                <a href="{{ route('invoices.show', $invoice) }}" wire:navigate class="dropdown-item">View</a>
+                                @can('update', $invoice)
+                                    <a href="{{ route('invoices.edit', $invoice) }}" wire:navigate class="dropdown-item">Edit</a>
+                                @endcan
+                                @can('delete', $invoice)
                                     <x-confirm-dialog
                                         title="Delete this invoice?"
                                         :message='"This will remove {$invoice->invoice_no} and its items. This cannot be undone."'
@@ -94,11 +97,11 @@
                                         :params="[$invoice->id]"
                                     >
                                         <x-slot:trigger>
-                                            <button type="button" class="text-danger-600 hover:text-danger-700">Delete</button>
+                                            <button type="button" class="dropdown-item-danger">Delete</button>
                                         </x-slot:trigger>
                                     </x-confirm-dialog>
-                                </span>
-                            @endcan
+                                @endcan
+                            </x-dropdown>
                         </td>
                     </tr>
                 @endforeach

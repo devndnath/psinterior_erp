@@ -169,4 +169,13 @@
     .table-base tbody td {
         @apply px-4 py-3.5 text-sm text-ink-700;
     }
+
+    /* Phase 5 (premium-SaaS redesign): menu-item chrome for
+       components/dropdown.blade.php's row-action panel. */
+    .dropdown-item {
+        @apply block w-full px-3 py-2 text-left text-sm text-ink-700 transition-colors hover:bg-ink-50;
+    }
+    .dropdown-item-danger {
+        @apply dropdown-item text-danger-600 hover:bg-danger-50;
+    }
 }

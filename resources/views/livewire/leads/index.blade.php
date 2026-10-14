@@ -79,12 +79,15 @@
                         <td>{{ $lead->assignee?->name ?? '—' }}</td>
                         <td>{{ $lead->expected_closing_date?->format('d M, Y') ?? '—' }}</td>
                         <td class="text-right">
-                            <a href="{{ route('leads.show', $lead) }}" wire:navigate class="text-ink-500 hover:text-ink-700">View</a>
-                            @can('update', $lead)
-                                <a href="{{ route('leads.edit', $lead) }}" wire:navigate class="ml-3 text-ink-500 hover:text-ink-700">Edit</a>
-                            @endcan
-                            @can('delete', $lead)
-                                <span class="ml-3 inline-block">
+                            {{-- Phase 5 (premium-SaaS redesign): a single
+                                 "..." action menu instead of several
+                                 separate text links in every row. --}}
+                            <x-dropdown>
+                                <a href="{{ route('leads.show', $lead) }}" wire:navigate class="dropdown-item">View</a>
+                                @can('update', $lead)
+                                    <a href="{{ route('leads.edit', $lead) }}" wire:navigate class="dropdown-item">Edit</a>
+                                @endcan
+                                @can('delete', $lead)
                                     <x-confirm-dialog
                                         title="Delete this lead?"
                                         :message='"This will remove {$lead->name} ({$lead->lead_no}). This cannot be undone."'
@@ -92,11 +95,11 @@
                                         :params="[$lead->id]"
                                     >
                                         <x-slot:trigger>
-                                            <button type="button" class="text-danger-600 hover:text-danger-700">Delete</button>
+                                            <button type="button" class="dropdown-item-danger">Delete</button>
                                         </x-slot:trigger>
                                     </x-confirm-dialog>
-                                </span>
-                            @endcan
+                                @endcan
+                            </x-dropdown>
                         </td>
                     </tr>
                 @endforeach
