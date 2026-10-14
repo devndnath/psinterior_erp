@@ -36,7 +36,7 @@
                 <label class="form-label">Address</label>
                 <textarea wire:model="company_address" rows="2" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm"></textarea>
             </div>
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="form-label">Phone</label>
                     <input wire:model="company_phone" type="text" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
@@ -59,7 +59,7 @@
     {{-- Finance / Tax --}}
     <div x-show="tab === 'finance'" x-cloak class="mt-6 max-w-xl">
         <form wire:submit="saveFinance" class="space-y-5">
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="form-label">Currency code</label>
                     <input wire:model="currency" type="text" maxlength="3" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm uppercase">
@@ -88,7 +88,7 @@
     <div x-show="tab === 'prefixes'" x-cloak class="mt-6 max-w-xl">
         <form wire:submit="savePrefixes" class="space-y-5">
             <p class="text-sm text-gray-500">Controls the prefix each module's auto-generated number uses (e.g. <span class="font-mono">{{ $prefix_project }}-000001</span>). Already-issued numbers are never renumbered.</p>
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="form-label">Lead</label>
                     <input wire:model="prefix_lead" type="text" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm uppercase">

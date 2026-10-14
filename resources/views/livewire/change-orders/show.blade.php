@@ -29,7 +29,7 @@
         @endif
     </p>
 
-    <div class="grid grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="col-span-2 space-y-6">
             <div class="panel p-6">
                 <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Details</h2>
@@ -39,6 +39,7 @@
             @if ($changeOrder->items->isNotEmpty())
                 <div class="panel p-6">
                     <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Line items</h2>
+                    <div class="overflow-x-auto">
                     <table class="table-base">
                         <thead>
                             <tr>
@@ -59,6 +60,7 @@
                             @endforeach
                         </tbody>
                     </table>
+                    </div>
                 </div>
             @endif
         </div>

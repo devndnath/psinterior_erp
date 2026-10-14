@@ -15,7 +15,7 @@
     </p>
 
     <div class="panel p-6">
-        <dl class="grid grid-cols-2 gap-4 text-sm">
+        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
             <div><dt class="text-ink-500">Your invoice no.</dt><dd class="font-medium text-ink-900">{{ $vendorInvoice->vendor_invoice_no ?: '—' }}</dd></div>
             <div><dt class="text-ink-500">Invoice date</dt><dd class="font-medium text-ink-900">{{ $vendorInvoice->invoice_date?->format('d M, Y') }}</dd></div>
             <div><dt class="text-ink-500">Amount</dt><dd class="font-semibold text-ink-900">{{ number_format($vendorInvoice->amount, 2) }}</dd></div>

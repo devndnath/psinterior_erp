@@ -8,7 +8,7 @@
 
     <p class="-mt-4 mb-6 text-sm text-ink-500">{{ $leave->from_date->format('d M, Y') }} – {{ $leave->to_date->format('d M, Y') }}</p>
 
-    <div class="grid grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="col-span-2 space-y-6">
             <div class="panel p-6">
                 <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Reason</h2>

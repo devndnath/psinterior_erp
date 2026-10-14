@@ -6,7 +6,7 @@
     </x-page-header>
 
     <form wire:submit="save" class="max-w-4xl space-y-6">
-        <div class="panel grid grid-cols-2 gap-4 p-6">
+        <div class="panel grid grid-cols-1 sm:grid-cols-2 gap-4 p-6">
             <x-select label="Project *" name="project_id" wire:model="project_id" :disabled="(bool) $siteReport">
                 <option value="">Select…</option>
                 @foreach ($projects as $proj)

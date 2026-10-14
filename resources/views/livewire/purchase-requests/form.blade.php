@@ -6,7 +6,7 @@
     </x-page-header>
 
     <form wire:submit="save" class="max-w-4xl space-y-6">
-        <div class="panel grid grid-cols-2 gap-4 p-6">
+        <div class="panel grid grid-cols-1 sm:grid-cols-2 gap-4 p-6">
             <div class="col-span-2">
                 <x-select label="Project *" name="project_id" wire:model="project_id" :disabled="(bool) $purchaseRequest">
                     <option value="">Select…</option>
@@ -28,7 +28,7 @@
 
             <div class="space-y-3">
                 @foreach ($items as $index => $item)
-                    <div wire:key="pr-item-{{ $index }}" class="grid grid-cols-12 gap-2 rounded-lg border border-ink-100 p-3">
+                    <div wire:key="pr-item-{{ $index }}" class="grid grid-cols-1 md:grid-cols-12 gap-2 rounded-lg border border-ink-100 p-3">
                         <div class="col-span-8">
                             <select wire:model="items.{{ $index }}.product_id" class="field-input">
                                 <option value="">Select a product…</option>

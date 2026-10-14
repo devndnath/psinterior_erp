@@ -6,7 +6,7 @@
     </x-page-header>
 
     <form wire:submit="save" class="max-w-2xl space-y-6">
-        <div class="panel grid grid-cols-2 gap-4 p-6">
+        <div class="panel grid grid-cols-1 sm:grid-cols-2 gap-4 p-6">
             <div class="col-span-2 rounded-lg bg-accent-50 p-3 text-sm text-accent-700">
                 Against warranty for {{ $warranty->project?->project_code }} — {{ $warranty->project?->name }}
                 ({{ $warranty->start_date->format('d M, Y') }} – {{ $warranty->end_date->format('d M, Y') }})

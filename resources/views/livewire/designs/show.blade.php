@@ -35,11 +35,11 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="col-span-2 space-y-6">
             <div class="card p-6">
                 <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Details</h2>
-                <dl class="grid grid-cols-2 gap-4 text-sm">
+                <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div><dt class="text-gray-500">Category</dt><dd class="font-medium text-gray-900">{{ $design->category?->label() ?? '—' }}</dd></div>
                     <div><dt class="text-gray-500">Uploaded by</dt><dd class="font-medium text-gray-900">{{ $design->uploader?->name ?? '—' }}</dd></div>
                     <div><dt class="text-gray-500">Client decision</dt>
@@ -73,7 +73,7 @@
                             @error('revisionFile') <p class="form-error">{{ $message }}</p> @enderror
                             <div wire:loading wire:target="revisionFile" class="mt-2 text-xs text-gray-400">Uploading…</div>
                         </div>
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                                 <label class="form-label">Drawing No.</label>
                                 <input type="text" wire:model="revisionDrawingNo" placeholder="e.g. DRG-ELV-03" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">

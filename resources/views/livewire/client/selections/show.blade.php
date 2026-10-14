@@ -37,7 +37,7 @@
         </div>
     @endif
 
-    <div class="grid grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         @foreach ($board->options as $option)
             @php($isChosen = $board->decided_option_id === $option->id)
             <div wire:key="option-{{ $option->id }}" class="panel p-4 {{ $isChosen ? 'border-l-4 border-success-500' : '' }}">

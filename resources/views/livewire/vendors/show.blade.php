@@ -38,11 +38,11 @@
         </div>
     @endif
 
-    <div class="grid grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="col-span-2 space-y-6">
             <div class="panel p-6">
                 <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Details</h2>
-                <dl class="grid grid-cols-2 gap-4 text-sm">
+                <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div><dt class="text-ink-500">Contact Person</dt><dd class="font-medium text-ink-900">{{ $vendor->contact_person ?: '—' }}</dd></div>
                     <div><dt class="text-ink-500">Phone</dt><dd class="font-medium text-ink-900">{{ $vendor->phone ?: '—' }}</dd></div>
                     <div><dt class="text-ink-500">Email</dt><dd class="font-medium text-ink-900">{{ $vendor->email ?: '—' }}</dd></div>
@@ -59,6 +59,7 @@
                 @if ($products->isEmpty())
                     <p class="text-sm text-ink-500">No products linked to this vendor yet.</p>
                 @else
+                    <div class="overflow-x-auto">
                     <table class="table-base">
                         <thead>
                             <tr>
@@ -75,6 +76,7 @@
                             @endforeach
                         </tbody>
                     </table>
+                    </div>
                 @endif
             </div>
 

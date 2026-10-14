@@ -19,11 +19,11 @@
         @endif
     </p>
 
-    <div class="grid grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="col-span-2 space-y-6">
             <div class="panel p-6">
                 <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Site conditions</h2>
-                <dl class="grid grid-cols-2 gap-4 text-sm">
+                <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div><dt class="text-ink-500">Weather</dt><dd class="font-medium text-ink-900">{{ $siteReport->weather ?: '—' }}</dd></div>
                     <div><dt class="text-ink-500">Manpower on site</dt><dd class="font-medium text-ink-900">{{ $siteReport->manpower_count ?? '—' }}</dd></div>
                 </dl>
@@ -58,7 +58,7 @@
                 @if ($photos->isEmpty())
                     <p class="text-sm text-ink-500">No photos uploaded.</p>
                 @else
-                    <div class="grid grid-cols-2 gap-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         @foreach ($photos as $photo)
                             <a href="{{ $photo->url() }}" target="_blank" class="block overflow-hidden rounded-lg border border-ink-100">
                                 <img src="{{ $photo->url() }}" alt="{{ $photo->file_name }}" class="h-24 w-full object-cover">

@@ -28,11 +28,11 @@
         {{ $product->sku }} — {{ $product->category?->name }}
     </p>
 
-    <div class="grid grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="col-span-2 space-y-6">
             <div class="panel p-6">
                 <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Details</h2>
-                <dl class="grid grid-cols-2 gap-4 text-sm">
+                <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div><dt class="text-ink-500">Brand</dt><dd class="font-medium text-ink-900">{{ $product->brand ?: '—' }}</dd></div>
                     <div><dt class="text-ink-500">Unit</dt><dd class="font-medium text-ink-900">{{ $product->unit?->name }} ({{ $product->unit?->short_code }})</dd></div>
                     <div><dt class="text-ink-500">Purchase Price</dt><dd class="font-medium text-ink-900">{{ number_format($product->purchase_price, 2) }}</dd></div>
@@ -50,6 +50,7 @@
                 @if ($stockPerWarehouse->isEmpty())
                     <p class="text-sm text-ink-500">No stock recorded for this product yet.</p>
                 @else
+                    <div class="overflow-x-auto">
                     <table class="table-base">
                         <thead>
                             <tr>
@@ -68,6 +69,7 @@
                             @endforeach
                         </tbody>
                     </table>
+                    </div>
                 @endif
             </div>
 
@@ -76,6 +78,7 @@
                 @if ($recentMovements->isEmpty())
                     <p class="text-sm text-ink-500">No stock movements recorded yet.</p>
                 @else
+                    <div class="overflow-x-auto">
                     <table class="table-base">
                         <thead>
                             <tr>
@@ -98,6 +101,7 @@
                             @endforeach
                         </tbody>
                     </table>
+                    </div>
                 @endif
             </div>
         </div>

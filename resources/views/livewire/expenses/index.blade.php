@@ -46,6 +46,7 @@
                 description="Record an expense to track money spent on a project."
             />
         @else
+            <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
@@ -97,6 +98,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
             <div class="border-t border-gray-100 px-4 py-3">
                 {{ $expenses->links() }}
             </div>

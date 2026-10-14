@@ -6,7 +6,7 @@
     </x-page-header>
 
     <form wire:submit="save" class="max-w-2xl space-y-6">
-        <div class="panel grid grid-cols-2 gap-4 p-6">
+        <div class="panel grid grid-cols-1 sm:grid-cols-2 gap-4 p-6">
             <div>
                 <x-select label="Subcontractor *" name="subcontractor_id" wire:model="subcontractor_id">
                     <option value="">Select…</option>

@@ -32,10 +32,11 @@
         </x-slot:actions>
     </x-page-header>
 
-    <div class="grid grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="col-span-2 space-y-6">
             <div class="panel p-6">
                 <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Breakdown</h2>
+                <div class="overflow-x-auto">
                 <table class="table-base">
                     <tbody>
                         <tr><td class="text-ink-500">Basic</td><td class="text-right font-medium text-ink-900">{{ number_format($payroll->basic, 2) }}</td></tr>
@@ -47,6 +48,7 @@
                         <tr class="bg-ink-50"><td class="font-semibold text-ink-900">Net Salary</td><td class="text-right font-semibold text-ink-900">{{ number_format($payroll->net_salary, 2) }}</td></tr>
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
 

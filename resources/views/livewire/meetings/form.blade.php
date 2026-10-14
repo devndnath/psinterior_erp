@@ -6,7 +6,7 @@
     </x-page-header>
 
     <form wire:submit="save" class="max-w-4xl space-y-6">
-        <div class="panel grid grid-cols-2 gap-4 p-6">
+        <div class="panel grid grid-cols-1 sm:grid-cols-2 gap-4 p-6">
             <x-select label="Project" name="project_id" wire:model="project_id">
                 <option value="">No project</option>
                 @foreach ($projects as $proj)
@@ -40,7 +40,7 @@
 
         <div class="panel p-6">
             <h2 class="mb-4 text-sm font-semibold text-ink-700">Participants</h2>
-            <div class="grid grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <x-select label="Users" name="participant_users" wire:model="participant_users" multiple size="6">
                     @foreach ($users as $u)
                         <option value="{{ $u->id }}">{{ $u->name }}</option>

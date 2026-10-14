@@ -6,7 +6,7 @@
     </h1>
 
     <form wire:submit="save" class="max-w-3xl space-y-6">
-        <div class="card grid grid-cols-2 gap-4 p-6">
+        <div class="card grid grid-cols-1 sm:grid-cols-2 gap-4 p-6">
             <div class="col-span-2">
                 <label class="form-label">Project *</label>
                 <select wire:model="project_id" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">

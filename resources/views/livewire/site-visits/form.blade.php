@@ -6,7 +6,7 @@
     </x-page-header>
 
     <form wire:submit="save" class="max-w-4xl space-y-6">
-        <div class="panel grid grid-cols-2 gap-4 p-6">
+        <div class="panel grid grid-cols-1 sm:grid-cols-2 gap-4 p-6">
             <x-select label="Client *" name="client_id" wire:model="client_id">
                 <option value="">Select…</option>
                 @foreach ($clients as $client)
@@ -51,7 +51,7 @@
 
             <div class="space-y-3">
                 @foreach ($rooms as $index => $room)
-                    <div wire:key="room-{{ $index }}" class="grid grid-cols-12 gap-2 rounded-lg border border-ink-100 p-3">
+                    <div wire:key="room-{{ $index }}" class="grid grid-cols-1 md:grid-cols-12 gap-2 rounded-lg border border-ink-100 p-3">
                         <div class="col-span-3">
                             <input wire:model="rooms.{{ $index }}.area_name" type="text" placeholder="Room / area name *" class="field-input">
                             @error("rooms.{$index}.area_name") <p class="form-error">{{ $message }}</p> @enderror

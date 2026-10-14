@@ -32,7 +32,7 @@
          <x-table>, same reasoning as the amounts summary on
          Invoices/Quotations show pages (Phase 15b). --}}
     <div class="panel max-w-xl p-6">
-        <dl class="grid grid-cols-2 gap-4 text-sm">
+        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
             <div><dt class="text-ink-500">Amount</dt><dd class="text-lg font-semibold text-ink-900">{{ number_format($payment->amount, 2) }}</dd></div>
             <div><dt class="text-ink-500">Date</dt><dd class="font-medium text-ink-900">{{ $payment->date?->format('d M, Y') }}</dd></div>
             <div><dt class="text-ink-500">Method</dt><dd class="font-medium text-ink-900">{{ $payment->method->label() }}</dd></div>

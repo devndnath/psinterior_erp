@@ -91,7 +91,7 @@
 
         @if ($showOptionForm)
             <form wire:submit="addOption" class="mb-6 space-y-3 rounded-lg border border-ink-100 p-4">
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="col-span-2">
                         <x-input label="Label *" name="optionLabel" wire:model="optionLabel" placeholder="e.g. Option A — Carrara Marble Look" />
                     </div>
@@ -117,7 +117,7 @@
         @if ($board->options->isEmpty())
             <p class="text-sm text-ink-500">No options added yet.</p>
         @else
-            <div class="grid grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 @foreach ($board->options as $option)
                     @php($isWinner = $board->decided_option_id === $option->id)
                     <div wire:key="option-{{ $option->id }}" class="rounded-lg border p-4 {{ $isWinner ? 'border-success-400 bg-success-50' : 'border-ink-100' }}">

@@ -16,7 +16,7 @@
         @endif
     </p>
 
-    <div class="grid grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="col-span-2 space-y-6">
             <div class="panel p-6">
                 <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Complaint</h2>
@@ -25,7 +25,7 @@
 
             <div class="panel p-6">
                 <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Details</h2>
-                <dl class="grid grid-cols-2 gap-4 text-sm">
+                <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div><dt class="text-ink-500">Assigned Technician</dt><dd class="font-medium text-ink-900">{{ $serviceRequest->assignedTechnician?->name ?? '—' }}</dd></div>
                     <div><dt class="text-ink-500">Warranty</dt><dd class="font-medium text-ink-900">
                         <a href="{{ route('warranties.show', $serviceRequest->warranty) }}" wire:navigate class="text-accent-600 hover:underline">

@@ -10,6 +10,7 @@
     </x-page-header>
 
     <div class="panel overflow-hidden">
+        <div class="overflow-x-auto">
         <table class="table-base">
             <thead>
                 <tr>
@@ -30,6 +31,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
         <div class="border-t border-ink-100 px-4 py-4">
             <dl class="ml-auto max-w-xs space-y-1 text-sm">
                 <div class="flex justify-between"><dt class="text-ink-500">Grand Total</dt><dd class="font-medium text-ink-900">{{ number_format($invoice->grand_total, 2) }}</dd></div>

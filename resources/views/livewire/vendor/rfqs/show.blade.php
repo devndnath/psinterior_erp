@@ -31,7 +31,7 @@
 
         <div class="space-y-3">
             @foreach ($items as $index => $item)
-                <div wire:key="rfq-item-{{ $index }}" class="grid grid-cols-12 gap-2 rounded-lg border border-ink-100 p-3">
+                <div wire:key="rfq-item-{{ $index }}" class="grid grid-cols-1 md:grid-cols-12 gap-2 rounded-lg border border-ink-100 p-3">
                     <div class="col-span-5 flex items-center text-sm font-medium text-ink-900">{{ $item['product_name'] }}</div>
                     <div class="col-span-3">
                         <input wire:model="items.{{ $index }}.qty" type="number" step="0.01" min="0.01" placeholder="Qty" @disabled(! $canRespond) class="field-input">

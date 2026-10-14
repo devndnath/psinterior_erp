@@ -6,7 +6,7 @@
     </x-page-header>
 
     <form wire:submit="save" class="max-w-4xl space-y-6">
-        <div class="panel grid grid-cols-2 gap-4 p-6">
+        <div class="panel grid grid-cols-1 sm:grid-cols-2 gap-4 p-6">
             <x-input label="SKU *" name="sku" wire:model="sku" />
             <x-input label="Name *" name="name" wire:model="name" />
             <x-select label="Category *" name="category_id" wire:model="category_id">

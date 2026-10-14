@@ -6,7 +6,7 @@
     </x-page-header>
 
     <form wire:submit="save" class="panel max-w-3xl space-y-6 p-6">
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="col-span-2">
                 <x-input label="Name *" name="name" wire:model="name" />
             </div>

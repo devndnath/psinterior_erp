@@ -15,6 +15,7 @@
 
     @if ($changeOrder->items->isNotEmpty())
         <div class="mt-6 panel overflow-hidden">
+            <div class="overflow-x-auto">
             <table class="table-base">
                 <thead>
                     <tr>
@@ -35,6 +36,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         </div>
     @endif
 

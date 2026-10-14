@@ -36,11 +36,11 @@
 
     <p class="-mt-4 mb-6 font-mono text-sm text-ink-500">{{ $lead->lead_no }}</p>
 
-    <div class="grid grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="col-span-2 space-y-6">
             <div class="panel p-6">
                 <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Lead details</h2>
-                <dl class="grid grid-cols-2 gap-4 text-sm">
+                <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div><dt class="text-ink-500">Phone</dt><dd class="font-medium text-ink-900">{{ $lead->phone ?: '—' }}</dd></div>
                     <div><dt class="text-ink-500">Email</dt><dd class="font-medium text-ink-900">{{ $lead->email ?: '—' }}</dd></div>
                     <div><dt class="text-ink-500">Company</dt><dd class="font-medium text-ink-900">{{ $lead->company_name ?: '—' }}</dd></div>

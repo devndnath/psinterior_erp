@@ -10,7 +10,7 @@
     <div class="space-y-6">
         <div class="panel p-6">
             <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Site conditions</h2>
-            <dl class="grid grid-cols-2 gap-4 text-sm">
+            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                 <div><dt class="text-ink-500">Weather</dt><dd class="font-medium text-ink-900">{{ $siteReport->weather ?: '—' }}</dd></div>
                 <div><dt class="text-ink-500">Manpower on site</dt><dd class="font-medium text-ink-900">{{ $siteReport->manpower_count ?? '—' }}</dd></div>
             </dl>

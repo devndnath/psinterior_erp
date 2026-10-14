@@ -18,11 +18,11 @@
         @endif
     </p>
 
-    <div class="grid grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="col-span-2 space-y-6">
             <div class="panel p-6">
                 <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Invoice details</h2>
-                <dl class="grid grid-cols-2 gap-4 text-sm">
+                <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div><dt class="text-ink-500">Vendor's invoice no.</dt><dd class="font-medium text-ink-900">{{ $vendorInvoice->vendor_invoice_no ?: '—' }}</dd></div>
                     <div><dt class="text-ink-500">Invoice date</dt><dd class="font-medium text-ink-900">{{ $vendorInvoice->invoice_date?->format('d M, Y') }}</dd></div>
                     <div><dt class="text-ink-500">Amount</dt><dd class="font-semibold text-ink-900">{{ number_format($vendorInvoice->amount, 2) }}</dd></div>
@@ -34,7 +34,7 @@
                 <div class="panel p-6">
                     <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Review</h2>
                     <form wire:submit="approve" class="space-y-3">
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <x-select label="Expense category *" name="categoryId" wire:model="categoryId">
                                 <option value="">Select…</option>
                                 @foreach ($categories as $cat)
@@ -60,7 +60,7 @@
             @if ($vendorInvoice->isReviewed())
                 <div class="panel p-6">
                     <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Review outcome</h2>
-                    <dl class="grid grid-cols-2 gap-4 text-sm">
+                    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                         <div><dt class="text-ink-500">Reviewed by</dt><dd class="font-medium text-ink-900">{{ $vendorInvoice->reviewer?->name ?? '—' }}</dd></div>
                         <div><dt class="text-ink-500">Reviewed at</dt><dd class="font-medium text-ink-900">{{ $vendorInvoice->reviewed_at?->format('d M, Y H:i') ?? '—' }}</dd></div>
                         @if ($vendorInvoice->expense)

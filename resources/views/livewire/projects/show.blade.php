@@ -26,11 +26,11 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="col-span-2 space-y-6">
             <div class="panel p-6">
                 <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Project details</h2>
-                <dl class="grid grid-cols-2 gap-4 text-sm">
+                <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div><dt class="text-ink-500">Type</dt><dd class="font-medium text-ink-900">{{ $project->type?->label() ?? '—' }}</dd></div>
                     <div><dt class="text-ink-500">Location</dt><dd class="font-medium text-ink-900">{{ $project->location ?: '—' }}</dd></div>
                     <div><dt class="text-ink-500">Start date</dt><dd class="font-medium text-ink-900">{{ $project->start_date?->format('d M, Y') ?? '—' }}</dd></div>
@@ -56,7 +56,7 @@
                 </div>
 
                 @if ($showMilestoneForm)
-                    <form wire:submit="addMilestone" class="mb-5 grid grid-cols-2 gap-3 border-b border-ink-100 pb-5">
+                    <form wire:submit="addMilestone" class="mb-5 grid grid-cols-1 sm:grid-cols-2 gap-3 border-b border-ink-100 pb-5">
                         <div class="col-span-2">
                             <x-input name="milestone_name" placeholder="Milestone name *" wire:model="milestone_name" />
                         </div>
@@ -123,7 +123,7 @@
                 </div>
 
                 @if ($showTaskForm)
-                    <form wire:submit="addTask" class="mb-5 grid grid-cols-2 gap-3 border-b border-ink-100 pb-5">
+                    <form wire:submit="addTask" class="mb-5 grid grid-cols-1 sm:grid-cols-2 gap-3 border-b border-ink-100 pb-5">
                         <div class="col-span-2">
                             <x-input name="task_name" placeholder="Task name *" wire:model="task_name" />
                         </div>

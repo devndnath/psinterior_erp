@@ -72,9 +72,17 @@
         @apply rounded-xl border-0 bg-surface shadow-soft transition-shadow duration-150 hover:shadow-lg;
     }
 
-    /* Shared input chrome for <x-input>/<x-select>/<x-textarea>. */
+    /* Shared input chrome for <x-input>/<x-select>/<x-textarea>.
+       text-base (16px) on mobile, dropping to text-sm (14px) from `sm`
+       up: below 16px, iOS Safari auto-zooms the whole page on focus —
+       every text field, select and textarea app-wide hit this the
+       moment a finger touched them, since text-sm applied unconditionally
+       before this fix. py-2.5 (not py-2) keeps a ~40px tap target, under
+       Apple/Google's ~44px guidance but close enough with the field's
+       border+shadow, and avoids a second broad reflow of every form's
+       vertical rhythm in the same pass as the grid responsiveness fix. */
     .field-input {
-        @apply block w-full rounded-lg border-ink-200 bg-surface text-sm text-ink-900 placeholder:text-ink-400 shadow-sm transition-colors focus:border-accent-500 focus:ring-accent-500;
+        @apply block w-full rounded-lg border-ink-200 bg-surface px-3 py-2.5 text-base text-ink-900 placeholder:text-ink-400 shadow-sm transition-colors focus:border-accent-500 focus:ring-accent-500 sm:text-sm;
     }
 
     /* Table chrome for <x-table>. Airier padding and a quieter header than

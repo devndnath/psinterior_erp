@@ -12,7 +12,7 @@
     @endif
 
     <form wire:submit="save" class="max-w-4xl space-y-6">
-        <div class="panel grid grid-cols-2 gap-4 p-6">
+        <div class="panel grid grid-cols-1 sm:grid-cols-2 gap-4 p-6">
             <x-select label="Vendor *" name="vendor_id" wire:model="vendor_id" :disabled="(bool) $vendorQuotation">
                 <option value="">Select…</option>
                 @foreach ($vendors as $v)
@@ -53,7 +53,7 @@
 
             <div class="space-y-3">
                 @foreach ($items as $index => $item)
-                    <div wire:key="po-item-{{ $index }}" class="grid grid-cols-12 gap-2 rounded-lg border border-ink-100 p-3">
+                    <div wire:key="po-item-{{ $index }}" class="grid grid-cols-1 md:grid-cols-12 gap-2 rounded-lg border border-ink-100 p-3">
                         <div class="col-span-6">
                             <select wire:model="items.{{ $index }}.product_id" @disabled($vendorQuotation) class="field-input disabled:bg-ink-50">
                                 <option value="">Select a product…</option>

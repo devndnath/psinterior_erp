@@ -57,7 +57,15 @@
         $today = now()->toDateString();
     @endphp
 
+    {{-- A 7-column week grid can't drop columns on a small screen without
+         losing its entire meaning, so instead of stacking it (the
+         grid-cols fix used everywhere else in this pass) it scrolls
+         horizontally below its own natural width — each day cell keeps a
+         readable minimum size instead of squeezing to unusable slivers
+         on a phone. --}}
     <div class="card overflow-hidden p-0">
+        <div class="overflow-x-auto">
+        <div class="min-w-[700px]">
         <div class="grid grid-cols-7 border-b border-ink-100 bg-ink-50 text-xs font-semibold uppercase tracking-wide text-ink-500">
             @foreach (['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as $dow)
                 <div class="px-3 py-2 text-center">{{ $dow }}</div>
@@ -105,6 +113,8 @@
             @for ($i = 0; $i < $trailingBlanks; $i++)
                 <div class="min-h-[7rem] border-b border-r border-ink-100 bg-ink-50/40"></div>
             @endfor
+        </div>
+        </div>
         </div>
     </div>
 </div>

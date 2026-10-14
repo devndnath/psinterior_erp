@@ -24,13 +24,14 @@
 
     <p class="-mt-4 mb-6 text-sm text-ink-500">{{ $warehouse->location ?: 'No location set' }}</p>
 
-    <div class="grid grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="col-span-2 space-y-6">
             <div class="panel p-6">
                 <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Stock by Product</h2>
                 @if ($stockPerProduct->isEmpty())
                     <p class="text-sm text-ink-500">No stock recorded in this warehouse yet.</p>
                 @else
+                    <div class="overflow-x-auto">
                     <table class="table-base">
                         <thead>
                             <tr>
@@ -50,6 +51,7 @@
                             @endforeach
                         </tbody>
                     </table>
+                    </div>
                 @endif
             </div>
         </div>

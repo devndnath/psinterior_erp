@@ -17,11 +17,11 @@
         — {{ $handover->project->name }}
     </p>
 
-    <div class="grid grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="col-span-2 space-y-6">
             <div class="panel p-6">
                 <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Details</h2>
-                <dl class="grid grid-cols-2 gap-4 text-sm">
+                <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div><dt class="text-ink-500">Handover Date</dt><dd class="font-medium text-ink-900">{{ $handover->handover_date->format('d M, Y') }}</dd></div>
                     <div><dt class="text-ink-500">Client Confirmed At</dt><dd class="font-medium text-ink-900">{{ $handover->client_confirmed_at?->format('d M, Y H:i') ?? '—' }}</dd></div>
                 </dl>

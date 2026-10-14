@@ -6,7 +6,7 @@
     </x-page-header>
 
     <form wire:submit="save" class="max-w-5xl space-y-6">
-        <div class="panel grid grid-cols-2 gap-4 p-6">
+        <div class="panel grid grid-cols-1 sm:grid-cols-2 gap-4 p-6">
             <x-input label="Received Date *" name="received_date" type="date" wire:model="received_date" />
             <div class="col-span-2">
                 <x-textarea label="Notes" name="notes" rows="2" wire:model="notes" />
@@ -19,6 +19,7 @@
         <div class="panel p-6">
             <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Items</h2>
 
+            <div class="overflow-x-auto">
             <table class="table-base">
                 <thead>
                     <tr>
@@ -52,6 +53,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
             <p class="mt-3 text-xs text-ink-400">Accepted quantity (received − damaged) is what reaches inventory. Damaged quantity cannot exceed received quantity.</p>
         </div>
 

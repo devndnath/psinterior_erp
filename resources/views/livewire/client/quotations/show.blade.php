@@ -9,6 +9,7 @@
     </x-page-header>
 
     <div class="panel overflow-hidden">
+        <div class="overflow-x-auto">
         <table class="table-base">
             <thead>
                 <tr>
@@ -29,6 +30,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
         <div class="border-t border-ink-100 px-4 py-4">
             <dl class="ml-auto max-w-xs space-y-1 text-sm">
                 <div class="flex justify-between border-t border-ink-100 pt-1 text-base"><dt class="font-semibold text-ink-700">Grand Total</dt><dd class="font-semibold text-ink-900">{{ number_format($quotation->grand_total, 2) }}</dd></div>

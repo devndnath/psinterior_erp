@@ -30,7 +30,7 @@
     </div>
 
     <div class="max-w-xl card p-6">
-        <dl class="grid grid-cols-2 gap-4 text-sm">
+        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
             <div><dt class="text-gray-500">Amount</dt><dd class="text-lg font-semibold text-gray-900">{{ number_format($expense->amount, 2) }}</dd></div>
             <div><dt class="text-gray-500">Date</dt><dd class="font-medium text-gray-900">{{ $expense->date?->format('d M, Y') }}</dd></div>
             <div><dt class="text-gray-500">Category</dt><dd class="font-medium text-gray-900">{{ $expense->category?->name ?? '—' }}</dd></div>

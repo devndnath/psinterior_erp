@@ -22,7 +22,7 @@
         {{ $subcontractorAssignment->subcontractor?->name }} on {{ $subcontractorAssignment->project?->project_code }} — {{ $subcontractorAssignment->project?->name }}
     </p>
 
-    <div class="grid grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="col-span-2 space-y-6">
             <div class="panel p-6">
                 <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Work Description</h2>
@@ -61,7 +61,7 @@
                 </div>
 
                 @if ($showPaymentForm)
-                    <form wire:submit="recordPayment" class="mb-4 grid grid-cols-3 gap-3 rounded-lg border border-ink-100 p-4">
+                    <form wire:submit="recordPayment" class="mb-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 rounded-lg border border-ink-100 p-4">
                         <x-input label="Date *" name="payment_date" type="date" wire:model="payment_date" />
                         <x-input label="Amount *" name="payment_amount" type="number" step="0.01" wire:model="payment_amount" />
                         <x-input label="Notes" name="payment_notes" wire:model="payment_notes" />

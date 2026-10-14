@@ -4,7 +4,7 @@
     <h1 class="mb-6 text-2xl font-semibold text-gray-900">Record Vendor Quotation</h1>
 
     <form wire:submit="save" class="max-w-4xl space-y-6">
-        <div class="card grid grid-cols-2 gap-4 p-6">
+        <div class="card grid grid-cols-1 sm:grid-cols-2 gap-4 p-6">
             <div class="col-span-2">
                 <label class="form-label">Vendor *</label>
                 <select wire:model="vendor_id" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
@@ -25,7 +25,7 @@
 
             <div class="space-y-3">
                 @foreach ($items as $index => $item)
-                    <div wire:key="vq-item-{{ $index }}" class="grid grid-cols-12 gap-2 rounded-lg border border-gray-100 p-3">
+                    <div wire:key="vq-item-{{ $index }}" class="grid grid-cols-1 md:grid-cols-12 gap-2 rounded-lg border border-gray-100 p-3">
                         <div class="col-span-6">
                             <select wire:model="items.{{ $index }}.product_id" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
                                 <option value="">Select a product…</option>
