@@ -50,23 +50,24 @@
                             <x-status-badge :label="$staffUser->is_active ? 'Active' : 'Inactive'" :color="$staffUser->is_active ? 'green' : 'gray'" />
                         </td>
                         <td class="text-right">
+                            {{-- Phase 5 (premium-SaaS redesign): a single "..." action menu instead of several separate text links in every row. --}}
+                            <x-dropdown>
                             @can('update', $staffUser)
-                                <a href="{{ route('users.edit', $staffUser) }}" wire:navigate class="text-ink-500 hover:text-ink-700">Edit</a>
+                                <a href="{{ route('users.edit', $staffUser) }}" wire:navigate class="dropdown-item">Edit</a>
                             @endcan
                             @can('delete', $staffUser)
-                                <span class="ml-3 inline-block">
-                                    <x-confirm-dialog
+                                                                    <x-confirm-dialog
                                         title="Delete this user?"
                                         message="This will remove this user's login. This cannot be undone."
                                         action="deleteUser"
                                         :params="[$staffUser->id]"
                                     >
                                         <x-slot:trigger>
-                                            <button type="button" class="text-danger-600 hover:text-danger-700">Delete</button>
+                                            <button type="button" class="dropdown-item-danger">Delete</button>
                                         </x-slot:trigger>
                                     </x-confirm-dialog>
-                                </span>
                             @endcan
+                            </x-dropdown>
                         </td>
                     </tr>
                 @endforeach

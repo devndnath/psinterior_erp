@@ -53,24 +53,25 @@
                         <td>{{ $subcontractor->phone ?: '—' }}</td>
                         <td>{{ $subcontractor->rate_type ?: '—' }}</td>
                         <td class="text-right">
-                            <a href="{{ route('subcontractors.show', $subcontractor) }}" wire:navigate class="text-ink-500 hover:text-ink-700">View</a>
+                            {{-- Phase 5 (premium-SaaS redesign): a single "..." action menu instead of several separate text links in every row. --}}
+                            <x-dropdown>
+                            <a href="{{ route('subcontractors.show', $subcontractor) }}" wire:navigate class="dropdown-item">View</a>
                             @can('update', $subcontractor)
-                                <a href="{{ route('subcontractors.edit', $subcontractor) }}" wire:navigate class="ml-3 text-ink-500 hover:text-ink-700">Edit</a>
+                                <a href="{{ route('subcontractors.edit', $subcontractor) }}" wire:navigate class="dropdown-item">Edit</a>
                             @endcan
                             @can('delete', $subcontractor)
-                                <span class="ml-3 inline-block">
-                                    <x-confirm-dialog
+                                                                    <x-confirm-dialog
                                         title="Delete this subcontractor?"
                                         :message='"This will remove {$subcontractor->name} and cannot be undone."'
                                         action="deleteSubcontractor"
                                         :params="[$subcontractor->id]"
                                     >
                                         <x-slot:trigger>
-                                            <button type="button" class="text-danger-600 hover:text-danger-700">Delete</button>
+                                            <button type="button" class="dropdown-item-danger">Delete</button>
                                         </x-slot:trigger>
                                     </x-confirm-dialog>
-                                </span>
                             @endcan
+                            </x-dropdown>
                         </td>
                     </tr>
                 @endforeach

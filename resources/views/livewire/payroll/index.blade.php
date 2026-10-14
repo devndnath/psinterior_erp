@@ -61,10 +61,13 @@
                             <x-status-badge :label="$payroll->status->label()" :color="$payroll->status->color()" />
                         </td>
                         <td class="text-right">
-                            <a href="{{ route('payroll.show', $payroll) }}" wire:navigate class="text-ink-500 hover:text-ink-700">View</a>
+                            {{-- Phase 5 (premium-SaaS redesign): a single "..." action menu instead of several separate text links in every row. --}}
+                            <x-dropdown>
+                            <a href="{{ route('payroll.show', $payroll) }}" wire:navigate class="dropdown-item">View</a>
                             @can('update', $payroll)
-                                <a href="{{ route('payroll.edit', $payroll) }}" wire:navigate class="ml-3 text-ink-500 hover:text-ink-700">Edit</a>
+                                <a href="{{ route('payroll.edit', $payroll) }}" wire:navigate class="dropdown-item">Edit</a>
                             @endcan
+                            </x-dropdown>
                         </td>
                     </tr>
                 @endforeach

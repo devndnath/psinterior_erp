@@ -75,24 +75,25 @@
                             <td class="px-4 py-3 text-sm text-gray-500">{{ $expense->date?->format('d M, Y') }}</td>
                             <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ number_format($expense->amount, 2) }}</td>
                             <td class="px-4 py-3 text-right text-sm">
-                                <a href="{{ route('expenses.show', $expense) }}" wire:navigate class="text-gray-500 hover:text-gray-700">View</a>
+                                {{-- Phase 5 (premium-SaaS redesign): a single "..." action menu instead of several separate text links in every row, and off the stock gray/red palette onto the design-system ink/danger tokens. --}}
+                                <x-dropdown>
+                                <a href="{{ route('expenses.show', $expense) }}" wire:navigate class="dropdown-item">View</a>
                                 @can('update', $expense)
-                                    <a href="{{ route('expenses.edit', $expense) }}" wire:navigate class="ml-3 text-gray-500 hover:text-gray-700">Edit</a>
+                                    <a href="{{ route('expenses.edit', $expense) }}" wire:navigate class="dropdown-item">Edit</a>
                                 @endcan
                                 @can('delete', $expense)
-                                    <span class="ml-3 inline-block">
-                                        <x-confirm-dialog
+                                                                            <x-confirm-dialog
                                             title="Delete this expense?"
                                             :message='"This will remove {$expense->expense_no}. This cannot be undone."'
                                             action="deleteExpense"
                                             :params="[$expense->id]"
                                         >
                                             <x-slot:trigger>
-                                                <button type="button" class="text-red-500 hover:text-red-700">Delete</button>
+                                                <button type="button" class="dropdown-item-danger">Delete</button>
                                             </x-slot:trigger>
                                         </x-confirm-dialog>
-                                    </span>
                                 @endcan
+                                </x-dropdown>
                             </td>
                         </tr>
                     @endforeach

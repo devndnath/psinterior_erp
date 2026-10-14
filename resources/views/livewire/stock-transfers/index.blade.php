@@ -55,7 +55,10 @@
                             <x-status-badge :label="$transfer->status->label()" :color="$transfer->status->color()" />
                         </td>
                         <td class="text-right">
-                            <a href="{{ route('stock-transfers.show', $transfer) }}" wire:navigate class="text-ink-500 hover:text-ink-700">View</a>
+                            {{-- Phase 5 (premium-SaaS redesign): a single "..." action menu instead of several separate text links in every row. --}}
+                            <x-dropdown>
+                            <a href="{{ route('stock-transfers.show', $transfer) }}" wire:navigate class="dropdown-item">View</a>
+                            </x-dropdown>
                         </td>
                     </tr>
                 @endforeach

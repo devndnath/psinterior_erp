@@ -58,7 +58,10 @@
                         <td><x-status-badge :label="$leave->manager_status->label()" :color="$leave->manager_status->color()" /></td>
                         <td><x-status-badge :label="$leave->hr_status->label()" :color="$leave->hr_status->color()" /></td>
                         <td class="text-right">
-                            <a href="{{ route('leaves.show', $leave) }}" wire:navigate class="text-ink-500 hover:text-ink-700">View</a>
+                            {{-- Phase 5 (premium-SaaS redesign): a single "..." action menu instead of several separate text links in every row. --}}
+                            <x-dropdown>
+                            <a href="{{ route('leaves.show', $leave) }}" wire:navigate class="dropdown-item">View</a>
+                            </x-dropdown>
                         </td>
                     </tr>
                 @endforeach

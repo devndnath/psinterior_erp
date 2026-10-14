@@ -34,23 +34,24 @@
                             <x-status-badge :label="$category->is_active ? 'Active' : 'Inactive'" :color="$category->is_active ? 'green' : 'gray'" />
                         </td>
                         <td class="text-right">
+                            {{-- Phase 5 (premium-SaaS redesign): a single "..." action menu instead of several separate text links in every row. --}}
+                            <x-dropdown>
                             @can('update', $category)
-                                <a href="{{ route('product-categories.edit', $category) }}" wire:navigate class="text-ink-500 hover:text-ink-700">Edit</a>
+                                <a href="{{ route('product-categories.edit', $category) }}" wire:navigate class="dropdown-item">Edit</a>
                             @endcan
                             @can('delete', $category)
-                                <span class="ml-3 inline-block">
-                                    <x-confirm-dialog
+                                                                    <x-confirm-dialog
                                         title="Delete this category?"
                                         :message='"This will remove {$category->name}. This cannot be undone."'
                                         action="deleteCategory"
                                         :params="[$category->id]"
                                     >
                                         <x-slot:trigger>
-                                            <button type="button" class="text-danger-600 hover:text-danger-700">Delete</button>
+                                            <button type="button" class="dropdown-item-danger">Delete</button>
                                         </x-slot:trigger>
                                     </x-confirm-dialog>
-                                </span>
                             @endcan
+                            </x-dropdown>
                         </td>
                     </tr>
                 @endforeach

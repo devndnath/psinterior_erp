@@ -36,23 +36,24 @@
                         <td>{{ $department->designations_count }}</td>
                         <td>{{ $department->employees_count }}</td>
                         <td class="text-right">
+                            {{-- Phase 5 (premium-SaaS redesign): a single "..." action menu instead of several separate text links in every row. --}}
+                            <x-dropdown>
                             @can('update', $department)
-                                <a href="{{ route('departments.edit', $department) }}" wire:navigate class="text-ink-500 hover:text-ink-700">Edit</a>
+                                <a href="{{ route('departments.edit', $department) }}" wire:navigate class="dropdown-item">Edit</a>
                             @endcan
                             @can('delete', $department)
-                                <span class="ml-3 inline-block">
-                                    <x-confirm-dialog
+                                                                    <x-confirm-dialog
                                         title="Delete this department?"
                                         message="This will remove this department. This cannot be undone."
                                         action="deleteDepartment"
                                         :params="[$department->id]"
                                     >
                                         <x-slot:trigger>
-                                            <button type="button" class="text-danger-600 hover:text-danger-700">Delete</button>
+                                            <button type="button" class="dropdown-item-danger">Delete</button>
                                         </x-slot:trigger>
                                     </x-confirm-dialog>
-                                </span>
                             @endcan
+                            </x-dropdown>
                         </td>
                     </tr>
                 @endforeach

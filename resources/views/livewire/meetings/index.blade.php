@@ -64,24 +64,25 @@
                         </td>
                         <td>{{ $meeting->location ?: '—' }}</td>
                         <td class="text-right">
-                            <a href="{{ route('meetings.show', $meeting) }}" wire:navigate class="text-ink-500 hover:text-ink-700">View</a>
+                            {{-- Phase 5 (premium-SaaS redesign): a single "..." action menu instead of several separate text links in every row. --}}
+                            <x-dropdown>
+                            <a href="{{ route('meetings.show', $meeting) }}" wire:navigate class="dropdown-item">View</a>
                             @can('update', $meeting)
-                                <a href="{{ route('meetings.edit', $meeting) }}" wire:navigate class="ml-3 text-ink-500 hover:text-ink-700">Edit</a>
+                                <a href="{{ route('meetings.edit', $meeting) }}" wire:navigate class="dropdown-item">Edit</a>
                             @endcan
                             @can('delete', $meeting)
-                                <span class="ml-3 inline-block">
-                                    <x-confirm-dialog
+                                                                    <x-confirm-dialog
                                         title="Delete this meeting?"
                                         message="This will remove the meeting and its participant list. This cannot be undone."
                                         action="deleteMeeting"
                                         :params="[$meeting->id]"
                                     >
                                         <x-slot:trigger>
-                                            <button type="button" class="text-danger-600 hover:text-danger-700">Delete</button>
+                                            <button type="button" class="dropdown-item-danger">Delete</button>
                                         </x-slot:trigger>
                                     </x-confirm-dialog>
-                                </span>
                             @endcan
+                            </x-dropdown>
                         </td>
                     </tr>
                 @endforeach

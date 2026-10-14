@@ -88,24 +88,25 @@
                                 <x-status-badge :label="$design->status->label()" :color="$design->status->color()" />
                             </td>
                             <td class="px-4 py-3 text-right text-sm">
-                                <a href="{{ route('designs.show', $design) }}" wire:navigate class="text-gray-500 hover:text-gray-700">View</a>
+                                {{-- Phase 5 (premium-SaaS redesign): a single "..." action menu instead of several separate text links in every row, and off the stock gray/red palette onto the design-system ink/danger tokens. --}}
+                                <x-dropdown>
+                                <a href="{{ route('designs.show', $design) }}" wire:navigate class="dropdown-item">View</a>
                                 @can('update', $design)
-                                    <a href="{{ route('designs.edit', $design) }}" wire:navigate class="ml-3 text-gray-500 hover:text-gray-700">Edit</a>
+                                    <a href="{{ route('designs.edit', $design) }}" wire:navigate class="dropdown-item">Edit</a>
                                 @endcan
                                 @can('delete', $design)
-                                    <span class="ml-3 inline-block">
-                                        <x-confirm-dialog
+                                                                            <x-confirm-dialog
                                             title="Delete this design?"
                                             :message='"This will remove {$design->design_no} and its revisions. This cannot be undone."'
                                             action="deleteDesign"
                                             :params="[$design->id]"
                                         >
                                             <x-slot:trigger>
-                                                <button type="button" class="text-red-500 hover:text-red-700">Delete</button>
+                                                <button type="button" class="dropdown-item-danger">Delete</button>
                                             </x-slot:trigger>
                                         </x-confirm-dialog>
-                                    </span>
                                 @endcan
+                                </x-dropdown>
                             </td>
                         </tr>
                     @endforeach

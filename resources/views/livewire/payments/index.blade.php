@@ -77,21 +77,22 @@
                         <td>{{ $payment->method->label() }}</td>
                         <td class="font-medium text-ink-900">{{ number_format($payment->amount, 2) }}</td>
                         <td class="text-right">
-                            <a href="{{ route('payments.show', $payment) }}" wire:navigate class="text-ink-500 hover:text-ink-700">View</a>
+                            {{-- Phase 5 (premium-SaaS redesign): a single "..." action menu instead of several separate text links in every row. --}}
+                            <x-dropdown>
+                            <a href="{{ route('payments.show', $payment) }}" wire:navigate class="dropdown-item">View</a>
                             @can('delete', $payment)
-                                <span class="ml-3 inline-block">
-                                    <x-confirm-dialog
+                                                                    <x-confirm-dialog
                                         title="Delete this payment?"
                                         :message='"This will remove {$payment->payment_no} and recalculate the linked invoice payment status. This cannot be undone."'
                                         action="deletePayment"
                                         :params="[$payment->id]"
                                     >
                                         <x-slot:trigger>
-                                            <button type="button" class="text-danger-600 hover:text-danger-700">Delete</button>
+                                            <button type="button" class="dropdown-item-danger">Delete</button>
                                         </x-slot:trigger>
                                     </x-confirm-dialog>
-                                </span>
                             @endcan
+                            </x-dropdown>
                         </td>
                     </tr>
                 @endforeach

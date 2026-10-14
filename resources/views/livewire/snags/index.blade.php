@@ -76,21 +76,22 @@
                             <x-status-badge :label="$snag->status->label()" :color="$snag->status->color()" />
                         </td>
                         <td class="text-right">
-                            <a href="{{ route('snags.show', $snag) }}" wire:navigate class="text-ink-500 hover:text-ink-700">View</a>
+                            {{-- Phase 5 (premium-SaaS redesign): a single "..." action menu instead of several separate text links in every row. --}}
+                            <x-dropdown>
+                            <a href="{{ route('snags.show', $snag) }}" wire:navigate class="dropdown-item">View</a>
                             @can('delete', $snag)
-                                <span class="ml-3 inline-block">
-                                    <x-confirm-dialog
+                                                                    <x-confirm-dialog
                                         title="Delete this snag?"
                                         :message='"This will remove {$snag->snag_no}. This cannot be undone."'
                                         action="deleteSnag"
                                         :params="[$snag->id]"
                                     >
                                         <x-slot:trigger>
-                                            <button type="button" class="text-danger-600 hover:text-danger-700">Delete</button>
+                                            <button type="button" class="dropdown-item-danger">Delete</button>
                                         </x-slot:trigger>
                                     </x-confirm-dialog>
-                                </span>
                             @endcan
+                            </x-dropdown>
                         </td>
                     </tr>
                 @endforeach

@@ -69,10 +69,13 @@
                             <x-status-badge :label="$mr->status->label()" :color="$mr->status->color()" />
                         </td>
                         <td class="text-right">
-                            <a href="{{ route('material-requisitions.show', $mr) }}" wire:navigate class="text-ink-500 hover:text-ink-700">View</a>
+                            {{-- Phase 5 (premium-SaaS redesign): a single "..." action menu instead of several separate text links in every row. --}}
+                            <x-dropdown>
+                            <a href="{{ route('material-requisitions.show', $mr) }}" wire:navigate class="dropdown-item">View</a>
                             @can('update', $mr)
-                                <a href="{{ route('material-requisitions.edit', $mr) }}" wire:navigate class="ml-3 text-ink-500 hover:text-ink-700">Edit</a>
+                                <a href="{{ route('material-requisitions.edit', $mr) }}" wire:navigate class="dropdown-item">Edit</a>
                             @endcan
+                            </x-dropdown>
                         </td>
                     </tr>
                 @endforeach

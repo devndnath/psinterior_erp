@@ -66,7 +66,10 @@
                             <x-status-badge :label="$board->status->label()" :color="$board->status->color()" />
                         </td>
                         <td class="text-right">
-                            <a href="{{ route('material-selections.show', $board) }}" wire:navigate class="text-ink-500 hover:text-ink-700">View</a>
+                            {{-- Phase 5 (premium-SaaS redesign): a single "..." action menu instead of several separate text links in every row. --}}
+                            <x-dropdown>
+                            <a href="{{ route('material-selections.show', $board) }}" wire:navigate class="dropdown-item">View</a>
+                            </x-dropdown>
                         </td>
                     </tr>
                 @endforeach
