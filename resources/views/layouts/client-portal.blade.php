@@ -6,13 +6,18 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     {{-- Dark-mode toggle (components/theme-toggle.blade.php, below): runs
          synchronously, before any CSS paints, so the page never flashes
-         the wrong theme on load. Mirrored verbatim in layouts/admin.blade
+         the wrong theme on load. Without a saved override, this defaults
+         to the real local time of day (dark 6pm-6am) rather than the OS
+         color-scheme preference — resources/js/theme.js keeps re-applying
+         the same rule while the tab stays open, so it also switches live
+         as day turns to night. Mirrored verbatim in layouts/admin.blade
          .php and vendor-portal.blade.php. --}}
     <script>
         (function () {
             try {
                 var stored = localStorage.getItem('theme');
-                var dark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+                var hour = new Date().getHours();
+                var dark = stored ? stored === 'dark' : (hour < 6 || hour >= 18);
                 document.documentElement.classList.toggle('dark', dark);
             } catch (e) {}
         })();

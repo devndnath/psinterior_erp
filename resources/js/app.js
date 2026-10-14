@@ -1,4 +1,5 @@
 import './bootstrap';
+import './theme';
 
 // Alpine ships inside Livewire 3 already (window.Alpine), so it is not
 // imported/started separately here — starting it twice breaks Livewire's
