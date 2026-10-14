@@ -15,20 +15,23 @@
             description="Your account doesn't have access to any CRM modules yet. Ask an administrator to assign you a role."
         />
     @else
-        {{-- Hero row: the headline numbers worth seeing before anything else.
-             UI/UX redesign round 2 (reference: dexignzone ERES demo) — each
-             tile is a solid brand-tone tile with a white icon medallion at
-             the right, cycling through the four design-system tones
-             (gold/emerald/orange/coral) instead of one repeated gradient,
-             so the row itself reads as more varied and "eye catching" at a
-             glance — the same move the reference demo makes with its own
-             red/green/blue/purple stat row. --}}
+        {{-- Hero row: the headline numbers worth seeing before anything
+             else. Premium-SaaS redesign pass: the round-2 solid-gradient-
+             tile-with-white-medallion treatment is replaced with the
+             spec's own "compact, elegant KPI cards... avoid giant
+             colorful statistic cards, decorative gradients" direction —
+             a flat bordered card with a small tinted icon chip instead of
+             a full-bleed color tile. $heroChipClasses keeps each tone's
+             complete class string literal (not built via string
+             interpolation) so Tailwind's content scanner can actually see
+             and generate them — same reasoning the old $heroTones map
+             already relied on. --}}
         @php
-            $heroTones = [
-                'accent' => 'from-accent-500 to-accent-600',
-                'success' => 'from-success-500 to-success-600',
-                'warning' => 'from-warning-500 to-warning-600',
-                'danger' => 'from-danger-400 to-danger-500',
+            $heroChipClasses = [
+                'accent' => 'bg-accent-50 text-accent-600',
+                'success' => 'bg-success-50 text-success-600',
+                'warning' => 'bg-warning-50 text-warning-600',
+                'danger' => 'bg-danger-50 text-danger-600',
             ];
             $heroCards = array_values(array_filter([
                 $totalLeads !== null ? ['label' => 'Total Leads', 'value' => $totalLeads, 'icon' => 'funnel', 'href' => route('leads.index'), 'tone' => 'accent'] : null,
@@ -41,16 +44,16 @@
         @if (count($heroCards))
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 @foreach ($heroCards as $hero)
-                    <a href="{{ $hero['href'] }}" wire:navigate class="group flex items-center justify-between gap-4 rounded-xl bg-gradient-to-br {{ $heroTones[$hero['tone']] }} p-5 text-white shadow-soft transition hover:-translate-y-0.5 hover:shadow-lg">
-                        <div class="min-w-0">
-                            <p class="text-sm font-medium text-white/80">{{ $hero['label'] }}</p>
-                            <p class="mt-2 text-3xl font-semibold tracking-tight">{{ $hero['value'] }}</p>
-                            @isset($hero['sub'])
-                                <p class="mt-1 text-xs text-white/70">{{ $hero['sub'] }}</p>
-                            @endisset
+                    <a href="{{ $hero['href'] }}" wire:navigate class="flex items-center gap-4 rounded-xl border border-ink-200 bg-surface p-5 transition-colors hover:border-ink-300">
+                        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg {{ $heroChipClasses[$hero['tone']] }}">
+                            <x-icon name="{{ $hero['icon'] }}" class="h-5 w-5" />
                         </div>
-                        <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white/20 ring-1 ring-white/30 transition group-hover:bg-white/25">
-                            <x-icon name="{{ $hero['icon'] }}" class="h-6 w-6 text-white" />
+                        <div class="min-w-0">
+                            <p class="text-sm text-ink-500">{{ $hero['label'] }}</p>
+                            <p class="mt-1 text-2xl font-semibold tracking-tight text-ink-900">{{ $hero['value'] }}</p>
+                            @isset($hero['sub'])
+                                <p class="mt-0.5 text-xs text-ink-400">{{ $hero['sub'] }}</p>
+                            @endisset
                         </div>
                     </a>
                 @endforeach
@@ -65,7 +68,7 @@
                 </h2>
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     @if ($newLeads !== null)
-                        <a href="{{ route('leads.index', ['status' => 'new']) }}" wire:navigate class="panel p-5 transition hover:-translate-y-0.5 hover:ring-1 hover:ring-accent-200">
+                        <a href="{{ route('leads.index', ['status' => 'new']) }}" wire:navigate class="panel p-5 hover:border-ink-300">
                             <p class="text-sm text-ink-500">New Leads</p>
                             <p class="mt-2 text-3xl font-semibold text-ink-900">{{ $newLeads }}</p>
                         </a>
@@ -77,25 +80,25 @@
                         </div>
                     @endif
                     @if ($upcomingSiteVisits !== null)
-                        <a href="{{ route('site-visits.index') }}" wire:navigate class="panel p-5 transition hover:-translate-y-0.5 hover:ring-1 hover:ring-accent-200">
+                        <a href="{{ route('site-visits.index') }}" wire:navigate class="panel p-5 hover:border-ink-300">
                             <p class="text-sm text-ink-500">Upcoming Site Visits</p>
                             <p class="mt-2 text-3xl font-semibold text-ink-900">{{ $upcomingSiteVisits }}</p>
                         </a>
                     @endif
                     @if ($designsAwaitingDecision !== null)
-                        <a href="{{ route('designs.index', ['status' => 'under_review']) }}" wire:navigate class="panel p-5 transition hover:-translate-y-0.5 hover:ring-1 hover:ring-accent-200">
+                        <a href="{{ route('designs.index', ['status' => 'under_review']) }}" wire:navigate class="panel p-5 hover:border-ink-300">
                             <p class="text-sm text-ink-500">Designs Awaiting Decision</p>
                             <p class="mt-2 text-3xl font-semibold text-ink-900">{{ $designsAwaitingDecision }}</p>
                         </a>
                     @endif
                     @if ($quotationsAwaitingDecision !== null)
-                        <a href="{{ route('quotations.index', ['status' => 'sent']) }}" wire:navigate class="panel p-5 transition hover:-translate-y-0.5 hover:ring-1 hover:ring-accent-200">
+                        <a href="{{ route('quotations.index', ['status' => 'sent']) }}" wire:navigate class="panel p-5 hover:border-ink-300">
                             <p class="text-sm text-ink-500">Quotations Awaiting Decision</p>
                             <p class="mt-2 text-3xl font-semibold text-ink-900">{{ $quotationsAwaitingDecision }}</p>
                         </a>
                     @endif
                     @if ($changeOrdersPending !== null)
-                        <a href="{{ route('change-orders.index', ['status' => 'pending']) }}" wire:navigate class="panel p-5 transition hover:-translate-y-0.5 hover:ring-1 hover:ring-accent-200">
+                        <a href="{{ route('change-orders.index', ['status' => 'pending']) }}" wire:navigate class="panel p-5 hover:border-ink-300">
                             <p class="text-sm text-ink-500">Change Orders Pending</p>
                             <p class="mt-2 text-3xl font-semibold text-ink-900">{{ $changeOrdersPending }}</p>
                         </a>
@@ -112,13 +115,13 @@
                 </h2>
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     @if ($projectsOnHold !== null)
-                        <a href="{{ route('projects.index', ['status' => 'on_hold']) }}" wire:navigate class="panel p-5 transition hover:-translate-y-0.5 hover:ring-1 hover:ring-accent-200">
+                        <a href="{{ route('projects.index', ['status' => 'on_hold']) }}" wire:navigate class="panel p-5 hover:border-ink-300">
                             <p class="text-sm text-ink-500">Projects On Hold</p>
                             <p class="mt-2 text-3xl font-semibold text-ink-900">{{ $projectsOnHold }}</p>
                         </a>
                     @endif
                     @if ($expensesThisMonth !== null)
-                        <a href="{{ route('expenses.index') }}" wire:navigate class="panel p-5 transition hover:-translate-y-0.5 hover:ring-1 hover:ring-accent-200">
+                        <a href="{{ route('expenses.index') }}" wire:navigate class="panel p-5 hover:border-ink-300">
                             <p class="text-sm text-ink-500">This Month's Expenses</p>
                             <p class="mt-2 text-3xl font-semibold text-ink-900">{{ number_format($expensesThisMonth, 2) }}</p>
                         </a>
@@ -135,19 +138,19 @@
                 </h2>
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     @if ($lowStockProducts !== null)
-                        <a href="{{ route('products.index', ['lowStock' => true]) }}" wire:navigate class="panel p-5 transition hover:-translate-y-0.5 hover:ring-1 hover:ring-accent-200">
+                        <a href="{{ route('products.index', ['lowStock' => true]) }}" wire:navigate class="panel p-5 hover:border-ink-300">
                             <p class="text-sm text-ink-500">Low Stock Products</p>
                             <p class="mt-2 text-3xl font-semibold {{ $lowStockProducts > 0 ? 'text-danger-600' : 'text-ink-900' }}">{{ $lowStockProducts }}</p>
                         </a>
                     @endif
                     @if ($pendingRequisitions !== null)
-                        <a href="{{ route('material-requisitions.index') }}" wire:navigate class="panel p-5 transition hover:-translate-y-0.5 hover:ring-1 hover:ring-accent-200">
+                        <a href="{{ route('material-requisitions.index') }}" wire:navigate class="panel p-5 hover:border-ink-300">
                             <p class="text-sm text-ink-500">Pending Material Requisitions</p>
                             <p class="mt-2 text-3xl font-semibold text-ink-900">{{ $pendingRequisitions }}</p>
                         </a>
                     @endif
                     @if ($pendingPurchaseOrders !== null)
-                        <a href="{{ route('purchase-orders.index') }}" wire:navigate class="panel p-5 transition hover:-translate-y-0.5 hover:ring-1 hover:ring-accent-200">
+                        <a href="{{ route('purchase-orders.index') }}" wire:navigate class="panel p-5 hover:border-ink-300">
                             <p class="text-sm text-ink-500">Pending Purchase Orders</p>
                             <p class="mt-2 text-3xl font-semibold text-ink-900">{{ $pendingPurchaseOrders }}</p>
                         </a>
@@ -164,13 +167,13 @@
                 </h2>
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     @if ($pendingLeaveRequests !== null)
-                        <a href="{{ route('leaves.index') }}" wire:navigate class="panel p-5 transition hover:-translate-y-0.5 hover:ring-1 hover:ring-accent-200">
+                        <a href="{{ route('leaves.index') }}" wire:navigate class="panel p-5 hover:border-ink-300">
                             <p class="text-sm text-ink-500">Pending Leave Requests</p>
                             <p class="mt-2 text-3xl font-semibold text-ink-900">{{ $pendingLeaveRequests }}</p>
                         </a>
                     @endif
                     @if ($payrollDue !== null)
-                        <a href="{{ route('payroll.index') }}" wire:navigate class="panel p-5 transition hover:-translate-y-0.5 hover:ring-1 hover:ring-accent-200">
+                        <a href="{{ route('payroll.index') }}" wire:navigate class="panel p-5 hover:border-ink-300">
                             <p class="text-sm text-ink-500">Payroll Due (this month)</p>
                             <p class="mt-2 text-3xl font-semibold text-ink-900">{{ $payrollDue }}</p>
                         </a>
@@ -187,13 +190,13 @@
                 </h2>
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     @if ($openSnags !== null)
-                        <a href="{{ route('snags.index') }}" wire:navigate class="panel p-5 transition hover:-translate-y-0.5 hover:ring-1 hover:ring-accent-200">
+                        <a href="{{ route('snags.index') }}" wire:navigate class="panel p-5 hover:border-ink-300">
                             <p class="text-sm text-ink-500">Open Snags</p>
                             <p class="mt-2 text-3xl font-semibold text-ink-900">{{ $openSnags }}</p>
                         </a>
                     @endif
                     @if ($openServiceRequests !== null)
-                        <a href="{{ route('warranties.index') }}" wire:navigate class="panel p-5 transition hover:-translate-y-0.5 hover:ring-1 hover:ring-accent-200">
+                        <a href="{{ route('warranties.index') }}" wire:navigate class="panel p-5 hover:border-ink-300">
                             <p class="text-sm text-ink-500">Open Service Requests</p>
                             <p class="mt-2 text-3xl font-semibold text-ink-900">{{ $openServiceRequests }}</p>
                         </a>
@@ -225,7 +228,7 @@
                                             datasets: [{
                                                 label: 'Leads',
                                                 data: @js($leadStatusCounts),
-                                                backgroundColor: '#D4A000',
+                                                backgroundColor: '#167D78',
                                                 borderRadius: 4,
                                             }],
                                         },
@@ -263,7 +266,7 @@
                                             labels: @js($projectStatusLabels),
                                             datasets: [{
                                                 data: @js($projectStatusCounts),
-                                                backgroundColor: ['#F4B400','#D4A000','#A67D00','#10B981','#34D399','#FB923C','#EA580C','#7A7468','#059669','#9D9689','#CB3B2B'],
+                                                backgroundColor: ['#1F8D86','#167D78','#126863','#10B981','#34D399','#FB923C','#EA580C','#707784','#059669','#AEB3C0','#CB3B2B'],
                                                 borderWidth: 0,
                                             }],
                                         },

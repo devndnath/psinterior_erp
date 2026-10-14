@@ -32,52 +32,64 @@
  * saturation brand/status colors read fine on a dark surface as-is, and
  * leaving them alone keeps this change scoped to neutrals only.
  */
+/*
+ * Premium-SaaS redesign pass: the neutral scale moved from the PS
+ * Solution-gold-matched warm ramp to a cool "charcoal/slate" ramp
+ * matching the uploaded design spec's own anchor colors — paper
+ * #F8F9FB, primary text #20242C, secondary text #707784, borders
+ * #E7EAF0 — which pairs better with the new deep-teal accent than the
+ * old warm grays did. Same semantic contract as before (50/100 =
+ * subtlest background tint, 900 = highest-contrast text, flipped in
+ * `.dark`), just re-tuned values.
+ */
 :root {
-    --color-paper: 250 250 247; /* #FAFAF7 */
+    --color-paper: 248 249 251; /* #F8F9FB */
     --color-surface: 255 255 255; /* #FFFFFF */
-    --color-ink-50: 247 246 244; /* #F7F6F4 */
-    --color-ink-100: 238 236 232; /* #EEECE8 */
-    --color-ink-200: 220 217 210; /* #DCD9D2 */
-    --color-ink-300: 194 189 178; /* #C2BDB2 */
-    --color-ink-400: 157 150 137; /* #9D9689 */
-    --color-ink-500: 122 116 104; /* #7A7468 */
-    --color-ink-600: 92 86 76; /* #5C564C */
-    --color-ink-700: 69 65 56; /* #454138 */
-    --color-ink-800: 47 45 39; /* #2F2D27 */
-    --color-ink-900: 32 36 31; /* #20241F */
+    --color-ink-50: 249 250 251; /* #F9FAFB */
+    --color-ink-100: 241 242 245; /* #F1F2F5 */
+    --color-ink-200: 231 234 240; /* #E7EAF0 — the spec's own border color */
+    --color-ink-300: 211 215 224; /* #D3D7E0 */
+    --color-ink-400: 174 179 192; /* #AEB3C0 */
+    --color-ink-500: 112 119 132; /* #707784 — the spec's own secondary text */
+    --color-ink-600: 88 95 108; /* #585F6C */
+    --color-ink-700: 69 75 87; /* #454B57 */
+    --color-ink-800: 46 51 60; /* #2E333C */
+    --color-ink-900: 32 36 44; /* #20242C — the spec's own primary text */
 }
 
 :root.dark {
-    --color-paper: 21 23 19;
-    --color-surface: 31 34 28;
-    --color-ink-50: 42 45 38;
-    --color-ink-100: 55 59 50;
-    --color-ink-200: 73 77 66;
-    --color-ink-300: 99 105 90;
-    --color-ink-400: 135 129 114;
-    --color-ink-500: 168 161 146;
-    --color-ink-600: 194 188 174;
-    --color-ink-700: 214 209 197;
-    --color-ink-800: 228 224 214;
-    --color-ink-900: 243 241 235;
+    --color-paper: 19 21 26;
+    --color-surface: 28 31 38;
+    --color-ink-50: 36 40 49;
+    --color-ink-100: 46 51 60;
+    --color-ink-200: 58 64 75;
+    --color-ink-300: 76 83 97;
+    --color-ink-400: 107 114 128;
+    --color-ink-500: 154 161 176;
+    --color-ink-600: 183 188 200;
+    --color-ink-700: 205 209 218;
+    --color-ink-800: 226 228 233;
+    --color-ink-900: 243 244 246;
 }
 
 @layer components {
-    /* UI/UX redesign round 2 (reference: dexignzone ERES admin demo) —
-       fully pill-shaped buttons (the demo's own .btn is a 38px/rounded-full
-       radius) instead of rounded-lg, still with the soft shadow + press
-       feedback from round 1. */
+    /* Premium-SaaS redesign pass: back to a subtle rounded-lg radius
+       (the spec explicitly asks for "subtle rather than excessively
+       rounded" — the round-2 fully-pill-shaped button doesn't fit that),
+       and the soft floating shadow is dropped in favor of a flat fill —
+       Linear/Notion/Stripe-style buttons carry their own weight from
+       color and don't lean on a shadow for emphasis. */
     .btn {
-        @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100;
+        @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100;
     }
     .btn-primary {
-        @apply btn bg-accent-600 text-white shadow-soft hover:bg-accent-700 focus:ring-accent-500;
+        @apply btn bg-accent-600 text-white hover:bg-accent-700 focus:ring-accent-500;
     }
     .btn-secondary {
-        @apply btn bg-surface text-ink-700 shadow-soft ring-1 ring-inset ring-ink-200 hover:border-ink-300 hover:bg-ink-50 focus:ring-accent-500 dark:shadow-none;
+        @apply btn border border-ink-200 bg-surface text-ink-700 hover:border-ink-300 hover:bg-ink-50 focus:ring-accent-500;
     }
     .btn-danger {
-        @apply btn bg-danger-600 text-white shadow-soft hover:bg-danger-700 focus:ring-danger-500;
+        @apply btn bg-danger-600 text-white hover:bg-danger-700 focus:ring-danger-500;
     }
     .form-label {
         @apply block text-sm font-medium text-ink-700 mb-1;
@@ -85,15 +97,15 @@
     .form-error {
         @apply mt-1 text-sm text-danger-600;
     }
-    /* Floating card, no border — separation comes from the soft shadow
-       alone (the reference demo's own card pattern), which reads as more
-       minimal than a ring/border on a surface already lighter than the
-       paper page background. Dark mode: the soft shadow (a very low-
-       opacity dark tint) is invisible against an already-dark page, so it
-       drops out in favor of a faint light ring instead — same separation
-       technique, inverted for a dark backdrop. */
+    /* Premium-SaaS redesign pass: separation now comes from a 1px
+       border-ink-200 (the spec's own #E7EAF0) instead of the round-2
+       floating soft-shadow treatment — "avoid heavy shadows... thick
+       borders", so a hairline border reads cleaner than either a visible
+       shadow or a thick one. border-ink-200 is CSS-variable-backed
+       (see :root/:root.dark above), so this stays correctly subtle in
+       both themes with no extra dark: overrides needed here. */
     .card {
-        @apply rounded-xl bg-surface shadow-soft dark:shadow-none dark:ring-1 dark:ring-ink-100;
+        @apply rounded-xl border border-ink-200 bg-surface;
     }
     .badge {
         @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ring-black/[0.04] dark:ring-white/[0.06];
@@ -108,19 +120,20 @@
        untouched and keep using .btn/.card/.badge/.form-label/.form-error
        exactly as before. ---- */
 
-    /* Serif page heading, used by <x-page-header>. */
+    /* Page heading, used by <x-page-header>. Premium-SaaS redesign pass:
+       moved off the Fraunces serif display font onto plain font-sans —
+       a warm editorial serif doesn't fit the flatter Linear/Notion/
+       Stripe-inspired look this pass is after, which leans on weight and
+       tracking for hierarchy instead of a second typeface. */
     .page-title {
-        @apply font-serif text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl;
+        @apply font-sans text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl;
     }
 
-    /* Primary content-area surface — same floating, borderless treatment
-       as .card above (unified in the round-2 redesign): a soft shadow
-       does the separating, not a hairline border, which is what gives
-       every panel/card on every page in this app that same "floating on
-       the page" feel the reference demo has, instead of a flat bordered
-       box. */
+    /* Primary content-area surface. Premium-SaaS redesign pass: same
+       border-based treatment as .card above, replacing the round-2
+       floating-shadow look — see .card's comment for the reasoning. */
     .panel {
-        @apply rounded-xl border-0 bg-surface shadow-soft transition-shadow duration-150 hover:shadow-lg dark:shadow-none dark:ring-1 dark:ring-ink-100 dark:hover:shadow-none;
+        @apply rounded-xl border border-ink-200 bg-surface transition-colors duration-150;
     }
 
     /* Shared input chrome for <x-input>/<x-select>/<x-textarea>.

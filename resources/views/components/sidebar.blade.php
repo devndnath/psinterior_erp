@@ -149,24 +149,26 @@
 @endphp
 
 {{--
-    Minimalist-but-attractive UI/UX redesign pass, round 2 — restyled after
-    reviewing a reference admin-dashboard demo (dexignzone ERES) the user
-    pointed to for the overall feel. The shell moves off the dark ink-900
-    theme onto the demo's light, airy sidebar-on-white-canvas pattern, and
-    the active item moves from a left accent bar to a solid accent-filled
-    pill with the demo's signature asymmetric "flowing" edge (rounded hard
-    on three corners, soft on the one that bleeds toward the content) —
-    rendered here in our own PS Solution gold rather than copied green.
-    The $groups data, permission gating, active-route logic and Alpine
-    behavior are byte-for-byte unchanged — only presentational classes
-    moved.
+    Light, airy sidebar-on-white-canvas shell (round 2, reference:
+    dexignzone ERES demo) with a solid accent-filled active item —
+    restyled again in the premium-SaaS redesign pass to a plain
+    rounded-lg fill (was an asymmetric "flowing pill" shape) and the new
+    deep-teal accent (was PS Solution gold), matching that spec's
+    "subtle rather than excessively rounded" and flat/no-shadow
+    direction. The $groups data, permission gating, active-route logic
+    and Alpine behavior are byte-for-byte unchanged across all of
+    this — only presentational classes moved.
 --}}
 <aside
     :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
     class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-ink-100 bg-surface transition-transform duration-200 ease-in-out lg:static lg:translate-x-0"
 >
     <div class="flex h-16 shrink-0 items-center gap-2.5 px-6">
-        <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-accent-400 to-accent-600 text-sm font-bold text-ink-900 shadow-soft">
+        {{-- Premium-SaaS redesign pass: flat accent-600 fill (no gradient,
+             no shadow — see app.css's .card comment) with white text, since
+             the deep teal accent is dark enough to need it (the old pale
+             gold didn't). --}}
+        <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-600 text-sm font-bold text-white">
             {{ substr(config('app.name'), 0, 1) }}
         </div>
         <span class="truncate text-sm font-semibold tracking-tight text-ink-900">{{ config('app.name') }}</span>
@@ -242,9 +244,17 @@
                             <a
                                 href="{{ route($item['route']) }}"
                                 wire:navigate
+                                {{-- Premium-SaaS redesign pass: the round-2
+                                     asymmetric "flowing pill" active shape
+                                     is replaced with a plain rounded-lg
+                                     fill, matching the spec's "subtle
+                                     rather than excessively rounded"
+                                     direction and the flat (no-shadow)
+                                     treatment used everywhere else in this
+                                     pass. --}}
                                 @class([
                                     'flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-colors',
-                                    'rounded-[4px_16px_16px_4px] bg-accent-600 text-white shadow-soft' => request()->routeIs($item['active'] ?? $item['route'].'*'),
+                                    'rounded-lg bg-accent-600 text-white' => request()->routeIs($item['active'] ?? $item['route'].'*'),
                                     'rounded-lg text-ink-500 hover:bg-ink-50 hover:text-ink-900' => ! request()->routeIs($item['active'] ?? $item['route'].'*'),
                                 ])
                             >
@@ -267,7 +277,7 @@
 
     <div class="border-t border-ink-100 p-3">
         <div class="flex items-center gap-3 rounded-lg p-2 transition hover:bg-ink-50">
-            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent-500 to-accent-700 text-xs font-semibold text-ink-900 shadow-soft">
+            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent-600 text-xs font-semibold text-white">
                 {{ strtoupper(substr(auth()->user()->name ?? '?', 0, 1)) }}
             </div>
             <div class="min-w-0 flex-1">

@@ -16,20 +16,24 @@ export default {
                 // Kept as-is (do not rename/remove — ~165 existing usages
                 // across 159 views depend on it). New work should prefer
                 // `accent` below; `brand` stays for backward compat only.
-                // Re-pointed to the same gold ramp as `accent` so legacy
-                // `brand-*` usages pick up the PS Solution branding too
-                // (website analysis — see `accent` below for sourcing).
+                // Premium-SaaS redesign pass: re-pointed from the PS
+                // Solution gold to the same deep-teal ramp as `accent`
+                // (see `accent` below for sourcing) so legacy `brand-*`
+                // usages — the two portal headers' logo chip and the
+                // guest/login layout — stay visually consistent with the
+                // rest of the rebrand instead of being the one leftover
+                // gold element on screen.
                 brand: {
-                    50: '#FEFBEA',
-                    100: '#FDF3C4',
-                    200: '#FBE587',
-                    300: '#F7D24A',
-                    400: '#F4C01C',
-                    500: '#F4B400',
-                    600: '#D4A000',
-                    700: '#A67D00',
-                    800: '#785C00',
-                    900: '#4D3A00',
+                    50: '#EAF6F5',
+                    100: '#D1EBE9',
+                    200: '#A3D7D3',
+                    300: '#74C2BC',
+                    400: '#3CA39C',
+                    500: '#1F8D86',
+                    600: '#167D78',
+                    700: '#126863',
+                    800: '#0E514D',
+                    900: '#0A3A37',
                 },
                 // Phase 13 design-system foundation ------------------------
                 // Page/elevated-surface backgrounds (warm off-white, not
@@ -94,26 +98,26 @@ export default {
                     800: 'rgb(var(--color-ink-800) / <alpha-value>)',
                     900: 'rgb(var(--color-ink-900) / <alpha-value>)',
                 },
-                // Primary brand color re-themed to match pssolutionbd.com's
-                // actual branding (extracted via computed-style inspection
-                // of the live site, not guessed): a warm gold anchored on
-                // the site's own CTA/nav-highlight gold `#F4B400` (500) and
-                // its darker hover shade `#D4A000` (600). 700–900 are pulled
-                // noticeably darker/browner than the site's own gold so
-                // `text-accent-700/800` keeps enough contrast on white for
-                // buttons, links and badge text — the site itself never
-                // needs gold text on white, the ERP does.
+                // Premium-SaaS redesign pass (per the uploaded design spec):
+                // moved off the PS Solution gold onto a sophisticated deep
+                // teal anchored on the spec's own `#167D78` (set here as
+                // 600, matching how every `.btn-primary`/active-nav usage
+                // in this codebase already expects the "main" tone to sit
+                // at 600 with 700 as its hover/darker shade — the exact
+                // slot `#D4A000` occupied in the old gold scale). 700–900
+                // are pulled darker for text/icon contrast on white; 50–300
+                // are light tints for badges, hover fills and icon chips.
                 accent: {
-                    50: '#FEFBEA',
-                    100: '#FDF3C4',
-                    200: '#FBE587',
-                    300: '#F7D24A',
-                    400: '#F4C01C',
-                    500: '#F4B400',
-                    600: '#D4A000',
-                    700: '#A67D00',
-                    800: '#785C00',
-                    900: '#4D3A00',
+                    50: '#EAF6F5',
+                    100: '#D1EBE9',
+                    200: '#A3D7D3',
+                    300: '#74C2BC',
+                    400: '#3CA39C',
+                    500: '#1F8D86',
+                    600: '#167D78',
+                    700: '#126863',
+                    800: '#0E514D',
+                    900: '#0A3A37',
                 },
                 // Optional cleaner semantics for new components (existing
                 // red-*/green-*/yellow-* Tailwind defaults remain in use
@@ -161,9 +165,16 @@ export default {
                     900: '#470F0C',
                 },
             },
+            // Premium-SaaS redesign pass: the Fraunces serif display font
+            // (used only by .page-title) is dropped in favor of Inter
+            // everywhere — a warm editorial serif heading doesn't fit the
+            // flatter, Linear/Notion/Stripe-inspired look this pass is
+            // after, which leans on weight and spacing for hierarchy
+            // instead of a second typeface. Manrope is kept as the first
+            // fallback (so anything still mid-load briefly renders close
+            // to its final look) with the same system-font chain after it.
             fontFamily: {
-                sans: ['Manrope', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-                serif: ['Fraunces', 'ui-serif', 'Georgia', 'serif'],
+                sans: ['Inter', 'Manrope', 'ui-sans-serif', 'system-ui', 'sans-serif'],
             },
             borderRadius: {
                 sm: '6px',
@@ -171,13 +182,13 @@ export default {
                 md: '8px',
                 lg: '12px',
             },
-            // UI/UX redesign round 2 — a soft, generous, low-opacity
-            // elevation (reference: the dexignzone ERES admin demo's own
-            // `.card` shadow, extracted via computed-style inspection:
-            // 0 12px 33px 0 rgba(62,73,84,.08)) used in place of Tailwind's
-            // stock `shadow-sm`/`shadow-md` on panels, cards and the
-            // active sidebar item, for a "floating" look with no need for
-            // a visible border.
+            // `soft` (the ERES-demo-inspired floating shadow from UI/UX
+            // round 2) is kept defined — a couple of one-off decorative
+            // spots may still reference it — but .card/.panel/.btn-* no
+            // longer @apply it by default. The premium-SaaS spec explicitly
+            // calls for subtle borders over heavy shadows, so separation
+            // now comes from a 1px border-ink-200 instead (resources/css/
+            // app.css), matching the Linear/Notion/Stripe reference point.
             boxShadow: {
                 soft: '0 12px 33px 0 rgba(62, 73, 84, 0.08)',
             },
