@@ -49,7 +49,11 @@ class Form extends Component
                 'lead_id' => $this->project->lead_id,
                 'name' => $this->project->name,
                 'type' => $this->project->type?->value ?? '',
-                'location' => $this->project->location,
+                // `location` is nullable on `projects` but typed `string`
+                // here — fill() throws a TypeError assigning null to a
+                // non-nullable typed property (same bug class hit in
+                // production on Clients\Form; see its mount() docblock).
+                'location' => $this->project->location ?? '',
                 'start_date' => $this->project->start_date?->format('Y-m-d') ?? '',
                 'expected_end_date' => $this->project->expected_end_date?->format('Y-m-d') ?? '',
                 'contract_value' => (string) $this->project->contract_value,

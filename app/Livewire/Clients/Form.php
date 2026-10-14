@@ -49,18 +49,27 @@ class Form extends Component
         Gate::authorize($this->client ? 'update' : 'create', $this->client ?? Client::class);
 
         if ($this->client) {
+            // The nullable varchar columns below (phone/email/company_name/
+            // address/billing_address/site_address/tax_id/notes) can hold
+            // null in the database, but these public properties are typed
+            // `string` (not `?string`) — Livewire's fill() throws a
+            // TypeError assigning null to a non-nullable typed property
+            // (hit in production editing a client saved before one of
+            // these fields was filled in). Coerce each to '' the same way
+            // assigned_to already was, rather than widening every property
+            // to ?string and touching every blade/validation usage below.
             $this->fill([
                 'name' => $this->client->name,
                 'type' => $this->client->type->value,
-                'phone' => $this->client->phone,
-                'email' => $this->client->email,
-                'company_name' => $this->client->company_name,
-                'address' => $this->client->address,
-                'billing_address' => $this->client->billing_address,
-                'site_address' => $this->client->site_address,
-                'tax_id' => $this->client->tax_id,
+                'phone' => $this->client->phone ?? '',
+                'email' => $this->client->email ?? '',
+                'company_name' => $this->client->company_name ?? '',
+                'address' => $this->client->address ?? '',
+                'billing_address' => $this->client->billing_address ?? '',
+                'site_address' => $this->client->site_address ?? '',
+                'tax_id' => $this->client->tax_id ?? '',
                 'assigned_to' => (string) $this->client->assigned_to,
-                'notes' => $this->client->notes,
+                'notes' => $this->client->notes ?? '',
             ]);
         }
     }

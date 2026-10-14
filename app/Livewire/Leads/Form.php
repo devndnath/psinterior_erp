@@ -41,21 +41,28 @@ class Form extends Component
         Gate::authorize($this->lead ? 'update' : 'create', $this->lead ?? Lead::class);
 
         if ($this->lead) {
+            // phone/email/company_name/address/interested_service/notes are
+            // nullable columns on `leads` but typed `string` (not
+            // `?string`) here — fill() throws a TypeError assigning null
+            // to a non-nullable typed property (same bug class hit in
+            // production on Clients\Form; see its mount() docblock).
+            // Coerce each to '' like every other optional field in this
+            // block already does.
             $this->fill([
                 'name' => $this->lead->name,
-                'phone' => $this->lead->phone,
-                'email' => $this->lead->email,
-                'company_name' => $this->lead->company_name,
-                'address' => $this->lead->address,
+                'phone' => $this->lead->phone ?? '',
+                'email' => $this->lead->email ?? '',
+                'company_name' => $this->lead->company_name ?? '',
+                'address' => $this->lead->address ?? '',
                 'project_type' => $this->lead->project_type?->value ?? '',
                 'estimated_budget' => (string) $this->lead->estimated_budget,
-                'interested_service' => $this->lead->interested_service,
+                'interested_service' => $this->lead->interested_service ?? '',
                 'lead_source_id' => (string) $this->lead->lead_source_id,
                 'assigned_to' => (string) $this->lead->assigned_to,
                 'priority' => $this->lead->priority->value,
                 'status' => $this->lead->status->value,
                 'expected_closing_date' => $this->lead->expected_closing_date?->format('Y-m-d') ?? '',
-                'notes' => $this->lead->notes,
+                'notes' => $this->lead->notes ?? '',
             ]);
         }
     }

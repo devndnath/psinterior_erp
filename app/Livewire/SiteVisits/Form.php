@@ -49,15 +49,21 @@ class Form extends Component
         Gate::authorize($this->siteVisit ? 'update' : 'create', $this->siteVisit ?? SiteVisit::class);
 
         if ($this->siteVisit) {
+            // site_address/purpose/requirements/notes are nullable columns
+            // on `site_visits` but typed `string` (not `?string`) here —
+            // fill() throws a TypeError assigning null to a non-nullable
+            // typed property (same bug class hit in production on
+            // Clients\Form; see its mount() docblock). Coerce each to ''
+            // like visit_date already does.
             $this->fill([
                 'client_id' => (string) $this->siteVisit->client_id,
                 'project_id' => (string) $this->siteVisit->project_id,
-                'site_address' => $this->siteVisit->site_address,
+                'site_address' => $this->siteVisit->site_address ?? '',
                 'visit_date' => $this->siteVisit->visit_date?->format('Y-m-d') ?? '',
                 'assigned_to' => (string) $this->siteVisit->assigned_to,
-                'purpose' => $this->siteVisit->purpose,
-                'requirements' => $this->siteVisit->requirements,
-                'notes' => $this->siteVisit->notes,
+                'purpose' => $this->siteVisit->purpose ?? '',
+                'requirements' => $this->siteVisit->requirements ?? '',
+                'notes' => $this->siteVisit->notes ?? '',
             ]);
 
             $this->rooms = $this->siteVisit->items->map(fn ($item) => [
