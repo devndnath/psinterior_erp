@@ -31,7 +31,10 @@
         x-show="open"
         x-cloak
         x-transition.opacity
-        class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 p-4"
+        {{-- Literal black, not bg-gray-900 — a dimming scrim must stay dark
+             in both themes, and gray-900 now flips to near-white in dark
+             mode (same reasoning as <x-modal>'s backdrop). --}}
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
         @keydown.escape.window="open = false"
     >
         <div

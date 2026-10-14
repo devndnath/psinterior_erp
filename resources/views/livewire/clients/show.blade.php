@@ -19,7 +19,7 @@
                 <div>
                     <p class="text-sm font-semibold text-success-800">{{ $passwordJustReset ? 'Portal password reset for' : 'Portal login created for' }} {{ $client->portalUser?->email }}</p>
                     <p class="mt-1 text-sm text-success-700">
-                        {{ $passwordJustReset ? 'New password' : 'Temporary password' }}: <code class="rounded bg-white px-2 py-0.5 font-mono">{{ $generatedPassword }}</code>
+                        {{ $passwordJustReset ? 'New password' : 'Temporary password' }}: <code class="rounded bg-surface px-2 py-0.5 font-mono">{{ $generatedPassword }}</code>
                         — this app doesn't send login emails, so copy it now and share it with {{ $client->name }}. It won't be shown again.
                     </p>
                 </div>

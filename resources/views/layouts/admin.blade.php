@@ -4,6 +4,19 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    {{-- Dark-mode toggle (components/theme-toggle.blade.php, in <x-topbar>):
+         runs synchronously, before any CSS paints, so the page never
+         flashes the wrong theme on load. Mirrored verbatim in
+         client-portal.blade.php and vendor-portal.blade.php. --}}
+    <script>
+        (function () {
+            try {
+                var stored = localStorage.getItem('theme');
+                var dark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.classList.toggle('dark', dark);
+            } catch (e) {}
+        })();
+    </script>
     {{-- Phase 13: Manrope (sans) + Fraunces (serif) design-system fonts. --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,9 +28,11 @@
 <body class="h-full font-sans antialiased">
     <div class="flex h-full">
 
-        {{-- Mobile backdrop --}}
+        {{-- Mobile backdrop. Literal black (not bg-ink-900) on purpose: this
+             is a dimming scrim, not text, so it must stay dark in both
+             themes — ink-900 itself now flips to near-white in dark mode. --}}
         <div x-show="sidebarOpen" x-cloak @click="sidebarOpen = false"
-             class="fixed inset-0 z-30 bg-ink-900/60 backdrop-blur-[2px] lg:hidden"></div>
+             class="fixed inset-0 z-30 bg-black/60 backdrop-blur-[2px] lg:hidden"></div>
 
         <x-sidebar />
 

@@ -19,6 +19,8 @@
 
     <div class="hidden h-6 w-px bg-ink-100 sm:block"></div>
 
+    <x-theme-toggle />
+
     {{-- Phase 11: database-channel notification bell (app/Notifications/*). --}}
     <livewire:notifications.bell />
 </header>

@@ -14,6 +14,54 @@
     display: none !important;
 }
 
+/*
+ * Dark-mode color variables (tailwind.config.js: darkMode: 'class').
+ * paper/surface/ink (and the ink-aliased `gray`) are defined here as
+ * "R G B" triplets rather than static hex so tailwind.config.js can wire
+ * them up as `rgb(var(--x) / <alpha-value>)` — this is what lets every
+ * existing bg-surface/text-ink-900/bg-paper/text-gray-500 class already
+ * used across the whole app re-color the instant `.dark` is toggled on
+ * <html>, with no per-view edits.
+ *
+ * `.dark` doesn't just darken each shade — the ink ramp is semantically
+ * flipped (50/100 stay "subtlest background tint", 900 stays "primary
+ * text", but the actual lightness inverts) so e.g. text-ink-900 keeps
+ * meaning "the most readable text color on this surface" in both themes
+ * instead of staying literally near-black. accent/success/warning/danger
+ * are deliberately left as static hex (unchanged in dark mode) — mid-
+ * saturation brand/status colors read fine on a dark surface as-is, and
+ * leaving them alone keeps this change scoped to neutrals only.
+ */
+:root {
+    --color-paper: 250 250 247; /* #FAFAF7 */
+    --color-surface: 255 255 255; /* #FFFFFF */
+    --color-ink-50: 247 246 244; /* #F7F6F4 */
+    --color-ink-100: 238 236 232; /* #EEECE8 */
+    --color-ink-200: 220 217 210; /* #DCD9D2 */
+    --color-ink-300: 194 189 178; /* #C2BDB2 */
+    --color-ink-400: 157 150 137; /* #9D9689 */
+    --color-ink-500: 122 116 104; /* #7A7468 */
+    --color-ink-600: 92 86 76; /* #5C564C */
+    --color-ink-700: 69 65 56; /* #454138 */
+    --color-ink-800: 47 45 39; /* #2F2D27 */
+    --color-ink-900: 32 36 31; /* #20241F */
+}
+
+:root.dark {
+    --color-paper: 21 23 19;
+    --color-surface: 31 34 28;
+    --color-ink-50: 42 45 38;
+    --color-ink-100: 55 59 50;
+    --color-ink-200: 73 77 66;
+    --color-ink-300: 99 105 90;
+    --color-ink-400: 135 129 114;
+    --color-ink-500: 168 161 146;
+    --color-ink-600: 194 188 174;
+    --color-ink-700: 214 209 197;
+    --color-ink-800: 228 224 214;
+    --color-ink-900: 243 241 235;
+}
+
 @layer components {
     /* UI/UX redesign round 2 (reference: dexignzone ERES admin demo) —
        fully pill-shaped buttons (the demo's own .btn is a 38px/rounded-full
@@ -26,7 +74,7 @@
         @apply btn bg-accent-600 text-white shadow-soft hover:bg-accent-700 focus:ring-accent-500;
     }
     .btn-secondary {
-        @apply btn bg-surface text-ink-700 shadow-soft ring-1 ring-inset ring-ink-200 hover:border-ink-300 hover:bg-ink-50 focus:ring-accent-500;
+        @apply btn bg-surface text-ink-700 shadow-soft ring-1 ring-inset ring-ink-200 hover:border-ink-300 hover:bg-ink-50 focus:ring-accent-500 dark:shadow-none;
     }
     .btn-danger {
         @apply btn bg-danger-600 text-white shadow-soft hover:bg-danger-700 focus:ring-danger-500;
@@ -40,12 +88,15 @@
     /* Floating card, no border — separation comes from the soft shadow
        alone (the reference demo's own card pattern), which reads as more
        minimal than a ring/border on a surface already lighter than the
-       paper page background. */
+       paper page background. Dark mode: the soft shadow (a very low-
+       opacity dark tint) is invisible against an already-dark page, so it
+       drops out in favor of a faint light ring instead — same separation
+       technique, inverted for a dark backdrop. */
     .card {
-        @apply rounded-xl bg-surface shadow-soft;
+        @apply rounded-xl bg-surface shadow-soft dark:shadow-none dark:ring-1 dark:ring-ink-100;
     }
     .badge {
-        @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ring-black/[0.04];
+        @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ring-black/[0.04] dark:ring-white/[0.06];
     }
     .th-sortable {
         @apply cursor-pointer select-none whitespace-nowrap px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-ink-500 hover:text-ink-700;
@@ -69,7 +120,7 @@
        the page" feel the reference demo has, instead of a flat bordered
        box. */
     .panel {
-        @apply rounded-xl border-0 bg-surface shadow-soft transition-shadow duration-150 hover:shadow-lg;
+        @apply rounded-xl border-0 bg-surface shadow-soft transition-shadow duration-150 hover:shadow-lg dark:shadow-none dark:ring-1 dark:ring-ink-100 dark:hover:shadow-none;
     }
 
     /* Shared input chrome for <x-input>/<x-select>/<x-textarea>.
@@ -100,7 +151,7 @@
         @apply divide-y divide-ink-100 bg-surface;
     }
     .table-base tbody tr {
-        @apply transition-colors hover:bg-accent-50/40;
+        @apply transition-colors hover:bg-accent-50/40 dark:hover:bg-accent-500/10;
     }
     .table-base tbody td {
         @apply px-4 py-3.5 text-sm text-ink-700;

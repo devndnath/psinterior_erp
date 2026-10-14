@@ -25,11 +25,11 @@
             x-transition:leave="transition ease-in duration-150"
             x-transition:leave-start="opacity-100"
             x-transition:leave-end="opacity-0"
-            class="pointer-events-auto w-full max-w-sm rounded-lg p-4 shadow-lg ring-1 ring-black/5"
+            class="pointer-events-auto w-full max-w-sm rounded-lg p-4 shadow-lg ring-1 ring-black/5 dark:ring-white/10"
             :class="{
-                'bg-green-50 text-green-800': toast.type === 'success',
-                'bg-red-50 text-red-800': toast.type === 'error',
-                'bg-blue-50 text-blue-800': toast.type === 'info',
+                'bg-green-50 text-green-800 dark:bg-green-900/40 dark:text-green-300': toast.type === 'success',
+                'bg-red-50 text-red-800 dark:bg-red-900/40 dark:text-red-300': toast.type === 'error',
+                'bg-blue-50 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300': toast.type === 'info',
             }"
         >
             <div class="flex items-start gap-3">

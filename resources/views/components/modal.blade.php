@@ -29,7 +29,10 @@
         x-show="open"
         x-cloak
         x-transition.opacity
-        class="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/50 p-4"
+        {{-- Literal black, not bg-ink-900 — a dimming scrim must stay dark
+             in both themes, and ink-900 now flips to near-white in dark
+             mode (see layouts/admin.blade.php's mobile backdrop). --}}
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
     >
         <div
             x-show="open"

@@ -29,7 +29,7 @@
                         <th class="px-4 py-3"></th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100 bg-white">
+                <tbody class="divide-y divide-gray-100 bg-surface">
                     @foreach ($categories as $category)
                         <tr wire:key="category-{{ $category->id }}" class="hover:bg-gray-50">
                             <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $category->name }}</td>

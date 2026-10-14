@@ -17,7 +17,7 @@
                 </select>
             @endif
 
-            <div class="flex items-center gap-1 rounded-lg border border-ink-200 bg-white p-1">
+            <div class="flex items-center gap-1 rounded-lg border border-ink-200 bg-surface p-1">
                 <button type="button" wire:click="previousMonth" class="rounded-md p-1.5 text-ink-500 hover:bg-ink-100" aria-label="Previous month">
                     <x-icon name="chevron-left" class="h-4 w-4" />
                 </button>

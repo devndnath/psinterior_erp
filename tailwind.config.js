@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+    darkMode: 'class',
     content: [
         './resources/**/*.blade.php',
         './resources/**/*.js',
@@ -35,27 +36,63 @@ export default {
                 // Tailwind's cool gray-50/white pairing). Tightened slightly
                 // (was #FAF8F4) to sit closer to pssolutionbd.com's own
                 // cream background (#FAFAF7, extracted from the live site).
+                //
+                // Dark-mode pass: these (plus `ink` and `gray` below) are
+                // now CSS-variable-backed instead of static hex, with the
+                // variables themselves defined in resources/css/app.css
+                // under `:root` (light) and `.dark` (dark). That lets the
+                // existing bg-surface/text-ink-900/bg-paper classes already
+                // used across all ~160 views re-color automatically when
+                // `.dark` is toggled on <html> — no per-view edits needed.
+                // The `rgb(var(...) / <alpha-value>)` form preserves
+                // Tailwind's opacity-modifier syntax (e.g. bg-surface/90,
+                // bg-ink-900/60) exactly as it worked with static hex.
                 paper: {
-                    DEFAULT: '#FAFAF7',
+                    DEFAULT: 'rgb(var(--color-paper) / <alpha-value>)',
                 },
                 surface: {
-                    DEFAULT: '#FFFFFF',
+                    DEFAULT: 'rgb(var(--color-surface) / <alpha-value>)',
                 },
                 // Warm-neutral text/border scale anchored on #20241F (900).
                 // A deliberate warm gray ramp — not Tailwind's default
                 // blue-tinted `gray` — used by every new component this
-                // phase introduces.
+                // phase introduces. See the dark-mode note above `paper`:
+                // each shade keeps its semantic role (50/100 = subtlest
+                // background tint, 900 = highest-contrast text) in both
+                // themes, but the actual values flip in `.dark` so
+                // text-ink-900 stays "primary text on this surface" rather
+                // than literally staying near-black.
                 ink: {
-                    50: '#F7F6F4',
-                    100: '#EEECE8',
-                    200: '#DCD9D2',
-                    300: '#C2BDB2',
-                    400: '#9D9689',
-                    500: '#7A7468',
-                    600: '#5C564C',
-                    700: '#454138',
-                    800: '#2F2D27',
-                    900: '#20241F',
+                    50: 'rgb(var(--color-ink-50) / <alpha-value>)',
+                    100: 'rgb(var(--color-ink-100) / <alpha-value>)',
+                    200: 'rgb(var(--color-ink-200) / <alpha-value>)',
+                    300: 'rgb(var(--color-ink-300) / <alpha-value>)',
+                    400: 'rgb(var(--color-ink-400) / <alpha-value>)',
+                    500: 'rgb(var(--color-ink-500) / <alpha-value>)',
+                    600: 'rgb(var(--color-ink-600) / <alpha-value>)',
+                    700: 'rgb(var(--color-ink-700) / <alpha-value>)',
+                    800: 'rgb(var(--color-ink-800) / <alpha-value>)',
+                    900: 'rgb(var(--color-ink-900) / <alpha-value>)',
+                },
+                // Pre-Phase-13 views (and the two portal layouts) still use
+                // Tailwind's stock `gray-*` scale directly instead of the
+                // `ink-*` design-system scale above. Re-pointed to the same
+                // variables as `ink` (same 50→900 semantic ramp) purely so
+                // those older views also go dark automatically — this does
+                // NOT change their light-mode appearance at all, since the
+                // light-mode variable values below match the ink scale's
+                // original hex values exactly.
+                gray: {
+                    50: 'rgb(var(--color-ink-50) / <alpha-value>)',
+                    100: 'rgb(var(--color-ink-100) / <alpha-value>)',
+                    200: 'rgb(var(--color-ink-200) / <alpha-value>)',
+                    300: 'rgb(var(--color-ink-300) / <alpha-value>)',
+                    400: 'rgb(var(--color-ink-400) / <alpha-value>)',
+                    500: 'rgb(var(--color-ink-500) / <alpha-value>)',
+                    600: 'rgb(var(--color-ink-600) / <alpha-value>)',
+                    700: 'rgb(var(--color-ink-700) / <alpha-value>)',
+                    800: 'rgb(var(--color-ink-800) / <alpha-value>)',
+                    900: 'rgb(var(--color-ink-900) / <alpha-value>)',
                 },
                 // Primary brand color re-themed to match pssolutionbd.com's
                 // actual branding (extracted via computed-style inspection

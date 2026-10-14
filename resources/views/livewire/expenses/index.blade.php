@@ -58,7 +58,7 @@
                         <th class="px-4 py-3"></th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100 bg-white">
+                <tbody class="divide-y divide-gray-100 bg-surface">
                     @foreach ($expenses as $expense)
                         <tr wire:key="expense-{{ $expense->id }}" class="hover:bg-gray-50">
                             <td class="px-4 py-3 text-sm font-mono text-gray-500">
