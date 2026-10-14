@@ -35,6 +35,16 @@ class User extends Authenticatable
         'user_type',
         'is_active',
         'last_login_at',
+        // UserService::create()/createLinkedAccount() both set this
+        // (an account this app creates itself already has a known-good
+        // email, so it's marked verified at creation rather than going
+        // through an email-verification flow — there's no outbound email
+        // in this app at all, see UserService::createLinkedAccount()'s
+        // docblock). Missing from this list meant every one of those
+        // User::create([...]) calls threw a MassAssignmentException in
+        // production (caught here: creating a client/vendor/employee
+        // portal login, or a staff user via the Users screen).
+        'email_verified_at',
     ];
 
     protected $hidden = [
