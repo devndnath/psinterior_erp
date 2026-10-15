@@ -163,29 +163,32 @@
 @endphp
 
 {{--
-    Light, airy sidebar-on-white-canvas shell (round 2, reference:
-    dexignzone ERES demo) with a solid accent-filled active item —
-    restyled again in the premium-SaaS redesign pass to a plain
-    rounded-lg fill (was an asymmetric "flowing pill" shape) and the new
-    deep-teal accent (was PS Solution gold), matching that spec's
-    "subtle rather than excessively rounded" and flat/no-shadow
-    direction. The $groups data, permission gating, active-route logic
-    and Alpine behavior are byte-for-byte unchanged across all of
-    this — only presentational classes moved.
+    Enterprise ERP redesign pass: a persistent DARK navigation rail —
+    the clearest single visual signature that separates "ERP" from
+    "consumer SaaS" (SAP Fiori's launchpad, Odoo's backend, Salesforce
+    Lightning's app rail, Oracle Cloud all use a fixed dark/colored nav
+    against a light content canvas). Deliberately hardcoded to literal
+    `slate-*`/`white` classes rather than the `ink-*`/`surface` design
+    tokens used everywhere else in the app: those tokens are CSS-
+    variable-backed so they flip with the day/night theme toggle
+    (resources/js/theme.js), but this sidebar is NOT meant to flip — it
+    stays dark regardless of whether the content area is in light or
+    dark mode, exactly like the ERPs referenced above. `accent-*` classes
+    are untouched (accent/success/warning/danger are static hex, never
+    theme-variable, so they already read correctly on a dark surface).
+    The $groups data, permission gating, active-route logic and Alpine
+    behavior are byte-for-byte unchanged across all of this —
+    only presentational classes changed.
 --}}
 <aside
     :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
-    class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-ink-100 bg-surface transition-transform duration-200 ease-in-out lg:static lg:translate-x-0"
+    class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-slate-900 transition-transform duration-200 ease-in-out lg:static lg:translate-x-0"
 >
-    <div class="flex h-16 shrink-0 items-center gap-2.5 px-6">
-        {{-- Premium-SaaS redesign pass: flat accent-600 fill (no gradient,
-             no shadow — see app.css's .card comment) with white text, since
-             the deep teal accent is dark enough to need it (the old pale
-             gold didn't). --}}
+    <div class="flex h-16 shrink-0 items-center gap-2.5 border-b border-slate-800 px-6">
         <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-600 text-sm font-bold text-white">
             {{ substr(config('app.name'), 0, 1) }}
         </div>
-        <span class="truncate text-sm font-semibold tracking-tight text-ink-900">{{ config('app.name') }}</span>
+        <span class="truncate text-sm font-semibold tracking-tight text-white">{{ config('app.name') }}</span>
     </div>
 
     <nav class="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
@@ -243,7 +246,7 @@
                     <button
                         type="button"
                         @click="toggle()"
-                        class="flex w-full items-center justify-between rounded-md px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-ink-400 transition hover:bg-ink-50 hover:text-ink-600"
+                        class="flex w-full items-center justify-between rounded-md px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500 transition hover:bg-slate-800 hover:text-slate-300"
                     >
                         <span>{{ $group['label'] }}</span>
                         <x-icon
@@ -258,18 +261,15 @@
                             <a
                                 href="{{ route($item['route']) }}"
                                 wire:navigate
-                                {{-- Premium-SaaS redesign pass: the round-2
-                                     asymmetric "flowing pill" active shape
-                                     is replaced with a plain rounded-lg
-                                     fill, matching the spec's "subtle
-                                     rather than excessively rounded"
-                                     direction and the flat (no-shadow)
-                                     treatment used everywhere else in this
-                                     pass. --}}
+                                {{-- Active item: a solid indigo fill — the
+                                     one spot of color against the dark
+                                     rail, unmissable at a glance. Inactive:
+                                     muted slate text, lighting up to white
+                                     on hover. --}}
                                 @class([
                                     'flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-colors',
                                     'rounded-lg bg-accent-600 text-white' => request()->routeIs($item['active'] ?? $item['route'].'*'),
-                                    'rounded-lg text-ink-500 hover:bg-ink-50 hover:text-ink-900' => ! request()->routeIs($item['active'] ?? $item['route'].'*'),
+                                    'rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs($item['active'] ?? $item['route'].'*'),
                                 ])
                             >
                                 <x-icon
@@ -277,7 +277,7 @@
                                     @class([
                                         'h-[18px] w-[18px] shrink-0',
                                         'text-white' => request()->routeIs($item['active'] ?? $item['route'].'*'),
-                                        'text-ink-400' => ! request()->routeIs($item['active'] ?? $item['route'].'*'),
+                                        'text-slate-500' => ! request()->routeIs($item['active'] ?? $item['route'].'*'),
                                     ])
                                 />
                                 <span class="truncate">{{ $item['label'] }}</span>
@@ -289,19 +289,19 @@
         @endforeach
     </nav>
 
-    <div class="border-t border-ink-100 p-3">
-        <div class="flex items-center gap-3 rounded-lg p-2 transition hover:bg-ink-50">
+    <div class="border-t border-slate-800 p-3">
+        <div class="flex items-center gap-3 rounded-lg p-2 transition hover:bg-slate-800">
             <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent-600 text-xs font-semibold text-white">
                 {{ strtoupper(substr(auth()->user()->name ?? '?', 0, 1)) }}
             </div>
             <div class="min-w-0 flex-1">
-                <p class="truncate text-sm font-medium text-ink-900">{{ auth()->user()->name }}</p>
-                <p class="truncate text-xs text-ink-400">{{ auth()->user()->getRoleNames()->first() ?? 'User' }}</p>
+                <p class="truncate text-sm font-medium text-white">{{ auth()->user()->name }}</p>
+                <p class="truncate text-xs text-slate-400">{{ auth()->user()->getRoleNames()->first() ?? 'User' }}</p>
             </div>
         </div>
         <form method="POST" action="{{ route('logout') }}" class="mt-0.5">
             @csrf
-            <button type="submit" class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-ink-400 transition hover:bg-danger-50 hover:text-danger-600">
+            <button type="submit" class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-400 transition hover:bg-slate-800 hover:text-red-400">
                 Log out
             </button>
         </form>

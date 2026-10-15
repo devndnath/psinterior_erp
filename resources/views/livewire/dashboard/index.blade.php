@@ -228,7 +228,7 @@
                                             datasets: [{
                                                 label: 'Leads',
                                                 data: @js($leadStatusCounts),
-                                                backgroundColor: '#167D78',
+                                                backgroundColor: '#4F46E5',
                                                 borderRadius: 4,
                                             }],
                                         },
@@ -266,7 +266,7 @@
                                             labels: @js($projectStatusLabels),
                                             datasets: [{
                                                 data: @js($projectStatusCounts),
-                                                backgroundColor: ['#1F8D86','#167D78','#126863','#10B981','#34D399','#FB923C','#EA580C','#707784','#059669','#AEB3C0','#CB3B2B'],
+                                                backgroundColor: ['#6366F1','#4F46E5','#4338CA','#10B981','#34D399','#FB923C','#EA580C','#64748B','#059669','#94A3B8','#CB3B2B'],
                                                 borderWidth: 0,
                                             }],
                                         },

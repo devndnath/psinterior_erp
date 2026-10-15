@@ -33,43 +33,48 @@
  * leaving them alone keeps this change scoped to neutrals only.
  */
 /*
- * Premium-SaaS redesign pass: the neutral scale moved from the PS
- * Solution-gold-matched warm ramp to a cool "charcoal/slate" ramp
- * matching the uploaded design spec's own anchor colors — paper
- * #F8F9FB, primary text #20242C, secondary text #707784, borders
- * #E7EAF0 — which pairs better with the new deep-teal accent than the
- * old warm grays did. Same semantic contract as before (50/100 =
+ * Enterprise ERP redesign pass: the neutral scale moves off the
+ * Premium-SaaS warm "charcoal" ramp onto Tailwind's own true-neutral
+ * `slate` scale, used verbatim — a cool, structured gray is the
+ * standard content-canvas neutral across professional data-dense
+ * software (Linear, Vercel, GitHub, most enterprise dashboards), and
+ * reads as more "serious tool" than a warm off-white. `paper` (the page
+ * canvas) sits a shade darker than pure white (slate-50) so surface
+ * cards visibly separate from the page behind them — a deliberate ERP
+ * convention (content lives in clearly bounded panels on a gray canvas,
+ * not white-on-white) distinct from the airier, borderless feel of a
+ * consumer SaaS page. Same semantic contract as before (50/100 =
  * subtlest background tint, 900 = highest-contrast text, flipped in
  * `.dark`), just re-tuned values.
  */
 :root {
-    --color-paper: 248 249 251; /* #F8F9FB */
+    --color-paper: 248 250 252; /* #F8FAFC — slate-50 */
     --color-surface: 255 255 255; /* #FFFFFF */
-    --color-ink-50: 249 250 251; /* #F9FAFB */
-    --color-ink-100: 241 242 245; /* #F1F2F5 */
-    --color-ink-200: 231 234 240; /* #E7EAF0 — the spec's own border color */
-    --color-ink-300: 211 215 224; /* #D3D7E0 */
-    --color-ink-400: 174 179 192; /* #AEB3C0 */
-    --color-ink-500: 112 119 132; /* #707784 — the spec's own secondary text */
-    --color-ink-600: 88 95 108; /* #585F6C */
-    --color-ink-700: 69 75 87; /* #454B57 */
-    --color-ink-800: 46 51 60; /* #2E333C */
-    --color-ink-900: 32 36 44; /* #20242C — the spec's own primary text */
+    --color-ink-50: 248 250 252; /* #F8FAFC — slate-50 */
+    --color-ink-100: 241 245 249; /* #F1F5F9 — slate-100 */
+    --color-ink-200: 226 232 240; /* #E2E8F0 — slate-200, border color */
+    --color-ink-300: 203 213 225; /* #CBD5E1 — slate-300 */
+    --color-ink-400: 148 163 184; /* #94A3B8 — slate-400 */
+    --color-ink-500: 100 116 139; /* #64748B — slate-500, secondary text */
+    --color-ink-600: 71 85 105; /* #475569 — slate-600 */
+    --color-ink-700: 51 65 85; /* #334155 — slate-700 */
+    --color-ink-800: 30 41 59; /* #1E293B — slate-800 */
+    --color-ink-900: 15 23 42; /* #0F172A — slate-900, primary text */
 }
 
 :root.dark {
-    --color-paper: 19 21 26;
-    --color-surface: 28 31 38;
-    --color-ink-50: 36 40 49;
-    --color-ink-100: 46 51 60;
-    --color-ink-200: 58 64 75;
-    --color-ink-300: 76 83 97;
-    --color-ink-400: 107 114 128;
-    --color-ink-500: 154 161 176;
-    --color-ink-600: 183 188 200;
-    --color-ink-700: 205 209 218;
-    --color-ink-800: 226 228 233;
-    --color-ink-900: 243 244 246;
+    --color-paper: 8 11 19; /* near slate-950 */
+    --color-surface: 17 24 39; /* #111827 — a standard dark card surface */
+    --color-ink-50: 30 41 59;
+    --color-ink-100: 40 53 77;
+    --color-ink-200: 51 65 85;
+    --color-ink-300: 71 85 105;
+    --color-ink-400: 100 116 139;
+    --color-ink-500: 148 163 184;
+    --color-ink-600: 180 190 205;
+    --color-ink-700: 203 213 225;
+    --color-ink-800: 226 232 240;
+    --color-ink-900: 248 250 252;
 }
 
 @layer components {

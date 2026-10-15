@@ -16,24 +16,24 @@ export default {
                 // Kept as-is (do not rename/remove — ~165 existing usages
                 // across 159 views depend on it). New work should prefer
                 // `accent` below; `brand` stays for backward compat only.
-                // Premium-SaaS redesign pass: re-pointed from the PS
-                // Solution gold to the same deep-teal ramp as `accent`
-                // (see `accent` below for sourcing) so legacy `brand-*`
-                // usages — the two portal headers' logo chip and the
-                // guest/login layout — stay visually consistent with the
-                // rest of the rebrand instead of being the one leftover
-                // gold element on screen.
+                // Enterprise ERP redesign pass: moved off the Premium-SaaS
+                // teal onto the same indigo ramp as `accent` below — see
+                // that scale's comment for the full rationale. Kept
+                // identical to `accent` for the same reason the teal pass
+                // kept them identical: legacy `brand-*` usages (the two
+                // portal headers' logo chip, the guest/login layout) stay
+                // visually consistent with the rest of the app.
                 brand: {
-                    50: '#EAF6F5',
-                    100: '#D1EBE9',
-                    200: '#A3D7D3',
-                    300: '#74C2BC',
-                    400: '#3CA39C',
-                    500: '#1F8D86',
-                    600: '#167D78',
-                    700: '#126863',
-                    800: '#0E514D',
-                    900: '#0A3A37',
+                    50: '#EEF2FF',
+                    100: '#E0E7FF',
+                    200: '#C7D2FE',
+                    300: '#A5B4FC',
+                    400: '#818CF8',
+                    500: '#6366F1',
+                    600: '#4F46E5',
+                    700: '#4338CA',
+                    800: '#3730A3',
+                    900: '#312E81',
                 },
                 // Phase 13 design-system foundation ------------------------
                 // Page/elevated-surface backgrounds (warm off-white, not
@@ -98,26 +98,26 @@ export default {
                     800: 'rgb(var(--color-ink-800) / <alpha-value>)',
                     900: 'rgb(var(--color-ink-900) / <alpha-value>)',
                 },
-                // Premium-SaaS redesign pass (per the uploaded design spec):
-                // moved off the PS Solution gold onto a sophisticated deep
-                // teal anchored on the spec's own `#167D78` (set here as
-                // 600, matching how every `.btn-primary`/active-nav usage
-                // in this codebase already expects the "main" tone to sit
-                // at 600 with 700 as its hover/darker shade — the exact
-                // slot `#D4A000` occupied in the old gold scale). 700–900
-                // are pulled darker for text/icon contrast on white; 50–300
-                // are light tints for badges, hover fills and icon chips.
+                // Enterprise ERP redesign pass: moved off the Premium-SaaS
+                // teal onto Tailwind's own indigo scale, used verbatim (no
+                // custom tuning) — indigo/blue is the de-facto "serious
+                // business software" color across enterprise ERPs (SAP
+                // Fiori, Salesforce Lightning, Oracle Cloud, Zoho all lean
+                // blue/indigo for primary actions), and reads as more
+                // trustworthy/neutral than a decorative teal. 600 is still
+                // the "main" tone every `.btn-primary`/active-nav usage in
+                // this codebase expects, with 700 as its hover/darker shade.
                 accent: {
-                    50: '#EAF6F5',
-                    100: '#D1EBE9',
-                    200: '#A3D7D3',
-                    300: '#74C2BC',
-                    400: '#3CA39C',
-                    500: '#1F8D86',
-                    600: '#167D78',
-                    700: '#126863',
-                    800: '#0E514D',
-                    900: '#0A3A37',
+                    50: '#EEF2FF',
+                    100: '#E0E7FF',
+                    200: '#C7D2FE',
+                    300: '#A5B4FC',
+                    400: '#818CF8',
+                    500: '#6366F1',
+                    600: '#4F46E5',
+                    700: '#4338CA',
+                    800: '#3730A3',
+                    900: '#312E81',
                 },
                 // Optional cleaner semantics for new components (existing
                 // red-*/green-*/yellow-* Tailwind defaults remain in use
