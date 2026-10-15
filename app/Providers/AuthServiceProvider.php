@@ -15,6 +15,7 @@ use App\Models\Designation;
 use App\Models\Employee;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
+use App\Models\ExpenseClaim;
 use App\Models\GoodsReceive;
 use App\Models\Handover;
 use App\Models\Inspection;
@@ -58,6 +59,7 @@ use App\Policies\DesignationPolicy;
 use App\Policies\DesignPolicy;
 use App\Policies\EmployeePolicy;
 use App\Policies\ExpenseCategoryPolicy;
+use App\Policies\ExpenseClaimPolicy;
 use App\Policies\ExpensePolicy;
 use App\Policies\GoodsReceivePolicy;
 use App\Policies\HandoverPolicy;
@@ -122,6 +124,7 @@ class AuthServiceProvider extends ServiceProvider
         Invoice::class => InvoicePolicy::class,
         Payment::class => PaymentPolicy::class,
         Expense::class => ExpensePolicy::class,
+        ExpenseClaim::class => ExpenseClaimPolicy::class,
         ProductCategory::class => ProductCategoryPolicy::class,
         Unit::class => UnitPolicy::class,
         Product::class => ProductPolicy::class,

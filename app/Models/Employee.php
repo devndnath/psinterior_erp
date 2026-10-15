@@ -82,4 +82,9 @@ class Employee extends Model
     {
         return $this->payrolls()->latest('month')->first();
     }
+
+    public function expenseClaims(): HasMany
+    {
+        return $this->hasMany(ExpenseClaim::class);
+    }
 }

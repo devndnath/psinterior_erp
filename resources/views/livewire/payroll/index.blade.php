@@ -5,7 +5,8 @@
         </x-slot:breadcrumbs>
         <x-slot:actions>
             @can('create', \App\Models\Payroll::class)
-                <x-button href="{{ route('payroll.create') }}" wire:navigate>+ New Payroll</x-button>
+                <x-button variant="secondary" href="{{ route('payroll.create') }}" wire:navigate>+ Manual Entry</x-button>
+                <x-button href="{{ route('payroll.generate') }}" wire:navigate>+ Generate Payroll</x-button>
             @endcan
         </x-slot:actions>
     </x-page-header>

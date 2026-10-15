@@ -33,6 +33,9 @@ use App\Livewire\Designs\Index as DesignIndex;
 use App\Livewire\Designs\Show as DesignShow;
 use App\Livewire\ExpenseCategories\Form as ExpenseCategoryForm;
 use App\Livewire\ExpenseCategories\Index as ExpenseCategoryIndex;
+use App\Livewire\ExpenseClaims\Form as ExpenseClaimForm;
+use App\Livewire\ExpenseClaims\Index as ExpenseClaimIndex;
+use App\Livewire\ExpenseClaims\Show as ExpenseClaimShow;
 use App\Livewire\Expenses\Form as ExpenseForm;
 use App\Livewire\Expenses\Index as ExpenseIndex;
 use App\Livewire\Expenses\Show as ExpenseShow;
@@ -100,7 +103,12 @@ use App\Livewire\Employees\Show as EmployeeShow;
 use App\Livewire\Leaves\Form as LeaveForm;
 use App\Livewire\Leaves\Index as LeaveIndex;
 use App\Livewire\Leaves\Show as LeaveShow;
+use App\Livewire\MyExpenseClaims\Form as MyExpenseClaimForm;
+use App\Livewire\MyExpenseClaims\Index as MyExpenseClaimIndex;
+use App\Livewire\MyLeaves\Form as MyLeaveForm;
+use App\Livewire\MyLeaves\Index as MyLeaveIndex;
 use App\Livewire\Payroll\Form as PayrollForm;
+use App\Livewire\Payroll\Generate as PayrollGenerate;
 use App\Livewire\Payroll\Index as PayrollIndex;
 use App\Livewire\Payroll\Show as PayrollShow;
 use App\Livewire\Settings\Index as SettingsIndex;
@@ -168,6 +176,22 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
     // `view_*` ability, so any authenticated staff user can open the
     // page even if every section on it happens to be empty for them.
     Route::get('/calendar', CalendarIndex::class)->name('calendar.index');
+
+    // Self-service for ANY staff user with a linked Employee record — no
+    // `can:` middleware, deliberately: these are the same reasoning as
+    // Dashboard/Calendar above (every staff login can reach the page,
+    // authorization happens inside the component against "is this your
+    // own Employee record", not via a granular permission — see
+    // MyLeaves\Index's and MyExpenseClaims\Index's docblocks).
+    Route::prefix('my-leaves')->name('my-leaves.')->group(function () {
+        Route::get('/', MyLeaveIndex::class)->name('index');
+        Route::get('/create', MyLeaveForm::class)->name('create');
+    });
+
+    Route::prefix('my-expense-claims')->name('my-expense-claims.')->group(function () {
+        Route::get('/', MyExpenseClaimIndex::class)->name('index');
+        Route::get('/create', MyExpenseClaimForm::class)->name('create');
+    });
 
     Route::middleware('can:manage_settings')->group(function () {
         Route::get('/settings', SettingsIndex::class)->name('settings.index');
@@ -461,8 +485,25 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
     Route::prefix('payroll')->name('payroll.')->group(function () {
         Route::get('/', PayrollIndex::class)->name('index')->middleware('can:view_payroll');
         Route::get('/create', PayrollForm::class)->name('create')->middleware('can:create_payroll');
+        // Same `create_payroll` ability as the manual form above — this is
+        // a smarter way to fill it in (pre-computed from attendance and
+        // approved conveyance claims), not a separate capability. Placed
+        // before '/{payroll}' so "generate" never matches as a payroll ID.
+        Route::get('/generate', PayrollGenerate::class)->name('generate')->middleware('can:create_payroll');
         Route::get('/{payroll}/edit', PayrollForm::class)->name('edit')->middleware('can:edit_payroll');
         Route::get('/{payroll}', PayrollShow::class)->name('show')->middleware('can:view_payroll');
+    });
+
+    // Employee reimbursement claims (conveyance/meal/accommodation) — the
+    // HR/Accounts review queue for what employees submit via My Expense
+    // Claims. `edit_expense_claims` gates approve/reject (see
+    // ExpenseClaimPolicy), mirroring how `edit_leaves` gates both leave
+    // approval steps above.
+    Route::prefix('expense-claims')->name('expense-claims.')->group(function () {
+        Route::get('/', ExpenseClaimIndex::class)->name('index')->middleware('can:view_expense_claims');
+        Route::get('/create', ExpenseClaimForm::class)->name('create')->middleware('can:create_expense_claims');
+        Route::get('/{expenseClaim}/edit', ExpenseClaimForm::class)->name('edit')->middleware('can:edit_expense_claims');
+        Route::get('/{expenseClaim}', ExpenseClaimShow::class)->name('show')->middleware('can:view_expense_claims');
     });
 
     Route::prefix('subcontractors')->name('subcontractors.')->group(function () {

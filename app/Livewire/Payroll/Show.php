@@ -58,7 +58,7 @@ class Show extends Component
     #[Title('Payroll')]
     public function render()
     {
-        $this->payroll->load('employee');
+        $this->payroll->load('employee', 'expenseClaims');
 
         return view('livewire.payroll.show');
     }

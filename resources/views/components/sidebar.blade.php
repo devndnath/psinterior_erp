@@ -22,6 +22,19 @@
             ],
         ],
         [
+            'label' => 'My Workspace',
+            'items' => [
+                // Self-service — no 'permission' key, same reasoning as
+                // Dashboard/Calendar above: any staff login can reach
+                // these, authorization happens inside the component
+                // against "is this your own Employee record" (see
+                // MyLeaves\Index's / MyExpenseClaims\Index's docblocks),
+                // not a granular view_*/create_* ability.
+                ['label' => 'My Leaves', 'route' => 'my-leaves.index', 'active' => 'my-leaves.*', 'icon' => 'calendar-off'],
+                ['label' => 'My Expense Claims', 'route' => 'my-expense-claims.index', 'active' => 'my-expense-claims.*', 'icon' => 'map-pin'],
+            ],
+        ],
+        [
             'label' => 'CRM & Sales',
             'items' => [
                 ['label' => 'Leads', 'route' => 'leads.index', 'active' => 'leads.*', 'icon' => 'funnel', 'permission' => 'view_leads'],
@@ -102,6 +115,7 @@
                 ['label' => 'Designations', 'route' => 'designations.index', 'active' => 'designations.*', 'icon' => 'id-badge', 'permission' => 'manage_employees'],
                 ['label' => 'Attendance', 'route' => 'attendance.index', 'active' => 'attendance.*', 'icon' => 'clock', 'permission' => 'view_attendance'],
                 ['label' => 'Leaves', 'route' => 'leaves.index', 'active' => 'leaves.*', 'icon' => 'calendar-off', 'permission' => 'view_leaves'],
+                ['label' => 'Expense Claims', 'route' => 'expense-claims.index', 'active' => 'expense-claims.*', 'icon' => 'wallet', 'permission' => 'view_expense_claims'],
                 ['label' => 'Payroll', 'route' => 'payroll.index', 'active' => 'payroll.*', 'icon' => 'banknote', 'permission' => 'view_payroll'],
                 ['label' => 'Subcontractors', 'route' => 'subcontractors.index', 'active' => 'subcontractors.*', 'icon' => 'hard-hat', 'permission' => 'view_subcontractors'],
             ],

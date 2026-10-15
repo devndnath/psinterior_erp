@@ -52,7 +52,7 @@ class RolePermissionSeeder extends Seeder
         'designs', 'documents', 'boqs', 'quotations', 'contracts', 'change_orders',
         'invoices', 'payments', 'expenses', 'inventory', 'warehouses',
         'material_requisitions', 'vendors', 'purchase_orders', 'goods_receives',
-        'employees', 'attendance', 'leaves', 'payroll', 'subcontractors',
+        'employees', 'attendance', 'leaves', 'payroll', 'expense_claims', 'subcontractors',
         'meetings', 'inspections', 'snags', 'handovers', 'warranties',
         'material_selections', 'site_reports', 'vendor_invoices', 'users', 'roles',
     ];
@@ -118,6 +118,11 @@ class RolePermissionSeeder extends Seeder
 
             'accountant' => $this->forModules(['invoices', 'payments', 'expenses'], ['view', 'create', 'edit'])
                 + $this->forModules(['quotations', 'contracts', 'change_orders', 'vendor_invoices'], ['view'])
+                // Reviewing conveyance/reimbursement claims (edit =
+                // approve/reject, see ExpenseClaimPolicy) sits with
+                // Accounts as much as HR, since it's the team that
+                // actually pays the employee back.
+                + $this->forModules(['expense_claims'], ['view', 'edit'])
                 + $this->named(['approve_invoice', 'view_finance', 'view_reports']),
 
             'procurement-officer' => $this->forModules(['purchase_orders', 'goods_receives', 'material_requisitions', 'vendors'], ['view', 'create', 'edit'])
@@ -127,7 +132,7 @@ class RolePermissionSeeder extends Seeder
             'store-manager' => $this->forModules(['inventory', 'warehouses', 'goods_receives', 'material_requisitions'], ['view', 'create', 'edit'])
                 + $this->named(['manage_inventory']),
 
-            'hr-manager' => $this->forModules(['employees', 'attendance', 'leaves', 'payroll'], ['view', 'create', 'edit'])
+            'hr-manager' => $this->forModules(['employees', 'attendance', 'leaves', 'payroll', 'expense_claims'], ['view', 'create', 'edit'])
                 + $this->named(['manage_employees', 'manage_payroll', 'view_reports']),
 
             'employee' => $this->forModules(['tasks', 'attendance'], ['view'])

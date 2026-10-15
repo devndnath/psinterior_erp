@@ -19,6 +19,7 @@ class Form extends Component
     public string $month = '';
     public string $basic = '0';
     public string $allowance = '0';
+    public string $conveyance = '0';
     public string $overtime = '0';
     public string $bonus = '0';
     public string $deduction = '0';
@@ -36,6 +37,7 @@ class Form extends Component
                 'month' => $this->payroll->month,
                 'basic' => (string) $this->payroll->basic,
                 'allowance' => (string) $this->payroll->allowance,
+                'conveyance' => (string) $this->payroll->conveyance,
                 'overtime' => (string) $this->payroll->overtime,
                 'bonus' => (string) $this->payroll->bonus,
                 'deduction' => (string) $this->payroll->deduction,
@@ -62,7 +64,7 @@ class Form extends Component
      */
     public function getNetSalaryProperty(): float
     {
-        return (float) $this->basic + (float) $this->allowance + (float) $this->overtime
+        return (float) $this->basic + (float) $this->allowance + (float) $this->conveyance + (float) $this->overtime
             + (float) $this->bonus - (float) $this->deduction - (float) $this->advance;
     }
 
@@ -73,6 +75,7 @@ class Form extends Component
             'month' => ['required', 'date_format:Y-m'],
             'basic' => ['required', 'numeric', 'min:0'],
             'allowance' => ['required', 'numeric', 'min:0'],
+            'conveyance' => ['required', 'numeric', 'min:0'],
             'overtime' => ['required', 'numeric', 'min:0'],
             'bonus' => ['required', 'numeric', 'min:0'],
             'deduction' => ['required', 'numeric', 'min:0'],

@@ -41,6 +41,7 @@
                     <tbody>
                         <tr><td class="text-ink-500">Basic</td><td class="text-right font-medium text-ink-900">{{ number_format($payroll->basic, 2) }}</td></tr>
                         <tr><td class="text-ink-500">Allowance</td><td class="text-right font-medium text-ink-900">{{ number_format($payroll->allowance, 2) }}</td></tr>
+                        <tr><td class="text-ink-500">Conveyance</td><td class="text-right font-medium text-ink-900">{{ number_format($payroll->conveyance, 2) }}</td></tr>
                         <tr><td class="text-ink-500">Overtime</td><td class="text-right font-medium text-ink-900">{{ number_format($payroll->overtime, 2) }}</td></tr>
                         <tr><td class="text-ink-500">Bonus</td><td class="text-right font-medium text-ink-900">{{ number_format($payroll->bonus, 2) }}</td></tr>
                         <tr><td class="text-ink-500">Deduction</td><td class="text-right font-medium text-danger-600">-{{ number_format($payroll->deduction, 2) }}</td></tr>
@@ -60,6 +61,20 @@
                     <p class="text-sm text-ink-500">{{ $payroll->employee->employee_id }}</p>
                 @endif
             </div>
+
+            @if ($payroll->expenseClaims->isNotEmpty())
+                <div class="panel p-6">
+                    <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Conveyance Claims Included</h2>
+                    <ul class="space-y-2 text-sm">
+                        @foreach ($payroll->expenseClaims as $claim)
+                            <li class="flex items-center justify-between">
+                                <a href="{{ route('expense-claims.show', $claim) }}" wire:navigate class="text-ink-500 hover:underline">{{ $claim->date->format('d M') }} · {{ $claim->type->label() }}</a>
+                                <span class="font-medium text-ink-900">{{ number_format($claim->amount, 2) }}</span>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
         </div>
     </div>
 </div>

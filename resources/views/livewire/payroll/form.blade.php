@@ -25,6 +25,9 @@
                 <x-input label="Allowance" name="allowance" type="number" step="0.01" wire:model.live="allowance" />
             </div>
             <div>
+                <x-input label="Conveyance" name="conveyance" type="number" step="0.01" wire:model.live="conveyance" />
+            </div>
+            <div>
                 <x-input label="Overtime" name="overtime" type="number" step="0.01" wire:model.live="overtime" />
             </div>
             <div>
@@ -39,7 +42,7 @@
             <div class="col-span-2 rounded-lg bg-ink-50 p-4">
                 <p class="text-sm text-ink-500">Net Salary (preview)</p>
                 <p class="text-2xl font-semibold text-ink-900">{{ number_format($this->netSalary, 2) }}</p>
-                <p class="mt-1 text-xs text-ink-400">basic + allowance + overtime + bonus − deduction − advance. Recalculated and stored on save.</p>
+                <p class="mt-1 text-xs text-ink-400">basic + allowance + conveyance + overtime + bonus − deduction − advance. Recalculated and stored on save.</p>
             </div>
         </div>
 
