@@ -60,12 +60,12 @@ class Generate extends Component
 
     public function updatedEmployeeId(): void
     {
-        $this->compute();
+        $this->compute(app(PayrollService::class));
     }
 
     public function updatedMonth(): void
     {
-        $this->compute();
+        $this->compute(app(PayrollService::class));
     }
 
     public function compute(PayrollService $service): void

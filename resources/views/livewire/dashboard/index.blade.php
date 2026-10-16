@@ -16,22 +16,28 @@
         />
     @else
         {{-- Hero row: the headline numbers worth seeing before anything
-             else. Premium-SaaS redesign pass: the round-2 solid-gradient-
-             tile-with-white-medallion treatment is replaced with the
-             spec's own "compact, elegant KPI cards... avoid giant
-             colorful statistic cards, decorative gradients" direction —
-             a flat bordered card with a small tinted icon chip instead of
-             a full-bleed color tile. $heroChipClasses keeps each tone's
+             else. "More statistical / analytics-ERP" pass: a circular
+             tone-filled icon badge, a bold tabular-nums value, and a
+             colored top accent bar that reads as a strong header color
+             at a glance, without reverting to the old solid-gradient
+             full-bleed tile — the card itself stays a flat, bordered
+             surface. $heroChipClasses/$heroBarClasses keep each tone's
              complete class string literal (not built via string
              interpolation) so Tailwind's content scanner can actually see
              and generate them — same reasoning the old $heroTones map
              already relied on. --}}
         @php
             $heroChipClasses = [
-                'accent' => 'bg-accent-50 text-accent-600',
-                'success' => 'bg-success-50 text-success-600',
-                'warning' => 'bg-warning-50 text-warning-600',
-                'danger' => 'bg-danger-50 text-danger-600',
+                'accent' => 'bg-accent-600 text-white',
+                'success' => 'bg-success-600 text-white',
+                'warning' => 'bg-warning-600 text-white',
+                'danger' => 'bg-danger-600 text-white',
+            ];
+            $heroBarClasses = [
+                'accent' => 'bg-accent-500',
+                'success' => 'bg-success-500',
+                'warning' => 'bg-warning-500',
+                'danger' => 'bg-danger-500',
             ];
             $heroCards = array_values(array_filter([
                 $totalLeads !== null ? ['label' => 'Total Leads', 'value' => $totalLeads, 'icon' => 'funnel', 'href' => route('leads.index'), 'tone' => 'accent'] : null,
@@ -44,17 +50,19 @@
         @if (count($heroCards))
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 @foreach ($heroCards as $hero)
-                    <a href="{{ $hero['href'] }}" wire:navigate class="flex items-center gap-4 rounded-xl border border-ink-200 bg-surface p-5 transition-colors hover:border-ink-300">
-                        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg {{ $heroChipClasses[$hero['tone']] }}">
+                    <a href="{{ $hero['href'] }}" wire:navigate class="group relative flex items-center gap-4 overflow-hidden rounded-xl border border-ink-200 bg-surface p-5 transition-all hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-soft">
+                        <span class="absolute inset-x-0 top-0 h-1 {{ $heroBarClasses[$hero['tone']] }}"></span>
+                        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full {{ $heroChipClasses[$hero['tone']] }}">
                             <x-icon name="{{ $hero['icon'] }}" class="h-5 w-5" />
                         </div>
-                        <div class="min-w-0">
-                            <p class="text-sm text-ink-500">{{ $hero['label'] }}</p>
-                            <p class="mt-1 text-2xl font-semibold tracking-tight text-ink-900">{{ $hero['value'] }}</p>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-sm font-medium text-ink-500">{{ $hero['label'] }}</p>
+                            <p class="mt-1 text-3xl font-bold tabular-nums tracking-tight text-ink-900">{{ $hero['value'] }}</p>
                             @isset($hero['sub'])
                                 <p class="mt-0.5 text-xs text-ink-400">{{ $hero['sub'] }}</p>
                             @endisset
                         </div>
+                        <x-icon name="chevron-right" class="h-4 w-4 shrink-0 self-start text-ink-300 transition-transform group-hover:translate-x-0.5 group-hover:text-ink-500" />
                     </a>
                 @endforeach
             </div>
@@ -64,43 +72,43 @@
         @if ($newLeads !== null || $openLeads !== null || $upcomingSiteVisits !== null || $designsAwaitingDecision !== null || $quotationsAwaitingDecision !== null || $changeOrdersPending !== null)
             <div class="mt-8">
                 <h2 class="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-ink-500">
-                    <x-icon name="trending-up" class="h-4 w-4 text-accent-600" /> CRM &amp; Sales
+                    <span class="flex h-6 w-6 items-center justify-center rounded-full bg-accent-100 text-accent-600"><x-icon name="trending-up" class="h-3.5 w-3.5" /></span> CRM &amp; Sales
                 </h2>
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     @if ($newLeads !== null)
-                        <a href="{{ route('leads.index', ['status' => 'new']) }}" wire:navigate class="panel p-5 hover:border-ink-300">
+                        <a href="{{ route('leads.index', ['status' => 'new']) }}" wire:navigate class="panel group relative overflow-hidden border-t-2 border-t-accent-300 p-5 transition-all hover:-translate-y-0.5 hover:border-t-accent-500 hover:shadow-soft">
                             <p class="text-sm text-ink-500">New Leads</p>
-                            <p class="mt-2 text-3xl font-semibold text-ink-900">{{ $newLeads }}</p>
+                            <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight text-ink-900 transition-colors group-hover:text-accent-700">{{ $newLeads }}</p>
                         </a>
                     @endif
                     @if ($openLeads !== null)
-                        <div class="panel p-5">
+                        <div class="panel relative overflow-hidden border-t-2 border-t-accent-300 p-5">
                             <p class="text-sm text-ink-500">Open Leads</p>
-                            <p class="mt-2 text-3xl font-semibold text-ink-900">{{ $openLeads }}</p>
+                            <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight text-ink-900">{{ $openLeads }}</p>
                         </div>
                     @endif
                     @if ($upcomingSiteVisits !== null)
-                        <a href="{{ route('site-visits.index') }}" wire:navigate class="panel p-5 hover:border-ink-300">
+                        <a href="{{ route('site-visits.index') }}" wire:navigate class="panel group relative overflow-hidden border-t-2 border-t-accent-300 p-5 transition-all hover:-translate-y-0.5 hover:border-t-accent-500 hover:shadow-soft">
                             <p class="text-sm text-ink-500">Upcoming Site Visits</p>
-                            <p class="mt-2 text-3xl font-semibold text-ink-900">{{ $upcomingSiteVisits }}</p>
+                            <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight text-ink-900 transition-colors group-hover:text-accent-700">{{ $upcomingSiteVisits }}</p>
                         </a>
                     @endif
                     @if ($designsAwaitingDecision !== null)
-                        <a href="{{ route('designs.index', ['status' => 'under_review']) }}" wire:navigate class="panel p-5 hover:border-ink-300">
+                        <a href="{{ route('designs.index', ['status' => 'under_review']) }}" wire:navigate class="panel group relative overflow-hidden border-t-2 border-t-accent-300 p-5 transition-all hover:-translate-y-0.5 hover:border-t-accent-500 hover:shadow-soft">
                             <p class="text-sm text-ink-500">Designs Awaiting Decision</p>
-                            <p class="mt-2 text-3xl font-semibold text-ink-900">{{ $designsAwaitingDecision }}</p>
+                            <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight text-ink-900 transition-colors group-hover:text-accent-700">{{ $designsAwaitingDecision }}</p>
                         </a>
                     @endif
                     @if ($quotationsAwaitingDecision !== null)
-                        <a href="{{ route('quotations.index', ['status' => 'sent']) }}" wire:navigate class="panel p-5 hover:border-ink-300">
+                        <a href="{{ route('quotations.index', ['status' => 'sent']) }}" wire:navigate class="panel group relative overflow-hidden border-t-2 border-t-accent-300 p-5 transition-all hover:-translate-y-0.5 hover:border-t-accent-500 hover:shadow-soft">
                             <p class="text-sm text-ink-500">Quotations Awaiting Decision</p>
-                            <p class="mt-2 text-3xl font-semibold text-ink-900">{{ $quotationsAwaitingDecision }}</p>
+                            <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight text-ink-900 transition-colors group-hover:text-accent-700">{{ $quotationsAwaitingDecision }}</p>
                         </a>
                     @endif
                     @if ($changeOrdersPending !== null)
-                        <a href="{{ route('change-orders.index', ['status' => 'pending']) }}" wire:navigate class="panel p-5 hover:border-ink-300">
+                        <a href="{{ route('change-orders.index', ['status' => 'pending']) }}" wire:navigate class="panel group relative overflow-hidden border-t-2 border-t-accent-300 p-5 transition-all hover:-translate-y-0.5 hover:border-t-accent-500 hover:shadow-soft">
                             <p class="text-sm text-ink-500">Change Orders Pending</p>
-                            <p class="mt-2 text-3xl font-semibold text-ink-900">{{ $changeOrdersPending }}</p>
+                            <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight text-ink-900 transition-colors group-hover:text-accent-700">{{ $changeOrdersPending }}</p>
                         </a>
                     @endif
                 </div>
@@ -111,19 +119,19 @@
         @if ($projectsOnHold !== null || $expensesThisMonth !== null)
             <div class="mt-8">
                 <h2 class="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-ink-500">
-                    <x-icon name="wallet" class="h-4 w-4 text-accent-600" /> Projects &amp; Finance
+                    <span class="flex h-6 w-6 items-center justify-center rounded-full bg-warning-100 text-warning-600"><x-icon name="wallet" class="h-3.5 w-3.5" /></span> Projects &amp; Finance
                 </h2>
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     @if ($projectsOnHold !== null)
-                        <a href="{{ route('projects.index', ['status' => 'on_hold']) }}" wire:navigate class="panel p-5 hover:border-ink-300">
+                        <a href="{{ route('projects.index', ['status' => 'on_hold']) }}" wire:navigate class="panel group relative overflow-hidden border-t-2 border-t-warning-300 p-5 transition-all hover:-translate-y-0.5 hover:border-t-warning-500 hover:shadow-soft">
                             <p class="text-sm text-ink-500">Projects On Hold</p>
-                            <p class="mt-2 text-3xl font-semibold text-ink-900">{{ $projectsOnHold }}</p>
+                            <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight text-ink-900 transition-colors group-hover:text-warning-700">{{ $projectsOnHold }}</p>
                         </a>
                     @endif
                     @if ($expensesThisMonth !== null)
-                        <a href="{{ route('expenses.index') }}" wire:navigate class="panel p-5 hover:border-ink-300">
+                        <a href="{{ route('expenses.index') }}" wire:navigate class="panel group relative overflow-hidden border-t-2 border-t-warning-300 p-5 transition-all hover:-translate-y-0.5 hover:border-t-warning-500 hover:shadow-soft">
                             <p class="text-sm text-ink-500">This Month's Expenses</p>
-                            <p class="mt-2 text-3xl font-semibold text-ink-900">{{ number_format($expensesThisMonth, 2) }}</p>
+                            <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight text-ink-900 transition-colors group-hover:text-warning-700">{{ number_format($expensesThisMonth, 2) }}</p>
                         </a>
                     @endif
                 </div>
@@ -134,25 +142,25 @@
         @if ($lowStockProducts !== null || $pendingRequisitions !== null || $pendingPurchaseOrders !== null)
             <div class="mt-8">
                 <h2 class="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-ink-500">
-                    <x-icon name="warehouse" class="h-4 w-4 text-accent-600" /> Inventory &amp; Procurement
+                    <span class="flex h-6 w-6 items-center justify-center rounded-full bg-success-100 text-success-600"><x-icon name="warehouse" class="h-3.5 w-3.5" /></span> Inventory &amp; Procurement
                 </h2>
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     @if ($lowStockProducts !== null)
-                        <a href="{{ route('products.index', ['lowStock' => true]) }}" wire:navigate class="panel p-5 hover:border-ink-300">
+                        <a href="{{ route('products.index', ['lowStock' => true]) }}" wire:navigate class="panel group relative overflow-hidden border-t-2 border-t-success-300 p-5 transition-all hover:-translate-y-0.5 hover:border-t-success-500 hover:shadow-soft">
                             <p class="text-sm text-ink-500">Low Stock Products</p>
-                            <p class="mt-2 text-3xl font-semibold {{ $lowStockProducts > 0 ? 'text-danger-600' : 'text-ink-900' }}">{{ $lowStockProducts }}</p>
+                            <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight {{ $lowStockProducts > 0 ? 'text-danger-600' : 'text-ink-900' }}">{{ $lowStockProducts }}</p>
                         </a>
                     @endif
                     @if ($pendingRequisitions !== null)
-                        <a href="{{ route('material-requisitions.index') }}" wire:navigate class="panel p-5 hover:border-ink-300">
+                        <a href="{{ route('material-requisitions.index') }}" wire:navigate class="panel group relative overflow-hidden border-t-2 border-t-success-300 p-5 transition-all hover:-translate-y-0.5 hover:border-t-success-500 hover:shadow-soft">
                             <p class="text-sm text-ink-500">Pending Material Requisitions</p>
-                            <p class="mt-2 text-3xl font-semibold text-ink-900">{{ $pendingRequisitions }}</p>
+                            <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight text-ink-900 transition-colors group-hover:text-success-700">{{ $pendingRequisitions }}</p>
                         </a>
                     @endif
                     @if ($pendingPurchaseOrders !== null)
-                        <a href="{{ route('purchase-orders.index') }}" wire:navigate class="panel p-5 hover:border-ink-300">
+                        <a href="{{ route('purchase-orders.index') }}" wire:navigate class="panel group relative overflow-hidden border-t-2 border-t-success-300 p-5 transition-all hover:-translate-y-0.5 hover:border-t-success-500 hover:shadow-soft">
                             <p class="text-sm text-ink-500">Pending Purchase Orders</p>
-                            <p class="mt-2 text-3xl font-semibold text-ink-900">{{ $pendingPurchaseOrders }}</p>
+                            <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight text-ink-900 transition-colors group-hover:text-success-700">{{ $pendingPurchaseOrders }}</p>
                         </a>
                     @endif
                 </div>
@@ -163,19 +171,19 @@
         @if ($pendingLeaveRequests !== null || $payrollDue !== null)
             <div class="mt-8">
                 <h2 class="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-ink-500">
-                    <x-icon name="hard-hat" class="h-4 w-4 text-accent-600" /> HR &amp; Workforce
+                    <span class="flex h-6 w-6 items-center justify-center rounded-full bg-accent-100 text-accent-600"><x-icon name="hard-hat" class="h-3.5 w-3.5" /></span> HR &amp; Workforce
                 </h2>
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     @if ($pendingLeaveRequests !== null)
-                        <a href="{{ route('leaves.index') }}" wire:navigate class="panel p-5 hover:border-ink-300">
+                        <a href="{{ route('leaves.index') }}" wire:navigate class="panel group relative overflow-hidden border-t-2 border-t-accent-300 p-5 transition-all hover:-translate-y-0.5 hover:border-t-accent-500 hover:shadow-soft">
                             <p class="text-sm text-ink-500">Pending Leave Requests</p>
-                            <p class="mt-2 text-3xl font-semibold text-ink-900">{{ $pendingLeaveRequests }}</p>
+                            <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight text-ink-900 transition-colors group-hover:text-accent-700">{{ $pendingLeaveRequests }}</p>
                         </a>
                     @endif
                     @if ($payrollDue !== null)
-                        <a href="{{ route('payroll.index') }}" wire:navigate class="panel p-5 hover:border-ink-300">
+                        <a href="{{ route('payroll.index') }}" wire:navigate class="panel group relative overflow-hidden border-t-2 border-t-accent-300 p-5 transition-all hover:-translate-y-0.5 hover:border-t-accent-500 hover:shadow-soft">
                             <p class="text-sm text-ink-500">Payroll Due (this month)</p>
-                            <p class="mt-2 text-3xl font-semibold text-ink-900">{{ $payrollDue }}</p>
+                            <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight text-ink-900 transition-colors group-hover:text-accent-700">{{ $payrollDue }}</p>
                         </a>
                     @endif
                 </div>
@@ -186,19 +194,19 @@
         @if ($openSnags !== null || $openServiceRequests !== null)
             <div class="mt-8">
                 <h2 class="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-ink-500">
-                    <x-icon name="shield-check" class="h-4 w-4 text-accent-600" /> QC &amp; Handover
+                    <span class="flex h-6 w-6 items-center justify-center rounded-full bg-danger-100 text-danger-600"><x-icon name="shield-check" class="h-3.5 w-3.5" /></span> QC &amp; Handover
                 </h2>
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     @if ($openSnags !== null)
-                        <a href="{{ route('snags.index') }}" wire:navigate class="panel p-5 hover:border-ink-300">
+                        <a href="{{ route('snags.index') }}" wire:navigate class="panel group relative overflow-hidden border-t-2 border-t-danger-300 p-5 transition-all hover:-translate-y-0.5 hover:border-t-danger-500 hover:shadow-soft">
                             <p class="text-sm text-ink-500">Open Snags</p>
-                            <p class="mt-2 text-3xl font-semibold text-ink-900">{{ $openSnags }}</p>
+                            <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight text-ink-900 transition-colors group-hover:text-danger-700">{{ $openSnags }}</p>
                         </a>
                     @endif
                     @if ($openServiceRequests !== null)
-                        <a href="{{ route('warranties.index') }}" wire:navigate class="panel p-5 hover:border-ink-300">
+                        <a href="{{ route('warranties.index') }}" wire:navigate class="panel group relative overflow-hidden border-t-2 border-t-danger-300 p-5 transition-all hover:-translate-y-0.5 hover:border-t-danger-500 hover:shadow-soft">
                             <p class="text-sm text-ink-500">Open Service Requests</p>
-                            <p class="mt-2 text-3xl font-semibold text-ink-900">{{ $openServiceRequests }}</p>
+                            <p class="mt-2 text-3xl font-bold tabular-nums tracking-tight text-ink-900 transition-colors group-hover:text-danger-700">{{ $openServiceRequests }}</p>
                         </a>
                     @endif
                 </div>
@@ -209,7 +217,7 @@
         @if ($leadsByStatus !== null || $projectsByStatus !== null || $invoicesByStatus !== null)
             <div class="mt-8">
                 <h2 class="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-ink-500">
-                    <x-icon name="bar-chart" class="h-4 w-4 text-accent-600" /> Breakdown
+                    <span class="flex h-6 w-6 items-center justify-center rounded-full bg-accent-100 text-accent-600"><x-icon name="bar-chart" class="h-3.5 w-3.5" /></span> Breakdown
                 </h2>
                 <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
                     @if ($leadsByStatus !== null)
@@ -218,7 +226,7 @@
                             $leadStatusCounts = collect(\App\Enums\LeadStatus::cases())->map(fn ($case) => $leadsByStatus[$case->value] ?? 0)->all();
                         @endphp
                         <div
-                            class="panel p-5"
+                            class="panel border-t-2 border-t-accent-300 p-5 shadow-sm"
                             x-data="{
                                 init() {
                                     new window.Chart(this.$refs.leadStatusChart, {
@@ -257,7 +265,7 @@
                             $projectStatusCounts = collect(\App\Enums\ProjectStatus::cases())->map(fn ($case) => $projectsByStatus[$case->value] ?? 0)->all();
                         @endphp
                         <div
-                            class="panel p-5"
+                            class="panel border-t-2 border-t-success-300 p-5 shadow-sm"
                             x-data="{
                                 init() {
                                     new window.Chart(this.$refs.projectStatusChart, {
@@ -292,7 +300,7 @@
                             $invoiceStatusCounts = collect(\App\Enums\InvoiceStatus::cases())->map(fn ($case) => $invoicesByStatus[$case->value] ?? 0)->all();
                         @endphp
                         <div
-                            class="panel p-5"
+                            class="panel border-t-2 border-t-warning-300 p-5 shadow-sm"
                             x-data="{
                                 init() {
                                     new window.Chart(this.$refs.invoiceStatusChart, {
