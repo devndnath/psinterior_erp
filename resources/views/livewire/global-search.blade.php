@@ -2,14 +2,14 @@
     {{-- Phase 16: moved off the old gray and brand-500 tones onto the
          ink and accent-500 scale to match the now-restyled topbar. --}}
     <div class="relative">
-        <x-icon name="search" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400" />
+        <x-icon name="search" class="pointer-events-none absolute right-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-ink-400" />
         <input
             type="search"
             wire:model.live.debounce.400ms="query"
             @focus="focused = true"
             @click.outside="focused = false"
-            placeholder="Search leads, clients, projects…"
-            class="block w-full rounded-lg border-0 bg-ink-100 py-1.5 pl-9 pr-3 text-sm text-ink-700 placeholder:text-ink-400 focus:bg-surface focus:ring-2 focus:ring-accent-500"
+            placeholder="Search for anything — leads, clients, projects, invoices…"
+            class="block w-full rounded-lg border border-ink-200 bg-surface py-2.5 pl-4 pr-10 text-sm text-ink-800 placeholder:text-ink-400 focus:border-accent-500 focus:ring-2 focus:ring-accent-500/30"
         >
     </div>
 

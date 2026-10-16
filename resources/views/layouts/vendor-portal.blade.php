@@ -25,7 +25,7 @@
     {{-- Premium-SaaS redesign pass: Inter, replacing Manrope + the Fraunces serif display font (see tailwind.config.js's fontFamily comment for why). --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <title>{{ isset($title) ? $title.' — ' : '' }}Vendor Portal — {{ config('app.name') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
@@ -36,7 +36,7 @@
     <header class="border-b border-gray-200 bg-surface">
         <div class="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
             <div class="flex items-center gap-3">
-                <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-sm font-bold text-white">
+                <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-500 text-sm font-bold text-charcoal">
                     {{ substr(config('app.name'), 0, 1) }}
                 </div>
                 <span class="text-sm font-semibold text-gray-900">Vendor Portal</span>

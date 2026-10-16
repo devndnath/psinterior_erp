@@ -5,7 +5,7 @@
 <div {{ $attributes->merge(['class' => 'w-full']) }}>
     <div class="h-2 w-full overflow-hidden rounded-full bg-gray-100">
         <div
-            class="h-full rounded-full transition-all duration-300 {{ $value >= 100 ? 'bg-green-500' : 'bg-brand-600' }}"
+            class="h-full rounded-full transition-all duration-300 {{ $value >= 100 ? 'bg-green-500' : 'bg-brand-500' }}"
             style="width: {{ $value }}%"
         ></div>
     </div>

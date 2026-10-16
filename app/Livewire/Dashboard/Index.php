@@ -22,6 +22,7 @@ use App\Models\Invoice;
 use App\Models\Lead;
 use App\Models\Leave;
 use App\Models\MaterialRequisition;
+use App\Models\Payment;
 use App\Models\Payroll;
 use App\Models\Product;
 use App\Models\Project;
@@ -30,6 +31,9 @@ use App\Models\Quotation;
 use App\Models\ServiceRequest;
 use App\Models\SiteVisit;
 use App\Models\Snag;
+use App\Models\Setting;
+use Carbon\CarbonImmutable;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -53,11 +57,185 @@ use Livewire\Component;
 #[Title('Dashboard')]
 class Index extends Component
 {
+    /** Statuses whose invoices still carry an unpaid balance. */
+    private const OPEN_INVOICE_STATUSES = [
+        InvoiceStatus::Issued,
+        InvoiceStatus::PartiallyPaid,
+        InvoiceStatus::Overdue,
+    ];
+
+    /**
+     * Brand-layout pass: the finance overview behind the dashboard's top
+     * half (rings, net-cash card, ratio bars, month-over-month KPI cards,
+     * 6-month cash-flow chart, largest open invoices). Every figure is
+     * computed from real Payment / Expense / Invoice / Project rows — no
+     * placeholder or estimated numbers; where a comparison has no data
+     * (e.g. nothing recorded last month) the delta is null and the view
+     * says so instead of showing 0% or a fake trend.
+     *
+     * Each block is gated on the same permission as its own module
+     * (view_payments / view_expenses / view_invoices / view_projects);
+     * composite figures (margin, net cash) appear only when the user can
+     * see BOTH inputs. Date bucketing (daily / monthly) is done in PHP
+     * over bounded windows (14 days / 6 months / year-to-date) rather than
+     * DB-specific DATE_FORMAT/strftime SQL, so it runs the same on MySQL
+     * and SQLite.
+     */
+    private function finance($user, ?Collection $openInvoices): array
+    {
+        $today = CarbonImmutable::today();
+        $monthStart = $today->startOfMonth();
+        $prevStart = $monthStart->subMonthNoOverflow();
+        $prevEnd = $monthStart->subDay();
+        $yearStart = $today->startOfYear();
+        $sparkStart = $today->subDays(13);
+        $chartStart = $monthStart->subMonthsNoOverflow(5);
+
+        $canPay = $user->can('view_payments');
+        $canExp = $user->can('view_expenses');
+        $canInv = $user->can('view_invoices');
+
+        $sumBetween = fn ($query, string $col, string $amountCol, $from, $to) => (float) $query
+            ->whereBetween($col, [$from->toDateString(), $to->toDateString()])
+            ->sum($amountCol);
+
+        $toDate = fn ($v) => $v instanceof \DateTimeInterface ? CarbonImmutable::instance($v) : CarbonImmutable::parse($v);
+
+        // Daily buckets for the last 14 days, oldest first.
+        $daily = function (Collection $rows, string $dateKey, string $amountKey) use ($sparkStart, $toDate): array {
+            $byDay = $rows->groupBy(fn ($r) => $toDate($r->{$dateKey})->toDateString())
+                ->map(fn ($g) => (float) $g->sum($amountKey));
+
+            return collect(range(0, 13))->map(function ($i) use ($sparkStart, $byDay) {
+                $d = $sparkStart->addDays($i);
+
+                return ['label' => $d->format('d M'), 'value' => round((float) ($byDay[$d->toDateString()] ?? 0), 2)];
+            })->all();
+        };
+
+        // Monthly buckets for the last 6 months (incl. current), oldest first.
+        $monthly = function (Collection $rows, string $dateKey, string $amountKey) use ($chartStart, $toDate): array {
+            $byMonth = $rows->groupBy(fn ($r) => $toDate($r->{$dateKey})->format('Y-m'))
+                ->map(fn ($g) => (float) $g->sum($amountKey));
+
+            return collect(range(0, 5))->map(fn ($i) => round((float) ($byMonth[$chartStart->addMonthsNoOverflow($i)->format('Y-m')] ?? 0), 2))->all();
+        };
+
+        $delta = fn (?float $cur, ?float $prev) => ($cur === null || $prev === null || $prev <= 0)
+            ? null
+            : round(($cur - $prev) / $prev * 100, 1);
+
+        $income = null;
+        if ($canPay) {
+            $cur = $sumBetween(Payment::query(), 'date', 'amount', $monthStart, $today->endOfMonth());
+            $prev = $sumBetween(Payment::query(), 'date', 'amount', $prevStart, $prevEnd);
+            $rows = Payment::query()->where('date', '>=', $chartStart->toDateString())->get(['date', 'amount']);
+            $income = [
+                'current' => $cur,
+                'previous' => $prev,
+                'delta' => $delta($cur, $prev),
+                'spark' => $daily($rows->filter(fn ($r) => $toDate($r->date)->gte($sparkStart)), 'date', 'amount'),
+                'monthly' => $monthly($rows, 'date', 'amount'),
+                'ytd' => $sumBetween(Payment::query(), 'date', 'amount', $yearStart, $today),
+            ];
+        }
+
+        $expenses = null;
+        if ($canExp) {
+            $cur = $sumBetween(Expense::query(), 'date', 'amount', $monthStart, $today->endOfMonth());
+            $prev = $sumBetween(Expense::query(), 'date', 'amount', $prevStart, $prevEnd);
+            $rows = Expense::query()->where('date', '>=', $chartStart->toDateString())->get(['date', 'amount']);
+            $expenses = [
+                'current' => $cur,
+                'previous' => $prev,
+                'delta' => $delta($cur, $prev),
+                'spark' => $daily($rows->filter(fn ($r) => $toDate($r->date)->gte($sparkStart)), 'date', 'amount'),
+                'monthly' => $monthly($rows, 'date', 'amount'),
+                'ytd' => $sumBetween(Expense::query(), 'date', 'amount', $yearStart, $today),
+            ];
+        }
+
+        $invoiced = null;
+        $receivables = null;
+        $ratios = null;
+        $topOpenInvoices = null;
+        if ($canInv) {
+            $live = fn () => Invoice::query()->where('status', '!=', InvoiceStatus::Cancelled->value);
+            $cur = $sumBetween($live(), 'invoice_date', 'grand_total', $monthStart, $today->endOfMonth());
+            $prev = $sumBetween($live(), 'invoice_date', 'grand_total', $prevStart, $prevEnd);
+            $rows = $live()->where('invoice_date', '>=', $sparkStart->toDateString())->get(['invoice_date', 'grand_total']);
+            $invoiced = [
+                'current' => $cur,
+                'previous' => $prev,
+                'delta' => $delta($cur, $prev),
+                'spark' => $daily($rows, 'invoice_date', 'grand_total'),
+            ];
+
+            $open = $openInvoices ?? collect();
+            $outstanding = (float) $open->sum(fn (Invoice $i) => $i->outstandingAmount());
+            $overdue = $open->filter(fn (Invoice $i) => $i->due_date && $i->due_date->lt($today));
+            $overdueAmount = (float) $overdue->sum(fn (Invoice $i) => $i->outstandingAmount());
+            $receivables = [
+                'total' => $outstanding,
+                'count' => $open->count(),
+                'overdueCount' => $overdue->count(),
+                'overdueAmount' => $overdueAmount,
+            ];
+
+            $billed = (float) $live()->sum('grand_total');
+            $collected = (float) $live()->sum('paid_amount');
+            $ratios = [
+                // Share of everything ever billed that has been collected.
+                'collection' => $billed > 0 ? round($collected / $billed * 100, 1) : null,
+                // Share of the open receivable balance that is past due.
+                'overdueShare' => $outstanding > 0 ? round($overdueAmount / $outstanding * 100, 1) : null,
+            ];
+
+            $topOpenInvoices = $open
+                ->sortByDesc(fn (Invoice $i) => $i->outstandingAmount())
+                ->take(5)
+                ->values();
+        }
+
+        $margin = null;
+        $netCash = null;
+        if ($income && $expenses) {
+            $netCash = $income['ytd'] - $expenses['ytd'];
+            $margin = $income['ytd'] > 0 ? round($netCash / $income['ytd'] * 100, 1) : null;
+        }
+
+        return [
+            'currency' => Setting::get('finance.currency', 'BDT'),
+            'monthLabel' => $today->format('F Y'),
+            'yearLabel' => $today->format('Y'),
+            'chartMonths' => collect(range(0, 5))->map(fn ($i) => $chartStart->addMonthsNoOverflow($i)->format('M'))->all(),
+            'income' => $income,
+            'expenses' => $expenses,
+            'invoiced' => $invoiced,
+            'receivables' => $receivables,
+            'ratios' => $ratios,
+            'topOpenInvoices' => $topOpenInvoices,
+            'margin' => $margin,
+            'netCash' => $netCash,
+            'avgProjectProgress' => $user->can('view_projects')
+                ? (($avg = Project::whereNotIn('status', [ProjectStatus::Completed->value, ProjectStatus::Cancelled->value])->avg('progress')) === null ? null : round((float) $avg, 1))
+                : null,
+        ];
+    }
+
     public function render()
     {
         $user = Auth::user();
 
-        return view('livewire.dashboard.index', [
+        // Fetched once and shared by the outstanding-invoices KPI and the
+        // finance overview (receivables, overdue share, largest open).
+        $openInvoices = $user->can('view_invoices')
+            ? Invoice::with('client:id,name')
+                ->whereIn('status', array_map(fn ($s) => $s->value, self::OPEN_INVOICE_STATUSES))
+                ->get()
+            : null;
+
+        return view('livewire.dashboard.index', $this->finance($user, $openInvoices) + [
             'totalLeads' => $user->can('view_leads') ? Lead::count() : null,
             'newLeads' => $user->can('view_leads') ? Lead::where('status', LeadStatus::New)->count() : null,
             'openLeads' => $user->can('view_leads') ? Lead::whereIn('status', array_filter(
@@ -83,16 +261,8 @@ class Index extends Component
                 QuotationStatus::Negotiation->value,
             ])->count() : null,
             'changeOrdersPending' => $user->can('view_change_orders') ? ChangeOrder::where('status', ChangeOrderStatus::Pending->value)->count() : null,
-            'outstandingInvoicesCount' => $user->can('view_invoices') ? Invoice::whereIn('status', [
-                InvoiceStatus::Issued->value,
-                InvoiceStatus::PartiallyPaid->value,
-                InvoiceStatus::Overdue->value,
-            ])->count() : null,
-            'outstandingInvoicesTotal' => $user->can('view_invoices') ? Invoice::whereIn('status', [
-                InvoiceStatus::Issued->value,
-                InvoiceStatus::PartiallyPaid->value,
-                InvoiceStatus::Overdue->value,
-            ])->get()->sum(fn (Invoice $invoice) => $invoice->outstandingAmount()) : null,
+            'outstandingInvoicesCount' => $openInvoices?->count(),
+            'outstandingInvoicesTotal' => $openInvoices?->sum(fn (Invoice $invoice) => $invoice->outstandingAmount()),
             'expensesThisMonth' => $user->can('view_expenses') ? (float) Expense::whereBetween('date', [
                 now()->startOfMonth()->toDateString(),
                 now()->endOfMonth()->toDateString(),

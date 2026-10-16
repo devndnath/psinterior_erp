@@ -60,54 +60,70 @@
  * flipped (50/100 stay "subtlest background tint", 900 stays "primary
  * text", but the actual lightness inverts) so e.g. text-ink-900 keeps
  * meaning "the most readable text color on this surface" in both themes
- * instead of staying literally near-black. accent/success/warning/danger
- * are deliberately left as static hex (unchanged in dark mode) — mid-
- * saturation brand/status colors read fine on a dark surface as-is, and
- * leaving them alone keeps this change scoped to neutrals only.
+ * instead of staying literally near-black. success/warning/danger stay
+ * static hex; `accent` (brand gold) is variable-backed too since the
+ * brand-layout pass — see the block below.
  */
 /*
- * Enterprise ERP redesign pass: the neutral scale moves off the
- * Premium-SaaS warm "charcoal" ramp onto Tailwind's own true-neutral
- * `slate` scale, used verbatim — a cool, structured gray is the
- * standard content-canvas neutral across professional data-dense
- * software (Linear, Vercel, GitHub, most enterprise dashboards), and
- * reads as more "serious tool" than a warm off-white. `paper` (the page
- * canvas) sits a shade darker than pure white (slate-50) so surface
- * cards visibly separate from the page behind them — a deliberate ERP
- * convention (content lives in clearly bounded panels on a gray canvas,
- * not white-on-white) distinct from the airier, borderless feel of a
- * consumer SaaS page. Same semantic contract as before (50/100 =
- * subtlest background tint, 900 = highest-contrast text, flipped in
- * `.dark`), just re-tuned values.
+ * Brand-layout pass (PS Solution): warm neutrals anchored on the brand's
+ * own charcoal (#20241F, ink-900) and cream canvas, plus the brand gold
+ * as `--color-accent-*`. `paper` (page canvas) sits a step darker than
+ * the white `surface` so bounded report cards separate clearly from the
+ * page behind them — the same structure as the reference finance
+ * dashboard. Accent 500 (#F4B400) is the brand fill in both themes;
+ * 600/700 are the text/link steps, re-stepped per theme so links stay
+ * readable (deep gold on white, bright gold on dark).
  */
 :root {
-    --color-paper: 248 250 252; /* #F8FAFC — slate-50 */
-    --color-surface: 255 255 255; /* #FFFFFF */
-    --color-ink-50: 248 250 252; /* #F8FAFC — slate-50 */
-    --color-ink-100: 241 245 249; /* #F1F5F9 — slate-100 */
-    --color-ink-200: 226 232 240; /* #E2E8F0 — slate-200, border color */
-    --color-ink-300: 203 213 225; /* #CBD5E1 — slate-300 */
-    --color-ink-400: 148 163 184; /* #94A3B8 — slate-400 */
-    --color-ink-500: 100 116 139; /* #64748B — slate-500, secondary text */
-    --color-ink-600: 71 85 105; /* #475569 — slate-600 */
-    --color-ink-700: 51 65 85; /* #334155 — slate-700 */
-    --color-ink-800: 30 41 59; /* #1E293B — slate-800 */
-    --color-ink-900: 15 23 42; /* #0F172A — slate-900, primary text */
+    --color-paper: 244 243 238; /* #F4F3EE */
+    --color-surface: 255 255 255;
+    --color-ink-50: 247 246 243;
+    --color-ink-100: 238 237 232;
+    --color-ink-200: 223 221 213; /* border */
+    --color-ink-300: 198 195 184;
+    --color-ink-400: 156 152 140;
+    --color-ink-500: 117 113 106; /* secondary text */
+    --color-ink-600: 90 87 80;
+    --color-ink-700: 66 64 58;
+    --color-ink-800: 45 44 40;
+    --color-ink-900: 32 36 31; /* #20241F brand charcoal */
+
+    --color-accent-50: 254 249 231;
+    --color-accent-100: 253 240 194;
+    --color-accent-200: 251 227 138;
+    --color-accent-300: 248 209 77;
+    --color-accent-400: 246 194 38;
+    --color-accent-500: 244 180 0; /* #F4B400 brand gold */
+    --color-accent-600: 143 107 0; /* link/text gold, 4.9:1 on white */
+    --color-accent-700: 115 86 0;
+    --color-accent-800: 90 67 0;
+    --color-accent-900: 63 47 0;
 }
 
 :root.dark {
-    --color-paper: 8 11 19; /* near slate-950 */
-    --color-surface: 17 24 39; /* #111827 — a standard dark card surface */
-    --color-ink-50: 30 41 59;
-    --color-ink-100: 40 53 77;
-    --color-ink-200: 51 65 85;
-    --color-ink-300: 71 85 105;
-    --color-ink-400: 100 116 139;
-    --color-ink-500: 148 163 184;
-    --color-ink-600: 180 190 205;
-    --color-ink-700: 203 213 225;
-    --color-ink-800: 226 232 240;
-    --color-ink-900: 248 250 252;
+    --color-paper: 17 18 15;
+    --color-surface: 27 29 25; /* #1B1D19 */
+    --color-ink-50: 35 37 32;
+    --color-ink-100: 44 46 40;
+    --color-ink-200: 58 60 53;
+    --color-ink-300: 79 81 73;
+    --color-ink-400: 114 116 107;
+    --color-ink-500: 154 156 146;
+    --color-ink-600: 183 184 175;
+    --color-ink-700: 207 208 200;
+    --color-ink-800: 228 229 222;
+    --color-ink-900: 245 245 240;
+
+    --color-accent-50: 42 36 16;
+    --color-accent-100: 58 48 20;
+    --color-accent-200: 90 74 18;
+    --color-accent-300: 138 111 16;
+    --color-accent-400: 201 154 8;
+    --color-accent-500: 244 180 0;
+    --color-accent-600: 247 201 72;
+    --color-accent-700: 250 215 118;
+    --color-accent-800: 252 230 166;
+    --color-accent-900: 254 245 214;
 }
 
 @layer components {
@@ -121,7 +137,7 @@
         @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100;
     }
     .btn-primary {
-        @apply btn bg-accent-600 text-white hover:bg-accent-700 focus:ring-accent-500;
+        @apply btn bg-accent-500 font-semibold text-charcoal hover:bg-accent-400 focus:ring-accent-500;
     }
     .btn-secondary {
         @apply btn border border-ink-200 bg-surface text-ink-700 hover:border-ink-300 hover:bg-ink-50 focus:ring-accent-500;

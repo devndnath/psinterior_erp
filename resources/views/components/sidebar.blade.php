@@ -163,35 +163,66 @@
 @endphp
 
 {{--
-    Enterprise ERP redesign pass: a persistent DARK navigation rail —
-    the clearest single visual signature that separates "ERP" from
-    "consumer SaaS" (SAP Fiori's launchpad, Odoo's backend, Salesforce
-    Lightning's app rail, Oracle Cloud all use a fixed dark/colored nav
-    against a light content canvas). Deliberately hardcoded to literal
-    `slate-*`/`white` classes rather than the `ink-*`/`surface` design
-    tokens used everywhere else in the app: those tokens are CSS-
-    variable-backed so they flip with the day/night theme toggle
-    (resources/js/theme.js), but this sidebar is NOT meant to flip — it
-    stays dark regardless of whether the content area is in light or
-    dark mode, exactly like the ERPs referenced above. `accent-*` classes
-    are untouched (accent/success/warning/danger are static hex, never
-    theme-variable, so they already read correctly on a dark surface).
-    The $groups data, permission gating, active-route logic and Alpine
-    behavior are byte-for-byte unchanged across all of this —
-    only presentational classes changed.
+    Brand-layout pass: a LIGHT sidebar modeled on the reference finance-
+    dashboard layout — white rail with a hairline right border, brand mark
+    + company name at the top, a desktop collapse toggle (icon-only rail,
+    remembered in localStorage), and the active item marked with the PS
+    Solution gold: a 3px gold edge bar, a faint gold wash, and charcoal
+    semibold text. Uses the theme-variable `surface`/`ink-*`/`accent-*`
+    tokens again (unlike the previous always-dark rail), so it follows the
+    day/night toggle with the rest of the app. The $groups data,
+    permission gating, active-route logic and per-group open/close
+    persistence are unchanged — only presentation and the collapse toggle
+    are new.
 --}}
 <aside
-    :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
-    class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-slate-900 transition-transform duration-200 ease-in-out lg:static lg:translate-x-0"
+    x-data="{
+        collapsed: false,
+        init() {
+            try { this.collapsed = localStorage.getItem('sidebar-collapsed') === '1'; } catch (e) {}
+        },
+        toggleCollapsed() {
+            this.collapsed = ! this.collapsed;
+            try { localStorage.setItem('sidebar-collapsed', this.collapsed ? '1' : '0'); } catch (e) {}
+        },
+    }"
+    :class="[
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
+        collapsed ? 'lg:w-[76px]' : 'lg:w-64',
+    ]"
+    class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-ink-200 bg-surface transition-all duration-200 ease-in-out lg:static lg:translate-x-0"
 >
-    <div class="flex h-16 shrink-0 items-center gap-2.5 border-b border-slate-800 px-6">
-        <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-600 text-sm font-bold text-white">
-            {{ substr(config('app.name'), 0, 1) }}
+    <div class="flex h-16 shrink-0 items-center gap-3 px-5" :class="collapsed ? 'lg:justify-center lg:px-0' : ''">
+        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent-500 text-sm font-extrabold text-charcoal">
+            {{ strtoupper(substr(\App\Models\Setting::get('company.name', config('app.name')), 0, 2)) }}
         </div>
-        <span class="truncate text-sm font-semibold tracking-tight text-white">{{ config('app.name') }}</span>
+        <div class="min-w-0 flex-1" :class="collapsed ? 'lg:hidden' : ''">
+            <p class="truncate text-[15px] font-extrabold tracking-tight text-ink-900">{{ \App\Models\Setting::get('company.name', config('app.name')) }}</p>
+            <p class="truncate text-[11px] font-medium text-ink-400">Enterprise ERP</p>
+        </div>
+        <button
+            type="button"
+            @click="toggleCollapsed()"
+            class="hidden rounded-md p-1.5 text-ink-400 transition hover:bg-ink-100 hover:text-ink-700 lg:block"
+            :class="collapsed ? 'lg:hidden' : ''"
+            aria-label="Collapse sidebar"
+        >
+            <x-icon name="panel-left-close" class="h-[18px] w-[18px]" />
+        </button>
     </div>
 
-    <nav class="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
+    <button
+        type="button"
+        x-show="collapsed"
+        x-cloak
+        @click="toggleCollapsed()"
+        class="mx-auto mb-2 hidden rounded-md p-1.5 text-ink-400 transition hover:bg-ink-100 hover:text-ink-700 lg:block"
+        aria-label="Expand sidebar"
+    >
+        <x-icon name="panel-left-open" class="h-[18px] w-[18px]" />
+    </button>
+
+    <nav class="flex-1 space-y-1 overflow-y-auto px-3 pb-4 pt-2">
         @foreach ($groups as $group)
             @php
                 $visibleItems = array_values(array_filter(
@@ -212,41 +243,30 @@
                         open: {{ $groupIsActive ? 'true' : 'false' }},
                         storageKey: '{{ $storageKey }}',
                         init() {
-                            // Auto-expand the group containing the current
-                            // route (the server-computed default above),
-                            // unless the visitor already has a stored
-                            // preference for this group — that preference
-                            // wins and survives wire:navigate since
-                            // localStorage isn't reset by Livewire's SPA
-                            // navigation (it only re-runs Alpine's x-data
-                            // init, it doesn't clear the browser's storage).
+                            // A stored preference wins over the server-
+                            // computed default (auto-expand the group that
+                            // holds the current route); survives
+                            // wire:navigate since localStorage persists.
                             try {
                                 const stored = localStorage.getItem(this.storageKey);
                                 if (stored !== null) {
                                     this.open = JSON.parse(stored);
                                 }
-                            } catch (e) {
-                                // Private browsing / disabled storage —
-                                // fall back to the server-computed default
-                                // (already set above) and carry on.
-                            }
+                            } catch (e) {}
                         },
                         toggle() {
                             this.open = ! this.open;
                             try {
                                 localStorage.setItem(this.storageKey, JSON.stringify(this.open));
-                            } catch (e) {
-                                // Storage unavailable — the toggle still
-                                // works for this page view via the Alpine
-                                // state above, it just won't persist.
-                            }
+                            } catch (e) {}
                         },
                     }"
                 >
                     <button
                         type="button"
                         @click="toggle()"
-                        class="flex w-full items-center justify-between rounded-md px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500 transition hover:bg-slate-800 hover:text-slate-300"
+                        x-show="! collapsed"
+                        class="flex w-full items-center justify-between rounded-md px-3 pb-1.5 pt-3 text-[11px] font-bold uppercase tracking-[0.08em] text-ink-400 transition hover:text-ink-700"
                     >
                         <span>{{ $group['label'] }}</span>
                         <x-icon
@@ -255,32 +275,34 @@
                             x-bind:class="open ? 'rotate-180' : ''"
                         />
                     </button>
+                    <div x-show="collapsed" x-cloak class="mx-auto my-2 hidden h-px w-8 bg-ink-200 lg:block"></div>
 
-                    <div x-show="open" x-cloak class="space-y-0.5 pb-1">
+                    <div x-show="open || collapsed" x-cloak class="space-y-0.5">
                         @foreach ($visibleItems as $item)
+                            @php $isActive = request()->routeIs($item['active'] ?? $item['route'].'*'); @endphp
                             <a
                                 href="{{ route($item['route']) }}"
                                 wire:navigate
-                                {{-- Active item: a solid indigo fill — the
-                                     one spot of color against the dark
-                                     rail, unmissable at a glance. Inactive:
-                                     muted slate text, lighting up to white
-                                     on hover. --}}
+                                title="{{ $item['label'] }}"
                                 @class([
-                                    'flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-colors',
-                                    'rounded-lg bg-accent-600 text-white' => request()->routeIs($item['active'] ?? $item['route'].'*'),
-                                    'rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs($item['active'] ?? $item['route'].'*'),
+                                    'relative flex items-center gap-3 rounded-lg px-3 py-2 text-[13.5px] transition-colors',
+                                    'bg-accent-50 font-semibold text-ink-900' => $isActive,
+                                    'font-medium text-ink-600 hover:bg-ink-50 hover:text-ink-900' => ! $isActive,
                                 ])
+                                :class="collapsed ? 'lg:justify-center lg:px-0' : ''"
                             >
+                                @if ($isActive)
+                                    <span class="absolute inset-y-1.5 left-0 w-[3px] rounded-r-full bg-accent-500"></span>
+                                @endif
                                 <x-icon
                                     :name="$item['icon']"
                                     @class([
                                         'h-[18px] w-[18px] shrink-0',
-                                        'text-white' => request()->routeIs($item['active'] ?? $item['route'].'*'),
-                                        'text-slate-500' => ! request()->routeIs($item['active'] ?? $item['route'].'*'),
+                                        'text-accent-600' => $isActive,
+                                        'text-ink-400' => ! $isActive,
                                     ])
                                 />
-                                <span class="truncate">{{ $item['label'] }}</span>
+                                <span class="truncate" :class="collapsed ? 'lg:hidden' : ''">{{ $item['label'] }}</span>
                             </a>
                         @endforeach
                     </div>
@@ -289,21 +311,22 @@
         @endforeach
     </nav>
 
-    <div class="border-t border-slate-800 p-3">
-        <div class="flex items-center gap-3 rounded-lg p-2 transition hover:bg-slate-800">
-            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent-600 text-xs font-semibold text-white">
+    <div class="border-t border-ink-200 p-3">
+        <div class="flex items-center gap-3 rounded-lg p-2" :class="collapsed ? 'lg:justify-center lg:p-0 lg:py-2' : ''">
+            <div class="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-charcoal text-xs font-bold text-accent-500 dark:bg-accent-500 dark:text-charcoal">
                 {{ strtoupper(substr(auth()->user()->name ?? '?', 0, 1)) }}
+                <span class="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-success-500 ring-2 ring-surface"></span>
             </div>
-            <div class="min-w-0 flex-1">
-                <p class="truncate text-sm font-medium text-white">{{ auth()->user()->name }}</p>
-                <p class="truncate text-xs text-slate-400">{{ auth()->user()->getRoleNames()->first() ?? 'User' }}</p>
+            <div class="min-w-0 flex-1" :class="collapsed ? 'lg:hidden' : ''">
+                <p class="truncate text-sm font-semibold text-ink-900">{{ auth()->user()->name }}</p>
+                <p class="truncate text-xs text-ink-500">{{ auth()->user()->getRoleNames()->first() ?? 'User' }}</p>
             </div>
+            <form method="POST" action="{{ route('logout') }}" :class="collapsed ? 'lg:hidden' : ''">
+                @csrf
+                <button type="submit" title="Log out" class="rounded-md p-1.5 text-ink-400 transition hover:bg-danger-50 hover:text-danger-600" aria-label="Log out">
+                    <x-icon name="log-out" class="h-[18px] w-[18px]" />
+                </button>
+            </form>
         </div>
-        <form method="POST" action="{{ route('logout') }}" class="mt-0.5">
-            @csrf
-            <button type="submit" class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-400 transition hover:bg-slate-800 hover:text-red-400">
-                Log out
-            </button>
-        </form>
     </div>
 </aside>

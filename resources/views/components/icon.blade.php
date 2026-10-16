@@ -84,6 +84,17 @@
         // Phase 5 (premium-SaaS redesign): components/dropdown.blade.php's
         // "..." row-action trigger.
         'more-horizontal' => '<circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="19" cy="12" r="1" fill="currentColor"/><circle cx="5" cy="12" r="1" fill="currentColor"/>',
+        // Brand-layout pass: sidebar collapse toggle, logout, and the
+        // dashboard's month-over-month delta arrows / report cards.
+        'panel-left-close' => '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="m16 15-3-3 3-3"/>',
+        'panel-left-open' => '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="m14 9 3 3-3 3"/>',
+        'log-out' => '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>',
+        'arrow-up-right' => '<path d="M7 7h10v10"/><path d="M7 17 17 7"/>',
+        'arrow-down-right' => '<path d="m7 7 10 10"/><path d="M17 7v10H7"/>',
+        'landmark' => '<line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/>',
+        'gauge' => '<path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/>',
+        'activity' => '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+        'check' => '<path d="M20 6 9 17l-5-5"/>',
         // Fallback: a plain circle outline rather than nothing, so an
         // unrecognised icon name never silently renders empty space.
         default => '<circle cx="12" cy="12" r="9"/>',

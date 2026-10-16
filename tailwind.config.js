@@ -16,24 +16,21 @@ export default {
                 // Kept as-is (do not rename/remove — ~165 existing usages
                 // across 159 views depend on it). New work should prefer
                 // `accent` below; `brand` stays for backward compat only.
-                // Enterprise ERP redesign pass: moved off the Premium-SaaS
-                // teal onto the same indigo ramp as `accent` below — see
-                // that scale's comment for the full rationale. Kept
-                // identical to `accent` for the same reason the teal pass
-                // kept them identical: legacy `brand-*` usages (the two
-                // portal headers' logo chip, the guest/login layout) stay
-                // visually consistent with the rest of the app.
+                // Brand-layout pass: points at the same CSS variables as
+                // `accent` below (PS Solution gold), so legacy `brand-*`
+                // usages (portal headers' logo chip, the guest/login layout)
+                // stay visually identical to the rest of the app.
                 brand: {
-                    50: '#EEF2FF',
-                    100: '#E0E7FF',
-                    200: '#C7D2FE',
-                    300: '#A5B4FC',
-                    400: '#818CF8',
-                    500: '#6366F1',
-                    600: '#4F46E5',
-                    700: '#4338CA',
-                    800: '#3730A3',
-                    900: '#312E81',
+                    50: 'rgb(var(--color-accent-50) / <alpha-value>)',
+                    100: 'rgb(var(--color-accent-100) / <alpha-value>)',
+                    200: 'rgb(var(--color-accent-200) / <alpha-value>)',
+                    300: 'rgb(var(--color-accent-300) / <alpha-value>)',
+                    400: 'rgb(var(--color-accent-400) / <alpha-value>)',
+                    500: 'rgb(var(--color-accent-500) / <alpha-value>)',
+                    600: 'rgb(var(--color-accent-600) / <alpha-value>)',
+                    700: 'rgb(var(--color-accent-700) / <alpha-value>)',
+                    800: 'rgb(var(--color-accent-800) / <alpha-value>)',
+                    900: 'rgb(var(--color-accent-900) / <alpha-value>)',
                 },
                 // Phase 13 design-system foundation ------------------------
                 // Page/elevated-surface backgrounds (warm off-white, not
@@ -98,27 +95,31 @@ export default {
                     800: 'rgb(var(--color-ink-800) / <alpha-value>)',
                     900: 'rgb(var(--color-ink-900) / <alpha-value>)',
                 },
-                // Enterprise ERP redesign pass: moved off the Premium-SaaS
-                // teal onto Tailwind's own indigo scale, used verbatim (no
-                // custom tuning) — indigo/blue is the de-facto "serious
-                // business software" color across enterprise ERPs (SAP
-                // Fiori, Salesforce Lightning, Oracle Cloud, Zoho all lean
-                // blue/indigo for primary actions), and reads as more
-                // trustworthy/neutral than a decorative teal. 600 is still
-                // the "main" tone every `.btn-primary`/active-nav usage in
-                // this codebase expects, with 700 as its hover/darker shade.
+                // Brand-layout pass: back to PS Solution's own gold
+                // (#F4B400 = 500, the site's CTA/nav-highlight color), now
+                // CSS-variable-backed (values in resources/css/app.css) so it
+                // re-steps per theme. 500 is the brand fill in both themes;
+                // 600/700 are the TEXT/link steps (168 `text-accent-600`
+                // usages app-wide) — a deep gold in light mode so links
+                // clear WCAG contrast on white, flipping to a bright gold in
+                // dark mode so they stay readable on the dark surface.
                 accent: {
-                    50: '#EEF2FF',
-                    100: '#E0E7FF',
-                    200: '#C7D2FE',
-                    300: '#A5B4FC',
-                    400: '#818CF8',
-                    500: '#6366F1',
-                    600: '#4F46E5',
-                    700: '#4338CA',
-                    800: '#3730A3',
-                    900: '#312E81',
+                    50: 'rgb(var(--color-accent-50) / <alpha-value>)',
+                    100: 'rgb(var(--color-accent-100) / <alpha-value>)',
+                    200: 'rgb(var(--color-accent-200) / <alpha-value>)',
+                    300: 'rgb(var(--color-accent-300) / <alpha-value>)',
+                    400: 'rgb(var(--color-accent-400) / <alpha-value>)',
+                    500: 'rgb(var(--color-accent-500) / <alpha-value>)',
+                    600: 'rgb(var(--color-accent-600) / <alpha-value>)',
+                    700: 'rgb(var(--color-accent-700) / <alpha-value>)',
+                    800: 'rgb(var(--color-accent-800) / <alpha-value>)',
+                    900: 'rgb(var(--color-accent-900) / <alpha-value>)',
                 },
+                // PS Solution brand charcoal (#20241F, pssolutionbd.com's own
+                // heading/text color). Static — used for text that sits ON
+                // the gold accent fill (e.g. .btn-primary), which must stay
+                // dark in both themes, unlike text-ink-900 which flips.
+                charcoal: '#20241F',
                 // Optional cleaner semantics for new components (existing
                 // red-*/green-*/yellow-* Tailwind defaults remain in use
                 // elsewhere and are untouched). Retuned to Tailwind's
@@ -165,16 +166,10 @@ export default {
                     900: '#470F0C',
                 },
             },
-            // Premium-SaaS redesign pass: the Fraunces serif display font
-            // (used only by .page-title) is dropped in favor of Inter
-            // everywhere — a warm editorial serif heading doesn't fit the
-            // flatter, Linear/Notion/Stripe-inspired look this pass is
-            // after, which leans on weight and spacing for hierarchy
-            // instead of a second typeface. Manrope is kept as the first
-            // fallback (so anything still mid-load briefly renders close
-            // to its final look) with the same system-font chain after it.
+            // Brand-layout pass: Manrope first — the typeface PS Solution's
+            // own site uses — with Inter as the fallback while it loads.
             fontFamily: {
-                sans: ['Inter', 'Manrope', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                sans: ['Manrope', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
             },
             borderRadius: {
                 sm: '6px',

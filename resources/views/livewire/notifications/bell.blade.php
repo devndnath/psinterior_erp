@@ -33,7 +33,7 @@
                     class="flex w-full items-start gap-2 border-b border-ink-50 px-4 py-3 text-left text-sm hover:bg-ink-50"
                 >
                     @if (! $notification->read_at)
-                        <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-accent-600"></span>
+                        <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-accent-500"></span>
                     @else
                         <span class="mt-1.5 h-2 w-2 shrink-0"></span>
                     @endif
