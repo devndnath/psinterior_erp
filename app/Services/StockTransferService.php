@@ -62,7 +62,7 @@ class StockTransferService
     public function complete(StockTransfer $transfer, ?int $userId = null): StockTransfer
     {
         return DB::transaction(function () use ($transfer, $userId) {
-            $transfer->load(['items', 'fromWarehouse', 'toWarehouse']);
+            $transfer->load(['items.product', 'fromWarehouse', 'toWarehouse']);
 
             foreach ($transfer->items as $item) {
                 $this->inventory->recordMovement(
