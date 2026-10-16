@@ -64,6 +64,17 @@ php artisan db:seed --class=DemoSeeder
 
 It builds one interlinked sample record through nearly every module — a lead converted to a client, a project taken all the way to handover/warranty, a BOQ→Quotation→Contract→Invoice→Payment chain, a full procurement cycle (PR→vendor quotation→PO→GRN→vendor invoice), inventory with opening stock, HR (attendance/leave/payroll), a subcontractor assignment, a meeting, an inspection with a snag taken to Closed, a selection board, and a daily site report — entirely through the same Service classes the UI calls, so numbering/totals/stock movements are exercised exactly as a human using the app would trigger them. It prints the demo staff/portal logins it creates (staff password is `password`) to the console, and is safe to re-run: it checks for its own marker client first and does nothing if the demo dataset is already present.
 
+### Full sample dataset (volume data for every table)
+
+For a demo or staging database that should look like a firm that has been operating for a year, run `SampleDataSeeder` instead (it runs `DemoSeeder` first, then adds volume on top):
+
+```bash
+php artisan migrate:fresh --seed
+php artisan db:seed --class=SampleDataSeeder
+```
+
+It adds ~20 clients, ~45 leads across every pipeline stage with follow-ups, site visits, 14 projects in every status (with milestones, tasks and team), designs with revisions and client decisions, BOQ → quotation (including revised versions) → contract → payment schedule → change orders, ~35 invoices with full/partial/overdue payments over 12 months, ~150 expenses over 6 months, 20 products in 3 warehouses (some below minimum stock), 5 full procurement cycles (PR → vendor quotes → PO → GRN → vendor invoice), material requisitions and stock transfers in every state, ~10 weeks of attendance for 16 employees, leaves, conveyance claims, 3 months of payroll (paid / finalized / draft), subcontractors with payments, meetings, inspections, snags, site reports, handovers, warranties, service requests and selection boards. Everything goes through the app's own Service classes, random choices use a fixed seed (same data every run), and it skips itself if already present. Not for production.
+
 ## 6. Storage Linking
 
 ```bash
