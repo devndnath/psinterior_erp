@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Pdf;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Pdf\Concerns\RespondsWithPdf;
 use App\Models\Invoice;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -32,13 +34,18 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class InvoicePdfController extends Controller
 {
-    public function __invoke(Invoice $invoice): Response
+    use RespondsWithPdf;
+
+    public function __invoke(Invoice $invoice, Request $request): Response
     {
         Gate::authorize('view', $invoice);
 
         $invoice->load(['project', 'client', 'items']);
 
-        return Pdf::loadView('pdf.invoice', ['invoice' => $invoice])
-            ->download("{$invoice->invoice_no}.pdf");
+        return $this->respondWithPdf(
+            Pdf::loadView('pdf.invoice', ['invoice' => $invoice]),
+            "{$invoice->invoice_no}.pdf",
+            $request,
+        );
     }
 }

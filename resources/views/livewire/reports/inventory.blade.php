@@ -6,7 +6,8 @@
             <x-breadcrumbs :items="['Reports' => route('reports.index'), 'Inventory' => null]" />
         </x-slot:breadcrumbs>
         <x-slot:actions>
-            <x-button variant="secondary" wire:click="exportCsv">Export CSV</x-button>
+            <x-button variant="secondary" class="no-print" wire:click="exportCsv">Export CSV</x-button>
+            <x-button variant="secondary" class="no-print" onclick="window.print()">Print</x-button>
         </x-slot:actions>
     </x-page-header>
 

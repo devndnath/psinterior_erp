@@ -3,7 +3,9 @@
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Pdf\BoqPdfController;
 use App\Http\Controllers\Pdf\ContractPdfController;
+use App\Http\Controllers\Pdf\ExpensePdfController;
 use App\Http\Controllers\Pdf\InvoicePdfController;
+use App\Http\Controllers\Pdf\PaymentPdfController;
 use App\Http\Controllers\Pdf\PurchaseOrderPdfController;
 use App\Http\Controllers\Pdf\QuotationPdfController;
 use App\Livewire\ActivityLogs\Index as ActivityLogIndex;
@@ -331,6 +333,7 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
         Route::get('/', PaymentIndex::class)->name('index')->middleware('can:view_payments');
         Route::get('/create', PaymentForm::class)->name('create')->middleware('can:create_payments');
         Route::get('/{payment}', PaymentShow::class)->name('show')->middleware('can:view_payments');
+        Route::get('/{payment}/pdf', PaymentPdfController::class)->name('pdf')->middleware('can:view_payments');
     });
 
     Route::prefix('expenses')->name('expenses.')->group(function () {
@@ -338,6 +341,7 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
         Route::get('/create', ExpenseForm::class)->name('create')->middleware('can:create_expenses');
         Route::get('/{expense}/edit', ExpenseForm::class)->name('edit')->middleware('can:edit_expenses');
         Route::get('/{expense}', ExpenseShow::class)->name('show')->middleware('can:view_expenses');
+        Route::get('/{expense}/pdf', ExpensePdfController::class)->name('pdf')->middleware('can:view_expenses');
     });
 
     Route::prefix('expense-categories')->name('expense-categories.')->group(function () {

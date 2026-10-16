@@ -7,6 +7,7 @@
             <span class="text-sm text-ink-400">v{{ $quotation->version }}</span>
             <x-status-badge :label="$quotation->status->label()" :color="$quotation->status->color()" />
             <x-button variant="secondary" wire:click="downloadPdf">Download PDF</x-button>
+            <x-button variant="secondary" href="{{ route('quotations.pdf', [$quotation, 'print' => 1]) }}" target="_blank">Print</x-button>
             @if ($quotation->status->value === 'approved' && $quotation->contracts->isEmpty())
                 @can('create', \App\Models\Contract::class)
                     <x-button variant="secondary" href="{{ route('contracts.create', ['quotation' => $quotation->id]) }}" wire:navigate>Create Contract</x-button>

@@ -6,6 +6,7 @@
         <x-slot:actions>
             <x-status-badge :label="$invoice->status->label()" :color="$invoice->status->color()" />
             <x-button variant="secondary" wire:click="downloadPdf">Download PDF</x-button>
+            <x-button variant="secondary" href="{{ route('invoices.pdf', [$invoice, 'print' => 1]) }}" target="_blank">Print</x-button>
             @can('issue', $invoice)
                 @if ($invoice->status->value === 'draft')
                     <x-button variant="secondary" wire:click="issueInvoice">Issue Invoice</x-button>

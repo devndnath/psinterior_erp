@@ -7,12 +7,13 @@
         </x-slot:breadcrumbs>
     </x-page-header>
 
-    <div class="panel mb-4 flex flex-wrap items-end justify-between gap-4 p-4">
+    <div class="panel mb-4 flex flex-wrap items-end justify-between gap-4 p-4 no-print">
         <div class="flex flex-wrap items-end gap-4">
             <x-input label="From" name="dateFrom" type="date" wire:model.live="dateFrom" class="w-40" />
             <x-input label="To" name="dateTo" type="date" wire:model.live="dateTo" class="w-40" />
         </div>
-        <x-button variant="secondary" wire:click="exportCsv">Export CSV</x-button>
+        <x-button variant="secondary" class="no-print" wire:click="exportCsv">Export CSV</x-button>
+        <x-button variant="secondary" class="no-print" onclick="window.print()">Print</x-button>
     </div>
 
     <div class="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">

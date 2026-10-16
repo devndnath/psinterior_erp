@@ -6,6 +6,7 @@
         <x-slot:actions>
             <x-status-badge :label="$contract->status->label()" :color="$contract->status->color()" />
             <x-button variant="secondary" wire:click="downloadPdf">Download PDF</x-button>
+            <x-button variant="secondary" href="{{ route('contracts.pdf', [$contract, 'print' => 1]) }}" target="_blank">Print</x-button>
             @can('update', $contract)
                 @if ($contract->status->value !== 'active')
                     <button type="button" wire:click="activate" wire:confirm="Activate this contract? This will update the project's contract value." class="btn-secondary">Activate</button>

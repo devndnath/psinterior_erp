@@ -4,6 +4,8 @@
             <x-breadcrumbs :items="['Payments' => route('payments.index'), $payment->payment_no => null]" />
         </x-slot:breadcrumbs>
         <x-slot:actions>
+            <x-button variant="secondary" wire:click="downloadPdf">Download PDF</x-button>
+            <x-button variant="secondary" href="{{ route('payments.pdf', [$payment, 'print' => 1]) }}" target="_blank">Print</x-button>
             @can('delete', $payment)
                 <x-confirm-dialog
                     title="Delete this payment?"

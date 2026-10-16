@@ -6,6 +6,7 @@
         <x-slot:actions>
             <x-status-badge :label="$purchaseOrder->status->label()" :color="$purchaseOrder->status->color()" />
             <x-button variant="secondary" wire:click="downloadPdf">Download PDF</x-button>
+            <x-button variant="secondary" href="{{ route('purchase-orders.pdf', [$purchaseOrder, 'print' => 1]) }}" target="_blank">Print</x-button>
             @can('update', $purchaseOrder)
                 <x-button variant="secondary" href="{{ route('purchase-orders.edit', $purchaseOrder) }}" wire:navigate>Edit</x-button>
             @endcan

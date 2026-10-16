@@ -12,6 +12,8 @@
             </p>
         </div>
         <div class="flex items-center gap-3">
+            <button type="button" wire:click="downloadPdf" class="btn-secondary">Download PDF</button>
+            <a href="{{ route('expenses.pdf', [$expense, 'print' => 1]) }}" target="_blank" class="btn-secondary">Print</a>
             @can('update', $expense)
                 <a href="{{ route('expenses.edit', $expense) }}" wire:navigate class="btn-secondary">Edit</a>
             @endcan

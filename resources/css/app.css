@@ -3,6 +3,39 @@
 @tailwind utilities;
 
 /*
+ * Print stylesheet: used wherever a "Print" button opens a report/page
+ * and the person hits the browser's own print dialog (Ctrl/Cmd+P), or
+ * for any page printed directly off the app rather than through a
+ * generated PDF. The persistent dark sidebar (<x-sidebar>, <aside>) and
+ * topbar (<x-topbar>, <header>) are chrome for navigating the app, not
+ * part of the report/record being printed, so both are hidden, and
+ * `.no-print` is a general-purpose escape hatch for any other
+ * interactive-only element (buttons, filters) a given view wants
+ * excluded from its printed output. `main` is widened to the full page
+ * since it no longer needs to share horizontal space with the sidebar.
+ */
+@media print {
+    aside,
+    header,
+    .no-print {
+        display: none !important;
+    }
+
+    main {
+        overflow: visible !important;
+    }
+
+    main > div {
+        max-width: none !important;
+        padding: 0 !important;
+    }
+
+    body {
+        background: #fff !important;
+    }
+}
+
+/*
  * x-cloak itself does nothing without this rule — Alpine relies on the
  * page defining it so a cloaked element stays hidden until Alpine
  * initializes, instead of flashing visible first. Used by the mobile

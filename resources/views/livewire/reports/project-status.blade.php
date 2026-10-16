@@ -7,7 +7,7 @@
         </x-slot:breadcrumbs>
     </x-page-header>
 
-    <div class="panel mb-4 flex flex-wrap items-end justify-between gap-4 p-4">
+    <div class="panel mb-4 flex flex-wrap items-end justify-between gap-4 p-4 no-print">
         <div class="flex flex-wrap items-end gap-4">
             <x-select label="Status" name="status" wire:model.live="status" class="w-48">
                 <option value="">All</option>
@@ -16,7 +16,8 @@
                 @endforeach
             </x-select>
         </div>
-        <x-button variant="secondary" wire:click="exportCsv">Export CSV</x-button>
+        <x-button variant="secondary" class="no-print" wire:click="exportCsv">Export CSV</x-button>
+        <x-button variant="secondary" class="no-print" onclick="window.print()">Print</x-button>
     </div>
 
     <x-table>

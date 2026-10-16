@@ -7,6 +7,7 @@
             <span class="text-sm text-ink-400">v{{ $boq->version }}</span>
             <x-status-badge :label="$boq->status->label()" :color="$boq->status->color()" />
             <x-button variant="secondary" wire:click="downloadPdf">Download PDF</x-button>
+            <x-button variant="secondary" href="{{ route('boqs.pdf', [$boq, 'print' => 1]) }}" target="_blank">Print</x-button>
             @can('create', \App\Models\Quotation::class)
                 <x-button variant="secondary" href="{{ route('quotations.create', ['project' => $boq->project_id, 'boq' => $boq->id]) }}" wire:navigate>Create Quotation</x-button>
             @endcan
