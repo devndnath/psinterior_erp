@@ -24,7 +24,7 @@
 @props(['align' => 'right'])
 
 <div x-data="{ open: false }" class="relative inline-block text-left" @click.outside="open = false" @keydown.escape.window="open = false">
-    <button type="button" @click="open = !open" class="rounded-lg p-1.5 text-ink-400 transition hover:bg-ink-50 hover:text-ink-700" aria-label="Open actions menu" aria-haspopup="true" :aria-expanded="open">
+    <button type="button" @click="open = !open" class="rounded-full p-2 text-ink-400 transition hover:bg-ink-100 hover:text-ink-700" aria-label="Open actions menu" aria-haspopup="true" :aria-expanded="open">
         <x-icon name="more-horizontal" class="h-4 w-4" />
     </button>
 
@@ -47,7 +47,7 @@
             closes it implicitly by leaving the page or triggering a
             Livewire re-render of the row.
         --}}
-        {{ $attributes->merge(['class' => ($align === 'left' ? 'left-0 origin-top-left' : 'right-0 origin-top-right').' absolute z-20 mt-1 w-44 rounded-lg border border-ink-200 bg-surface py-1 shadow-lg focus:outline-none']) }}
+        {{ $attributes->merge(['class' => ($align === 'left' ? 'left-0 origin-top-left' : 'right-0 origin-top-right').' absolute z-20 mt-1 w-48 rounded-2xl border border-ink-200/70 bg-surface p-1.5 shadow-xl shadow-black/[0.06] focus:outline-none']) }}
     >
         {{ $slot }}
     </div>

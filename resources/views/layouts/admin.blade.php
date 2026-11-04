@@ -30,22 +30,24 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
-<body class="h-full font-sans antialiased">
-    <div class="flex h-full">
+<body class="app-canvas h-full font-sans antialiased">
+    {{-- Soft-canvas pass: header across the top on the canvas, then the
+         floating sidebar pill and the scrolling content side by side. --}}
+    <div class="flex h-full flex-col">
 
         {{-- Mobile backdrop. Literal black (not bg-ink-900) on purpose: this
              is a dimming scrim, not text, so it must stay dark in both
              themes — ink-900 itself now flips to near-white in dark mode. --}}
         <div x-show="sidebarOpen" x-cloak @click="sidebarOpen = false"
-             class="fixed inset-0 z-30 bg-black/60 backdrop-blur-[2px] lg:hidden"></div>
+             class="fixed inset-0 z-30 bg-black/50 backdrop-blur-[2px] lg:hidden"></div>
 
-        <x-sidebar />
+        <x-topbar />
 
-        <div class="flex min-w-0 flex-1 flex-col">
-            <x-topbar />
+        <div class="flex min-h-0 flex-1 gap-5 lg:px-5 lg:pb-5">
+            <x-sidebar />
 
-            <main class="flex-1 overflow-y-auto">
-                <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            <main class="min-w-0 flex-1 overflow-y-auto">
+                <div class="mx-auto max-w-[1440px] px-3 pb-10 pt-1 sm:px-4 lg:px-1">
                     {{--
                         Phase 16: removed the old fallback <h1> that used
                         to render here from $title (the ['title' => ...]

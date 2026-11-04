@@ -23,7 +23,7 @@
 
         <div class="panel p-6">
             <h2 class="mb-4 text-sm font-semibold text-ink-700">Attach a copy (optional)</h2>
-            <input wire:model="files" type="file" multiple class="block w-full text-sm text-ink-600 file:mr-4 file:rounded-lg file:border-0 file:bg-accent-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-accent-700 hover:file:bg-accent-100">
+            <input wire:model="files" type="file" multiple class="block w-full text-sm text-ink-600 file:mr-4 file:rounded-full file:border-0 file:bg-accent-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-accent-700 hover:file:bg-accent-100">
             @error('files.*') <p class="form-error">{{ $message }}</p> @enderror
             <div wire:loading wire:target="files" class="mt-2 text-xs text-ink-400">Uploading…</div>
         </div>

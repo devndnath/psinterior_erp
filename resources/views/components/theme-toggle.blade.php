@@ -32,7 +32,7 @@
     }"
     x-on:theme-changed.window="dark = document.documentElement.classList.contains('dark')"
     @click="toggle()"
-    {{ $attributes->merge(['class' => 'rounded-lg p-2 text-ink-500 transition hover:bg-ink-50 hover:text-ink-900']) }}
+    {{ $attributes->merge(['class' => 'icon-btn']) }}
     :aria-label="dark ? 'Switch to light mode' : 'Switch to dark mode'"
     :title="dark ? 'Switch to light mode' : 'Switch to dark mode'"
 >

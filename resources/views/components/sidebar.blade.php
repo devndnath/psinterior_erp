@@ -163,66 +163,69 @@
 @endphp
 
 {{--
-    Brand-layout pass: a LIGHT sidebar modeled on the reference finance-
-    dashboard layout — white rail with a hairline right border, brand mark
-    + company name at the top, a desktop collapse toggle (icon-only rail,
-    remembered in localStorage), and the active item marked with the PS
-    Solution gold: a 3px gold edge bar, a faint gold wash, and charcoal
-    semibold text. Uses the theme-variable `surface`/`ink-*`/`accent-*`
-    tokens again (unlike the previous always-dark rail), so it follows the
-    day/night toggle with the rest of the app. The $groups data,
-    permission gating, active-route logic and per-group open/close
-    persistence are unchanged — only presentation and the collapse toggle
-    are new.
+    Soft-canvas pass: a floating rounded "pill" navigation rail, modeled on
+    the reference analytics layout — icon-only by default on desktop, each
+    item a 44px circle with the active page in a solid charcoal circle and
+    a gold icon (gold circle + charcoal icon in dark mode), the PS Solution
+    pair. Hovering an icon shows its label in a tooltip (teleported to
+    <body> so the rail's scroll area can't clip it). The toggle at the top
+    expands the rail to show labels and the collapsible module groups;
+    the choice is remembered in localStorage ('sidebar-collapsed'). On
+    mobile it is an off-canvas drawer that always shows labels.
+
+    The $groups data, permission gating, active-route logic and per-group
+    open/close persistence are unchanged — only presentation changed.
 --}}
 <aside
     x-data="{
-        collapsed: false,
+        collapsed: true,
+        desktop: window.matchMedia('(min-width: 1024px)').matches,
+        tip: { show: false, label: '', top: 0, left: 0 },
+        get rail() { return this.collapsed && this.desktop; },
         init() {
-            try { this.collapsed = localStorage.getItem('sidebar-collapsed') === '1'; } catch (e) {}
+            try {
+                const stored = localStorage.getItem('sidebar-collapsed');
+                if (stored !== null) this.collapsed = stored === '1';
+            } catch (e) {}
+            const mq = window.matchMedia('(min-width: 1024px)');
+            mq.addEventListener('change', (e) => { this.desktop = e.matches; this.tip.show = false; });
         },
         toggleCollapsed() {
             this.collapsed = ! this.collapsed;
+            this.tip.show = false;
             try { localStorage.setItem('sidebar-collapsed', this.collapsed ? '1' : '0'); } catch (e) {}
+        },
+        showTip(el, label) {
+            if (! this.rail) return;
+            const r = el.getBoundingClientRect();
+            this.tip = { show: true, label, top: r.top + r.height / 2, left: r.right + 12 };
         },
     }"
     :class="[
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
-        collapsed ? 'lg:w-[76px]' : 'lg:w-64',
+        sidebarOpen ? 'translate-x-0' : '-translate-x-[110%] lg:translate-x-0',
+        rail ? 'lg:w-[72px]' : 'lg:w-64',
     ]"
-    class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-ink-200 bg-surface transition-all duration-200 ease-in-out lg:static lg:translate-x-0"
+    class="fixed inset-y-3 left-3 z-40 flex w-72 shrink-0 flex-col rounded-[32px] border border-ink-200/70 bg-surface shadow-2xl shadow-black/10 transition-all duration-200 ease-in-out dark:border-white/[0.06] lg:static lg:inset-auto lg:h-full lg:shadow-[0_1px_2px_rgba(32,36,31,0.04)]"
 >
-    <div class="flex h-16 shrink-0 items-center gap-3 px-5" :class="collapsed ? 'lg:justify-center lg:px-0' : ''">
-        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent-500 text-sm font-extrabold text-charcoal">
-            {{ strtoupper(substr(\App\Models\Setting::get('company.name', config('app.name')), 0, 2)) }}
-        </div>
-        <div class="min-w-0 flex-1" :class="collapsed ? 'lg:hidden' : ''">
-            <p class="truncate text-[15px] font-extrabold tracking-tight text-ink-900">{{ \App\Models\Setting::get('company.name', config('app.name')) }}</p>
-            <p class="truncate text-[11px] font-medium text-ink-400">Enterprise ERP</p>
-        </div>
+    {{-- Expand / collapse (desktop) and close (mobile) --}}
+    <div class="flex shrink-0 items-center gap-2 px-3 pb-2 pt-3" :class="rail ? 'justify-center' : 'justify-between pl-5'">
+        <span x-show="! rail" class="text-[11px] font-bold uppercase tracking-[0.12em] text-ink-400">Menu</span>
         <button
             type="button"
             @click="toggleCollapsed()"
-            class="hidden rounded-md p-1.5 text-ink-400 transition hover:bg-ink-100 hover:text-ink-700 lg:block"
-            :class="collapsed ? 'lg:hidden' : ''"
-            aria-label="Collapse sidebar"
+            class="hidden h-11 w-11 items-center justify-center rounded-full text-ink-500 transition hover:bg-ink-100 hover:text-ink-900 lg:flex"
+            :aria-label="rail ? 'Expand sidebar' : 'Collapse sidebar'"
+            @mouseenter="showTip($el, 'Expand menu')" @mouseleave="tip.show = false"
         >
-            <x-icon name="panel-left-close" class="h-[18px] w-[18px]" />
+            <x-icon name="panel-left-open" class="h-[18px] w-[18px]" x-show="rail" />
+            <x-icon name="panel-left-close" class="h-[18px] w-[18px]" x-show="! rail" x-cloak />
+        </button>
+        <button type="button" @click="sidebarOpen = false" class="flex h-10 w-10 items-center justify-center rounded-full text-ink-500 transition hover:bg-ink-100 lg:hidden" aria-label="Close menu">
+            <x-icon name="x" class="h-5 w-5" />
         </button>
     </div>
 
-    <button
-        type="button"
-        x-show="collapsed"
-        x-cloak
-        @click="toggleCollapsed()"
-        class="mx-auto mb-2 hidden rounded-md p-1.5 text-ink-400 transition hover:bg-ink-100 hover:text-ink-700 lg:block"
-        aria-label="Expand sidebar"
-    >
-        <x-icon name="panel-left-open" class="h-[18px] w-[18px]" />
-    </button>
-
-    <nav class="flex-1 space-y-1 overflow-y-auto px-3 pb-4 pt-2">
+    <nav class="flex-1 overflow-y-auto overscroll-contain px-3 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" @scroll="tip.show = false">
         @foreach ($groups as $group)
             @php
                 $visibleItems = array_values(array_filter(
@@ -261,12 +264,13 @@
                             } catch (e) {}
                         },
                     }"
+                    class="py-0.5"
                 >
                     <button
                         type="button"
                         @click="toggle()"
-                        x-show="! collapsed"
-                        class="flex w-full items-center justify-between rounded-md px-3 pb-1.5 pt-3 text-[11px] font-bold uppercase tracking-[0.08em] text-ink-400 transition hover:text-ink-700"
+                        x-show="! rail"
+                        class="flex w-full items-center justify-between rounded-full px-3 pb-1.5 pt-3 text-[11px] font-bold uppercase tracking-[0.1em] text-ink-400 transition hover:text-ink-700"
                     >
                         <span>{{ $group['label'] }}</span>
                         <x-icon
@@ -275,34 +279,36 @@
                             x-bind:class="open ? 'rotate-180' : ''"
                         />
                     </button>
-                    <div x-show="collapsed" x-cloak class="mx-auto my-2 hidden h-px w-8 bg-ink-200 lg:block"></div>
+                    @unless ($loop->first)
+                        <div x-show="rail" x-cloak class="mx-auto my-2 h-1 w-1 rounded-full bg-ink-300"></div>
+                    @endunless
 
-                    <div x-show="open || collapsed" x-cloak class="space-y-0.5">
+                    <div x-show="open || rail" x-cloak class="space-y-1">
                         @foreach ($visibleItems as $item)
                             @php $isActive = request()->routeIs($item['active'] ?? $item['route'].'*'); @endphp
                             <a
                                 href="{{ route($item['route']) }}"
                                 wire:navigate
-                                title="{{ $item['label'] }}"
+                                aria-label="{{ $item['label'] }}"
+                                @if ($isActive) aria-current="page" @endif
+                                @mouseenter="showTip($el, @js($item['label']))"
+                                @mouseleave="tip.show = false"
                                 @class([
-                                    'relative flex items-center gap-3 rounded-lg px-3 py-2 text-[13.5px] transition-colors',
-                                    'bg-accent-50 font-semibold text-ink-900' => $isActive,
-                                    'font-medium text-ink-600 hover:bg-ink-50 hover:text-ink-900' => ! $isActive,
+                                    'group/nav flex items-center rounded-full text-[13.5px] transition-colors',
+                                    'bg-charcoal font-semibold text-white dark:bg-accent-500 dark:text-charcoal' => $isActive,
+                                    'font-medium text-ink-600 hover:bg-ink-100 hover:text-ink-900' => ! $isActive,
                                 ])
-                                :class="collapsed ? 'lg:justify-center lg:px-0' : ''"
+                                :class="rail ? 'mx-auto h-11 w-11 justify-center' : 'gap-3 px-3.5 py-2.5'"
                             >
-                                @if ($isActive)
-                                    <span class="absolute inset-y-1.5 left-0 w-[3px] rounded-r-full bg-accent-500"></span>
-                                @endif
                                 <x-icon
                                     :name="$item['icon']"
                                     @class([
                                         'h-[18px] w-[18px] shrink-0',
-                                        'text-accent-600' => $isActive,
-                                        'text-ink-400' => ! $isActive,
+                                        'text-accent-500 dark:text-charcoal' => $isActive,
+                                        'text-ink-400 group-hover/nav:text-ink-700' => ! $isActive,
                                     ])
                                 />
-                                <span class="truncate" :class="collapsed ? 'lg:hidden' : ''">{{ $item['label'] }}</span>
+                                <span class="truncate" x-show="! rail">{{ $item['label'] }}</span>
                             </a>
                         @endforeach
                     </div>
@@ -311,22 +317,22 @@
         @endforeach
     </nav>
 
-    <div class="border-t border-ink-200 p-3">
-        <div class="flex items-center gap-3 rounded-lg p-2" :class="collapsed ? 'lg:justify-center lg:p-0 lg:py-2' : ''">
-            <div class="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-charcoal text-xs font-bold text-accent-500 dark:bg-accent-500 dark:text-charcoal">
-                {{ strtoupper(substr(auth()->user()->name ?? '?', 0, 1)) }}
-                <span class="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-success-500 ring-2 ring-surface"></span>
-            </div>
-            <div class="min-w-0 flex-1" :class="collapsed ? 'lg:hidden' : ''">
-                <p class="truncate text-sm font-semibold text-ink-900">{{ auth()->user()->name }}</p>
-                <p class="truncate text-xs text-ink-500">{{ auth()->user()->getRoleNames()->first() ?? 'User' }}</p>
-            </div>
-            <form method="POST" action="{{ route('logout') }}" :class="collapsed ? 'lg:hidden' : ''">
-                @csrf
-                <button type="submit" title="Log out" class="rounded-md p-1.5 text-ink-400 transition hover:bg-danger-50 hover:text-danger-600" aria-label="Log out">
-                    <x-icon name="log-out" class="h-[18px] w-[18px]" />
-                </button>
-            </form>
+    {{-- Appearance toggle, in the brand gold (the reference's accent circle). --}}
+    <div class="shrink-0 p-3" :class="rail ? 'flex justify-center' : ''">
+        <div class="flex items-center gap-3" :class="rail ? '' : 'rounded-full bg-ink-50 p-1.5 pr-4'">
+            <x-theme-toggle class="!h-11 !w-11 !border-0 !bg-accent-500 !text-charcoal hover:!bg-accent-400" />
+            <span x-show="! rail" class="text-sm font-medium text-ink-600">Appearance</span>
         </div>
     </div>
+
+    <template x-teleport="body">
+        <div
+            x-show="tip.show && rail"
+            x-cloak
+            x-transition.opacity.duration.100ms
+            :style="`top: ${tip.top}px; left: ${tip.left}px`"
+            class="pointer-events-none fixed z-[60] -translate-y-1/2 whitespace-nowrap rounded-full bg-charcoal px-3 py-1.5 text-xs font-semibold text-white shadow-lg dark:bg-accent-500 dark:text-charcoal"
+            x-text="tip.label"
+        ></div>
+    </template>
 </aside>

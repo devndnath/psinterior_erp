@@ -19,10 +19,9 @@
 --}}
 @props(['title', 'description' => null])
 
-{{-- Minimalist redesign pass: a hairline bottom border separates the
-     header from the content below it on every page that uses this
-     component, instead of relying on margin alone to imply the break. --}}
-<div {{ $attributes->merge(['class' => 'mb-7 border-b border-ink-100 pb-5']) }}>
+{{-- Soft-canvas pass: no divider — the title sits on the canvas and the
+     rounded cards below carry the structure, as in the reference. --}}
+<div {{ $attributes->merge(['class' => 'mb-6']) }}>
     @isset($breadcrumbs)
         <div class="mb-4">{{ $breadcrumbs }}</div>
     @endisset

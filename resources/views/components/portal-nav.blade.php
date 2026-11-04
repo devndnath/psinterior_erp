@@ -48,6 +48,6 @@
 --}}
 <nav {{ $attributes->merge(['class' => 'flex-wrap items-center overflow-x-auto font-medium text-gray-600']) }}>
     @foreach ($links as $link)
-        <a href="{{ route($link['route']) }}" wire:navigate class="shrink-0 hover:text-brand-600">{{ $link['label'] }}</a>
+        <a href="{{ route($link['route']) }}" wire:navigate @class(['shrink-0 rounded-full px-3.5 py-2 transition-colors', 'bg-charcoal text-white dark:bg-accent-500 dark:text-charcoal' => request()->routeIs($link['route'].'*'), 'hover:bg-ink-100 hover:text-ink-900' => ! request()->routeIs($link['route'].'*')])>{{ $link['label'] }}</a>
     @endforeach
 </nav>

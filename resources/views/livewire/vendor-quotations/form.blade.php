@@ -7,7 +7,7 @@
         <div class="card grid grid-cols-1 sm:grid-cols-2 gap-4 p-6">
             <div class="col-span-2">
                 <label class="form-label">Vendor *</label>
-                <select wire:model="vendor_id" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                <select wire:model="vendor_id" class="field-input">
                     <option value="">Select…</option>
                     @foreach ($vendors as $v)
                         <option value="{{ $v->id }}">{{ $v->company_name }}</option>
@@ -27,7 +27,7 @@
                 @foreach ($items as $index => $item)
                     <div wire:key="vq-item-{{ $index }}" class="grid grid-cols-1 md:grid-cols-12 gap-2 rounded-lg border border-gray-100 p-3">
                         <div class="col-span-6">
-                            <select wire:model="items.{{ $index }}.product_id" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                            <select wire:model="items.{{ $index }}.product_id" class="field-input">
                                 <option value="">Select a product…</option>
                                 @foreach ($products as $product)
                                     <option value="{{ $product->id }}">{{ $product->name }} ({{ $product->sku }})</option>
@@ -36,11 +36,11 @@
                             @error("items.{$index}.product_id") <p class="form-error">{{ $message }}</p> @enderror
                         </div>
                         <div class="col-span-2">
-                            <input wire:model="items.{{ $index }}.qty" type="number" step="0.01" placeholder="Qty" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                            <input wire:model="items.{{ $index }}.qty" type="number" step="0.01" placeholder="Qty" class="field-input">
                             @error("items.{$index}.qty") <p class="form-error">{{ $message }}</p> @enderror
                         </div>
                         <div class="col-span-3">
-                            <input wire:model="items.{{ $index }}.rate" type="number" step="0.01" placeholder="Rate" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                            <input wire:model="items.{{ $index }}.rate" type="number" step="0.01" placeholder="Rate" class="field-input">
                             @error("items.{$index}.rate") <p class="form-error">{{ $message }}</p> @enderror
                         </div>
                         <div class="col-span-1 flex items-center justify-end">

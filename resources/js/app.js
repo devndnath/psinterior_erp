@@ -32,6 +32,9 @@ window.psChartTheme = function () {
         dark,
         income: dark ? '#12A372' : '#059669', // brand emerald
         expense: dark ? '#BD8A00' : '#C68F00', // brand gold, chart step
+        expenseFill: dark ? 'rgba(189, 138, 0, 0.16)' : 'rgba(198, 143, 0, 0.12)', // area under the expense line
+        tooltipBg: dark ? '#F5F5F0' : '#20241F', // brand charcoal pill (inverted in dark)
+        tooltipText: dark ? '#20241F' : '#FFFFFF',
         single: dark ? '#BD8A00' : '#C68F00', // single-series charts
         text: css('--color-ink-500'),
         grid: css('--color-ink-100'),

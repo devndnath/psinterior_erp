@@ -9,7 +9,7 @@
         <div class="card grid grid-cols-1 gap-4 p-6">
             <div>
                 <label class="form-label">Name *</label>
-                <input wire:model="name" type="text" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                <input wire:model="name" type="text" class="field-input">
                 @error('name') <p class="form-error">{{ $message }}</p> @enderror
             </div>
             <label class="flex items-center gap-2">

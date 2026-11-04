@@ -12,17 +12,17 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
-<body class="h-full font-sans antialiased">
+<body class="app-canvas h-full font-sans antialiased">
     <div class="flex min-h-full flex-col items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
         <div class="w-full max-w-sm">
             <div class="mb-8 flex flex-col items-center">
-                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-500 text-xl font-bold text-charcoal">
+                <div class="flex h-14 w-14 items-center justify-center rounded-full bg-charcoal text-lg font-extrabold text-accent-500 ring-4 ring-surface dark:bg-accent-500 dark:text-charcoal dark:ring-white/5">
                     {{ substr(config('app.name'), 0, 1) }}
                 </div>
                 <h1 class="mt-4 text-xl font-semibold text-gray-900">{{ config('app.name') }}</h1>
             </div>
 
-            <div class="card p-6">
+            <div class="card p-7 sm:p-8">
                 {{ $slot }}
             </div>
         </div>

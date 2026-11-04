@@ -75,11 +75,11 @@
  * readable (deep gold on white, bright gold on dark).
  */
 :root {
-    --color-paper: 244 243 238; /* #F4F3EE */
+    --color-paper: 238 237 232; /* #EEEDE8 soft canvas */
     --color-surface: 255 255 255;
     --color-ink-50: 247 246 243;
     --color-ink-100: 238 237 232;
-    --color-ink-200: 223 221 213; /* border */
+    --color-ink-200: 229 227 220; /* hairline border */
     --color-ink-300: 198 195 184;
     --color-ink-400: 156 152 140;
     --color-ink-500: 117 113 106; /* secondary text */
@@ -101,7 +101,7 @@
 }
 
 :root.dark {
-    --color-paper: 17 18 15;
+    --color-paper: 15 16 13;
     --color-surface: 27 29 25; /* #1B1D19 */
     --color-ink-50: 35 37 32;
     --color-ink-100: 44 46 40;
@@ -126,6 +126,24 @@
     --color-accent-900: 254 245 214;
 }
 
+/*
+ * Soft-canvas theme: the page background is a quiet warm gray with two
+ * faint light washes (brand gold top-right, charcoal bottom-left), so the
+ * white cards and the floating sidebar pill lift off it without shadows.
+ */
+.app-canvas {
+    background-color: rgb(var(--color-paper));
+    background-image:
+        radial-gradient(1100px 520px at 88% -8%, rgb(244 180 0 / 0.10), transparent 62%),
+        radial-gradient(900px 560px at -6% 108%, rgb(32 36 31 / 0.06), transparent 60%);
+    background-attachment: fixed;
+}
+:root.dark .app-canvas {
+    background-image:
+        radial-gradient(1100px 520px at 88% -8%, rgb(244 180 0 / 0.07), transparent 62%),
+        radial-gradient(900px 560px at -6% 108%, rgb(255 255 255 / 0.03), transparent 60%);
+}
+
 @layer components {
     /* Premium-SaaS redesign pass: back to a subtle rounded-lg radius
        (the spec explicitly asks for "subtle rather than excessively
@@ -134,13 +152,13 @@
        Linear/Notion/Stripe-style buttons carry their own weight from
        color and don't lean on a shadow for emphasis. */
     .btn {
-        @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100;
+        @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100;
     }
     .btn-primary {
         @apply btn bg-accent-500 font-semibold text-charcoal hover:bg-accent-400 focus:ring-accent-500;
     }
     .btn-secondary {
-        @apply btn border border-ink-200 bg-surface text-ink-700 hover:border-ink-300 hover:bg-ink-50 focus:ring-accent-500;
+        @apply btn border border-ink-200 bg-surface text-ink-800 hover:border-ink-300 hover:bg-ink-50 focus:ring-accent-500;
     }
     .btn-danger {
         @apply btn bg-danger-600 text-white hover:bg-danger-700 focus:ring-danger-500;
@@ -159,7 +177,7 @@
        (see :root/:root.dark above), so this stays correctly subtle in
        both themes with no extra dark: overrides needed here. */
     .card {
-        @apply rounded-xl border border-ink-200 bg-surface;
+        @apply rounded-3xl border border-ink-200/70 bg-surface shadow-[0_1px_2px_rgba(32,36,31,0.04)] dark:border-white/[0.06] dark:shadow-none;
     }
     .badge {
         @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ring-black/[0.04] dark:ring-white/[0.06];
@@ -180,14 +198,14 @@
        Stripe-inspired look this pass is after, which leans on weight and
        tracking for hierarchy instead of a second typeface. */
     .page-title {
-        @apply font-sans text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl;
+        @apply font-sans text-2xl font-semibold tracking-tight text-ink-900 sm:text-[28px];
     }
 
     /* Primary content-area surface. Premium-SaaS redesign pass: same
        border-based treatment as .card above, replacing the round-2
        floating-shadow look — see .card's comment for the reasoning. */
     .panel {
-        @apply rounded-xl border border-ink-200 bg-surface transition-colors duration-150;
+        @apply rounded-3xl border border-ink-200/70 bg-surface shadow-[0_1px_2px_rgba(32,36,31,0.04)] transition-colors duration-150 dark:border-white/[0.06] dark:shadow-none;
     }
 
     /* Shared input chrome for <x-input>/<x-select>/<x-textarea>.
@@ -200,7 +218,7 @@
        border+shadow, and avoids a second broad reflow of every form's
        vertical rhythm in the same pass as the grid responsiveness fix. */
     .field-input {
-        @apply block w-full rounded-lg border-ink-200 bg-surface px-3 py-2.5 text-base text-ink-900 placeholder:text-ink-400 shadow-sm transition-colors focus:border-accent-500 focus:ring-accent-500 sm:text-sm;
+        @apply block w-full rounded-full border-ink-200 bg-surface px-4 py-2.5 text-base text-ink-900 placeholder:text-ink-400 shadow-none transition-colors focus:border-accent-500 focus:ring-2 focus:ring-accent-500/30 sm:text-sm;
     }
 
     /* Table chrome for <x-table>. Airier padding and a quieter header than
@@ -209,27 +227,55 @@
         @apply min-w-full divide-y divide-ink-100;
     }
     .table-base thead {
-        @apply bg-ink-50/60;
+        @apply bg-ink-50/70;
     }
     .table-base thead th {
-        @apply px-4 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-500;
+        @apply px-5 py-3.5 text-left text-xs font-semibold text-ink-500 first:pl-6 last:pr-6;
     }
     .table-base tbody {
         @apply divide-y divide-ink-100 bg-surface;
     }
     .table-base tbody tr {
-        @apply transition-colors hover:bg-accent-50/40 dark:hover:bg-accent-500/10;
+        @apply transition-colors hover:bg-ink-50/80;
     }
     .table-base tbody td {
-        @apply px-4 py-3.5 text-sm text-ink-700;
+        @apply px-5 py-3.5 text-sm text-ink-700 first:pl-6 last:pr-6;
     }
 
     /* Phase 5 (premium-SaaS redesign): menu-item chrome for
        components/dropdown.blade.php's row-action panel. */
     .dropdown-item {
-        @apply block w-full px-3 py-2 text-left text-sm text-ink-700 transition-colors hover:bg-ink-50;
+        @apply block w-full rounded-xl px-3 py-2 text-left text-sm text-ink-700 transition-colors hover:bg-ink-50;
     }
     .dropdown-item-danger {
         @apply dropdown-item text-danger-600 hover:bg-danger-50;
+    }
+
+    /* ---- Soft-canvas theme pass ------------------------------------
+       Floating-pill navigation, rounded cards and pill controls (the
+       "soft analytics" look), in the PS Solution gold + charcoal. ---- */
+
+    /* Multi-line fields can't be pills — keep them softly rounded. */
+    textarea.field-input,
+    select[multiple].field-input {
+        @apply rounded-2xl;
+    }
+
+    /* Card heading, e.g. "Revenue Trend". */
+    .section-title {
+        @apply text-[15px] font-semibold tracking-tight text-ink-900;
+    }
+    .section-sub {
+        @apply mt-0.5 text-xs text-ink-500;
+    }
+
+    /* Round icon button (topbar utilities, card menus). */
+    .icon-btn {
+        @apply inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-ink-200/80 bg-surface text-ink-600 transition hover:border-ink-300 hover:text-ink-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-500;
+    }
+
+    /* Small outlined pill label, e.g. "Last 6 months". */
+    .chip {
+        @apply inline-flex items-center gap-1.5 rounded-full border border-ink-200 bg-surface px-3 py-1 text-xs font-medium text-ink-600;
     }
 }

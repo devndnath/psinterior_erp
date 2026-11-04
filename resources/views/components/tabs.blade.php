@@ -21,14 +21,14 @@
 
 @php($active = $active ?? array_key_first($tabs))
 
-<div class="border-b border-ink-200">
-    <nav class="-mb-px flex gap-6 overflow-x-auto" aria-label="Tabs">
+<div class="-mx-1 overflow-x-auto px-1 pb-1">
+    <nav class="inline-flex gap-1 rounded-full border border-ink-200/70 bg-surface p-1" aria-label="Tabs">
         @foreach ($tabs as $key => $label)
             <button
                 type="button"
                 @click="tab = '{{ $key }}'"
-                :class="tab === '{{ $key }}' ? 'border-accent-600 text-accent-600' : 'border-transparent text-ink-500 hover:border-ink-300 hover:text-ink-700'"
-                class="whitespace-nowrap border-b-2 px-1 py-3 text-sm font-medium transition-colors"
+                :class="tab === '{{ $key }}' ? 'bg-charcoal text-white dark:bg-accent-500 dark:text-charcoal' : 'text-ink-500 hover:bg-ink-50 hover:text-ink-900'"
+                class="whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors"
             >
                 {{ $label }}
             </button>

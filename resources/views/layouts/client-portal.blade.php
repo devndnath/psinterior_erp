@@ -30,7 +30,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
-<body class="h-full font-sans antialiased">
+<body class="app-canvas h-full font-sans antialiased">
     {{--
         A deliberately simpler, visually distinct shell from
         layouts/admin.blade.php — a top nav bar, no sidebar, a muted
@@ -38,15 +38,15 @@
         the staff admin area. No notification bell here (Phase 11 scope:
         staff-side only).
     --}}
-    <header class="border-b border-gray-200 bg-surface">
-        <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+    <header class="px-3 pt-3 sm:px-6">
+        <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 rounded-full border border-ink-200/70 bg-surface py-2 pl-2 pr-2 shadow-[0_1px_2px_rgba(32,36,31,0.04)] dark:border-white/[0.06] sm:pr-3">
             <div class="flex items-center gap-3">
-                <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-500 text-sm font-bold text-charcoal">
+                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-charcoal text-sm font-extrabold text-accent-500 dark:bg-accent-500 dark:text-charcoal">
                     {{ substr(config('app.name'), 0, 1) }}
                 </div>
                 <span class="text-sm font-semibold text-gray-900">Client Portal</span>
             </div>
-            <x-portal-nav guard="client" class="hidden gap-5 text-sm sm:flex" />
+            <x-portal-nav guard="client" class="hidden gap-1 text-sm sm:flex" />
             <div class="flex items-center gap-3">
                 <span class="hidden text-sm text-gray-500 sm:inline">{{ auth('client')->user()->name }}</span>
                 <x-theme-toggle />
@@ -56,7 +56,7 @@
                 </form>
             </div>
         </div>
-        <x-portal-nav guard="client" class="flex gap-4 border-t border-gray-100 px-4 py-2 text-xs sm:hidden" />
+        <x-portal-nav guard="client" class="mx-auto mt-2 flex gap-1 text-xs sm:hidden" />
     </header>
 
     <main class="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">

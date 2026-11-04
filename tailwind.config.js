@@ -175,7 +175,10 @@ export default {
                 sm: '6px',
                 DEFAULT: '8px',
                 md: '8px',
-                lg: '12px',
+                lg: '14px',
+                xl: '18px',
+                '2xl': '22px',
+                '3xl': '28px',
             },
             // `soft` (the ERES-demo-inspired floating shadow from UI/UX
             // round 2) is kept defined — a couple of one-off decorative

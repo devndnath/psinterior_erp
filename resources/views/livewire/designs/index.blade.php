@@ -16,11 +16,11 @@
     <div class="card mb-4 flex flex-wrap items-end gap-4 p-4">
         <div class="min-w-[220px] flex-1">
             <label class="form-label">Search</label>
-            <input wire:model.live.debounce.400ms="search" type="text" placeholder="Design no, title…" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+            <input wire:model.live.debounce.400ms="search" type="text" placeholder="Design no, title…" class="field-input">
         </div>
         <div>
             <label class="form-label">Project</label>
-            <select wire:model.live="project" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+            <select wire:model.live="project" class="field-input">
                 <option value="">Any project</option>
                 @foreach ($projects as $proj)
                     <option value="{{ $proj->id }}">{{ $proj->project_code }} — {{ $proj->name }}</option>
@@ -29,7 +29,7 @@
         </div>
         <div>
             <label class="form-label">Category</label>
-            <select wire:model.live="category" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+            <select wire:model.live="category" class="field-input">
                 <option value="">Any category</option>
                 @foreach ($categories as $value => $label)
                     <option value="{{ $value }}">{{ $label }}</option>
@@ -38,7 +38,7 @@
         </div>
         <div>
             <label class="form-label">Status</label>
-            <select wire:model.live="status" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+            <select wire:model.live="status" class="field-input">
                 <option value="">Any status</option>
                 @foreach ($statuses as $value => $label)
                     <option value="{{ $value }}">{{ $label }}</option>

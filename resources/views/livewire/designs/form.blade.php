@@ -9,7 +9,7 @@
         <div class="card grid grid-cols-1 sm:grid-cols-2 gap-4 p-6">
             <div class="col-span-2">
                 <label class="form-label">Project *</label>
-                <select wire:model="project_id" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                <select wire:model="project_id" class="field-input">
                     <option value="">Select…</option>
                     @foreach ($projects as $proj)
                         <option value="{{ $proj->id }}">{{ $proj->project_code }} — {{ $proj->name }}</option>
@@ -19,12 +19,12 @@
             </div>
             <div class="col-span-2">
                 <label class="form-label">Title *</label>
-                <input wire:model="title" type="text" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                <input wire:model="title" type="text" class="field-input">
                 @error('title') <p class="form-error">{{ $message }}</p> @enderror
             </div>
             <div>
                 <label class="form-label">Category</label>
-                <select wire:model="category" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                <select wire:model="category" class="field-input">
                     <option value="">None</option>
                     @foreach ($categories as $value => $label)
                         <option value="{{ $value }}">{{ $label }}</option>
@@ -34,7 +34,7 @@
             </div>
             <div class="col-span-2">
                 <label class="form-label">Description</label>
-                <textarea wire:model="description" rows="3" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm"></textarea>
+                <textarea wire:model="description" rows="3" class="field-input"></textarea>
                 @error('description') <p class="form-error">{{ $message }}</p> @enderror
             </div>
         </div>
@@ -43,7 +43,7 @@
             <div class="card p-6">
                 <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">First revision</h2>
                 <label class="form-label">File *</label>
-                <input wire:model="file" type="file" class="block w-full text-sm text-gray-600 file:mr-4 file:rounded-lg file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand-700 hover:file:bg-brand-100">
+                <input wire:model="file" type="file" class="block w-full text-sm text-gray-600 file:mr-4 file:rounded-full file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand-700 hover:file:bg-brand-100">
                 @error('file') <p class="form-error">{{ $message }}</p> @enderror
                 <div wire:loading wire:target="file" class="mt-2 text-xs text-gray-400">Uploading…</div>
                 <p class="mt-3 text-xs text-gray-400">Every design needs a first file — later revisions are added from the design's page.</p>

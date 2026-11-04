@@ -6,14 +6,14 @@
         <div>
             <label for="email" class="form-label">Email</label>
             <input wire:model="email" id="email" type="email" autofocus autocomplete="username"
-                   class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                   class="field-input">
             @error('email') <p class="form-error">{{ $message }}</p> @enderror
         </div>
 
         <div>
             <label for="password" class="form-label">Password</label>
             <input wire:model="password" id="password" type="password" autocomplete="current-password"
-                   class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                   class="field-input">
             @error('password') <p class="form-error">{{ $message }}</p> @enderror
         </div>
 
