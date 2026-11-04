@@ -276,6 +276,7 @@ class UserRoleDepartmentManagementTest extends TestCase
             ->call('deleteDepartment', $department->id)
             ->assertHasNoErrors();
 
-        $this->assertNull($department->fresh());
+        // Departments soft-delete; fresh() ignores the SoftDeletes scope.
+        $this->assertSoftDeleted($department);
     }
 }

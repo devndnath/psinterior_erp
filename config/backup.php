@@ -88,7 +88,11 @@ return [
         'notifiable' => \Spatie\Backup\Notifications\Notifiable::class,
 
         'mail' => [
-            'to' => env('BACKUP_NOTIFICATION_EMAIL'),
+            // spatie/laravel-backup validates this address when the app
+            // boots, so a blank BACKUP_NOTIFICATION_EMAIL (as .env.example
+            // ships) would break every request and artisan command. Fall
+            // back to the mail-from address until one is configured.
+            'to' => env('BACKUP_NOTIFICATION_EMAIL') ?: env('MAIL_FROM_ADDRESS', 'hello@example.com'),
 
             'from' => [
                 'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),

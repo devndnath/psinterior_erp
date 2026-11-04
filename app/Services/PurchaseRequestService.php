@@ -49,7 +49,7 @@ class PurchaseRequestService
 
         return DB::transaction(function () use ($pr, $data, $items) {
             $pr->update([
-                'requested_by' => $data['requested_by'] ?? $pr->requested_by,
+                'requested_by' => array_key_exists('requested_by', $data) ? $data['requested_by'] : $pr->requested_by,
             ]);
 
             $this->syncItems($pr, $items);

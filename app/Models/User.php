@@ -47,6 +47,20 @@ class User extends Authenticatable
         'email_verified_at',
     ];
 
+    /**
+     * Nullable columns defaulted on the model too, so a User built in
+     * memory (factory, User::create() without these keys) carries them.
+     * Strict mode throws on reading an attribute the instance doesn't
+     * hold, and LogsLastActivity / CompanyScope read last_login_at and
+     * company_id on every authenticated request.
+     */
+    protected $attributes = [
+        'company_id' => null,
+        'phone' => null,
+        'avatar_path' => null,
+        'last_login_at' => null,
+    ];
+
     protected $hidden = [
         'password',
         'remember_token',

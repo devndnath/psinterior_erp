@@ -42,15 +42,15 @@ class MeetingService
     {
         return DB::transaction(function () use ($meeting, $data, $participantRefs) {
             $meeting->update([
-                'project_id' => $data['project_id'] ?? $meeting->project_id,
-                'type' => $data['type'] ?? $meeting->type->value,
-                'date' => $data['date'] ?? $meeting->date,
-                'time' => $data['time'] ?? $meeting->time,
-                'location' => $data['location'] ?? $meeting->location,
-                'agenda' => $data['agenda'] ?? $meeting->agenda,
-                'discussion' => $data['discussion'] ?? $meeting->discussion,
-                'decisions' => $data['decisions'] ?? $meeting->decisions,
-                'follow_up' => $data['follow_up'] ?? $meeting->follow_up,
+                'project_id' => array_key_exists('project_id', $data) ? $data['project_id'] : $meeting->project_id,
+                'type' => array_key_exists('type', $data) ? $data['type'] : $meeting->type->value,
+                'date' => array_key_exists('date', $data) ? $data['date'] : $meeting->date,
+                'time' => array_key_exists('time', $data) ? $data['time'] : $meeting->time,
+                'location' => array_key_exists('location', $data) ? $data['location'] : $meeting->location,
+                'agenda' => array_key_exists('agenda', $data) ? $data['agenda'] : $meeting->agenda,
+                'discussion' => array_key_exists('discussion', $data) ? $data['discussion'] : $meeting->discussion,
+                'decisions' => array_key_exists('decisions', $data) ? $data['decisions'] : $meeting->decisions,
+                'follow_up' => array_key_exists('follow_up', $data) ? $data['follow_up'] : $meeting->follow_up,
             ]);
 
             $this->syncParticipants($meeting, $participantRefs);

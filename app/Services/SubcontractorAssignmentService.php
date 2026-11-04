@@ -20,8 +20,8 @@ class SubcontractorAssignmentService
     public function update(SubcontractorAssignment $assignment, array $data): SubcontractorAssignment
     {
         $assignment->update([
-            'work_description' => $data['work_description'] ?? $assignment->work_description,
-            'rate' => $data['rate'] ?? $assignment->rate,
+            'work_description' => array_key_exists('work_description', $data) ? $data['work_description'] : $assignment->work_description,
+            'rate' => array_key_exists('rate', $data) ? $data['rate'] : $assignment->rate,
         ]);
 
         return $assignment->fresh();

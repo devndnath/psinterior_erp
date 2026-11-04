@@ -44,8 +44,12 @@ class PermissionGatingTest extends TestCase
         $admin = User::factory()->create();
         $admin->assignRole('super-admin');
 
-        // Deliberately does NOT hold manage_settings directly — the
-        // Gate::before bypass must grant it anyway.
+        // RolePermissionSeeder grants super-admin every permission, so
+        // take this one away first: the Gate::before bypass must still
+        // grant it.
+        \Spatie\Permission\Models\Role::findByName('super-admin', 'web')->revokePermissionTo('manage_settings');
+        $admin->refresh();
+
         $this->assertFalse($admin->hasPermissionTo('manage_settings'));
         $this->actingAs($admin)->get('/settings')->assertOk();
     }

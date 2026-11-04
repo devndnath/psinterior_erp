@@ -31,7 +31,7 @@ class SanitizeUtf8InputTest extends TestCase
         // json_encode() itself would refuse to encode the invalid string.
         $request->headers->set('Content-Type', 'application/json');
         $jsonBag = $request->json();
-        $jsonBag->set('items.0.description', $invalid);
+        $jsonBag->set('items', [['description' => $invalid]]);
 
         $this->assertFalse(mb_check_encoding($invalid, 'UTF-8'));
 
@@ -52,7 +52,7 @@ class SanitizeUtf8InputTest extends TestCase
 
         $request = Request::create('/livewire/update', 'POST');
         $request->headers->set('Content-Type', 'application/json');
-        $request->json()->set('items.0.description', $bengali);
+        $request->json()->set('items', [['description' => $bengali]]);
 
         $middleware = new SanitizeUtf8Input;
         $middleware->handle($request, function (Request $req) use ($bengali) {

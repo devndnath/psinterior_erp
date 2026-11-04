@@ -41,11 +41,11 @@ class InspectionService
     {
         return DB::transaction(function () use ($inspection, $data, $items) {
             $inspection->update([
-                'area' => $data['area'] ?? $inspection->area,
-                'inspection_date' => $data['inspection_date'] ?? $inspection->inspection_date,
-                'inspector_id' => $data['inspector_id'] ?? $inspection->inspector_id,
-                'notes' => $data['notes'] ?? $inspection->notes,
-                'result' => $data['result'] ?? $inspection->result->value,
+                'area' => array_key_exists('area', $data) ? $data['area'] : $inspection->area,
+                'inspection_date' => array_key_exists('inspection_date', $data) ? $data['inspection_date'] : $inspection->inspection_date,
+                'inspector_id' => array_key_exists('inspector_id', $data) ? $data['inspector_id'] : $inspection->inspector_id,
+                'notes' => array_key_exists('notes', $data) ? $data['notes'] : $inspection->notes,
+                'result' => array_key_exists('result', $data) ? $data['result'] : $inspection->result->value,
             ]);
 
             $this->syncItems($inspection, $items);
@@ -78,7 +78,11 @@ class InspectionService
      */
     protected function recalculateResult(Inspection $inspection): void
     {
-        $results = $inspection->items()->pluck('result');
+        // pluck() applies the model's enum cast, so normalise to raw
+        // values before comparing (a loose enum-vs-string contains()
+        // never matches, which left every inspection "Passed").
+        $results = $inspection->items()->pluck('result')
+            ->map(fn ($r) => $r instanceof InspectionResult ? $r->value : $r);
 
         $overall = match (true) {
             $results->contains(InspectionResult::Failed->value) => InspectionResult::Failed,

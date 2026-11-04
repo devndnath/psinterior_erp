@@ -128,11 +128,12 @@ class LeadTest extends TestCase
     public function test_lead_list_can_be_filtered_by_status(): void
     {
         Lead::factory()->create(['status' => LeadStatus::Won->value, 'name' => 'Won Lead']);
-        Lead::factory()->create(['status' => LeadStatus::New->value, 'name' => 'New Lead']);
+        // Not "New Lead": the page's own "+ New Lead" button would match.
+        Lead::factory()->create(['status' => LeadStatus::New->value, 'name' => 'Fresh Prospect']);
 
         Livewire::actingAs($this->staff)->test(LeadIndex::class)
             ->set('status', LeadStatus::Won->value)
             ->assertSee('Won Lead')
-            ->assertDontSee('New Lead');
+            ->assertDontSee('Fresh Prospect');
     }
 }

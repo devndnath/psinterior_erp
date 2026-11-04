@@ -46,6 +46,10 @@ class StockTransferService
 
     public function ship(StockTransfer $transfer): StockTransfer
     {
+        if ($transfer->status !== StockTransferStatus::Pending) {
+            throw new \RuntimeException('Only a pending stock transfer can be shipped.');
+        }
+
         $transfer->update(['status' => StockTransferStatus::InTransit->value]);
 
         return $transfer->fresh();
@@ -62,6 +66,15 @@ class StockTransferService
     public function complete(StockTransfer $transfer, ?int $userId = null): StockTransfer
     {
         return DB::transaction(function () use ($transfer, $userId) {
+            // Re-read the status under a row lock so a double-click (or two
+            // users completing at once) can't move the same stock twice.
+            $current = StockTransfer::whereKey($transfer->getKey())->lockForUpdate()->value('status');
+            $current = $current instanceof StockTransferStatus ? $current : StockTransferStatus::from($current);
+
+            if (! in_array($current, [StockTransferStatus::Pending, StockTransferStatus::InTransit], true)) {
+                throw new \RuntimeException("This stock transfer is already {$current->label()} and cannot be completed.");
+            }
+
             $transfer->load(['items.product', 'fromWarehouse', 'toWarehouse']);
 
             foreach ($transfer->items as $item) {
@@ -99,6 +112,10 @@ class StockTransferService
     {
         if ($transfer->status === StockTransferStatus::Completed) {
             throw new \RuntimeException('A completed stock transfer cannot be cancelled.');
+        }
+
+        if ($transfer->status === StockTransferStatus::Cancelled) {
+            throw new \RuntimeException('This stock transfer is already cancelled.');
         }
 
         $transfer->update(['status' => StockTransferStatus::Cancelled->value]);

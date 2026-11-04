@@ -37,7 +37,14 @@ class FlagOverdueInvoices extends Command
             return self::SUCCESS;
         }
 
-        $financeUsers = User::permission('view_finance')->get();
+        // User::permission() throws if the permission row doesn't exist
+        // (e.g. roles not seeded yet); the overdue flagging itself must
+        // still run, so fall back to notifying only project managers.
+        try {
+            $financeUsers = User::permission('view_finance')->get();
+        } catch (\Spatie\Permission\Exceptions\PermissionDoesNotExist) {
+            $financeUsers = collect();
+        }
 
         foreach ($invoices as $invoice) {
             $invoice->update(['status' => InvoiceStatus::Overdue->value]);

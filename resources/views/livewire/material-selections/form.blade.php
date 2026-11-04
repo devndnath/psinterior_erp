@@ -8,7 +8,7 @@
     <form wire:submit="save" class="max-w-2xl space-y-6">
         <div class="panel grid grid-cols-1 sm:grid-cols-2 gap-4 p-6">
             <div class="col-span-2">
-                <x-select label="Project *" name="project_id" wire:model="project_id" @disabled($board) class="disabled:bg-ink-50">
+                <x-select label="Project *" name="project_id" wire:model="project_id" :disabled="(bool) $board" class="disabled:bg-ink-50">
                     <option value="">Select…</option>
                     @foreach ($projects as $proj)
                         <option value="{{ $proj->id }}">{{ $proj->project_code }} — {{ $proj->name }}</option>

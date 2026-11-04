@@ -46,14 +46,50 @@ class BoqService
     {
         return DB::transaction(function () use ($boq, $data, $items) {
             $boq->update([
-                'discount' => $data['discount'] ?? $boq->discount,
-                'tax' => $data['tax'] ?? $boq->tax,
+                'discount' => array_key_exists('discount', $data) ? $data['discount'] : $boq->discount,
+                'tax' => array_key_exists('tax', $data) ? $data['tax'] : $boq->tax,
             ]);
 
             $this->syncItems($boq, $items);
             $this->recalculateTotals($boq);
 
             return $boq->fresh(['items']);
+        });
+    }
+
+    /**
+     * "Create New Version" from a BOQ's Show page: copies its items into
+     * a fresh Draft on the same project and, per the Phase 5 spec, the
+     * BOQ it was copied from is Superseded if it was the Active one —
+     * the new draft becomes the working version until it is activated.
+     */
+    public function createNewVersion(Boq $source): Boq
+    {
+        return DB::transaction(function () use ($source) {
+            $source->loadMissing('items', 'project');
+
+            $items = $source->items->map(fn ($item) => [
+                'item' => $item->item,
+                'description' => $item->description,
+                'category' => $item->category,
+                'qty' => $item->qty,
+                'unit' => $item->unit,
+                'rate' => $item->rate,
+                'labour_cost' => $item->labour_cost,
+                'material_cost' => $item->material_cost,
+                'remarks' => $item->remarks,
+            ])->all();
+
+            $newBoq = $this->create($source->project, [
+                'discount' => $source->discount,
+                'tax' => $source->tax,
+            ], $items);
+
+            if ($source->status === BoqStatus::Active) {
+                $source->update(['status' => BoqStatus::Superseded->value]);
+            }
+
+            return $newBoq;
         });
     }
 

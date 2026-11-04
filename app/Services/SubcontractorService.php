@@ -24,11 +24,11 @@ class SubcontractorService
     public function update(Subcontractor $subcontractor, array $data): Subcontractor
     {
         $subcontractor->update([
-            'name' => $data['name'] ?? $subcontractor->name,
-            'trade' => $data['trade'] ?? $subcontractor->trade->value,
-            'phone' => $data['phone'] ?? $subcontractor->phone,
-            'address' => $data['address'] ?? $subcontractor->address,
-            'rate_type' => $data['rate_type'] ?? $subcontractor->rate_type,
+            'name' => array_key_exists('name', $data) ? $data['name'] : $subcontractor->name,
+            'trade' => array_key_exists('trade', $data) ? $data['trade'] : $subcontractor->trade->value,
+            'phone' => array_key_exists('phone', $data) ? $data['phone'] : $subcontractor->phone,
+            'address' => array_key_exists('address', $data) ? $data['address'] : $subcontractor->address,
+            'rate_type' => array_key_exists('rate_type', $data) ? $data['rate_type'] : $subcontractor->rate_type,
         ]);
 
         return $subcontractor->fresh();

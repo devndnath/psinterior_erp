@@ -21,6 +21,21 @@ class PaymentService
 
     public function create(array $data): Payment
     {
+        if (! empty($data['invoice_id'])) {
+            $invoice = Invoice::findOrFail($data['invoice_id']);
+
+            // The payment and the invoice it settles must be for the same
+            // project, or project profitability and the invoice's paid
+            // status would disagree about where the money went.
+            if ((int) $invoice->project_id !== (int) $data['project_id']) {
+                throw new \InvalidArgumentException('The selected invoice belongs to a different project.');
+            }
+
+            if ($invoice->status === \App\Enums\InvoiceStatus::Cancelled) {
+                throw new \InvalidArgumentException('A payment cannot be applied to a cancelled invoice.');
+            }
+        }
+
         return DB::transaction(function () use ($data) {
             $payment = Payment::create([
                 'payment_no' => $this->numbering->next('PAY'),

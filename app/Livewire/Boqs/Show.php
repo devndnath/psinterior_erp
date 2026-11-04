@@ -39,22 +39,7 @@ class Show extends Component
     {
         Gate::authorize('create', Boq::class);
 
-        $items = $this->boq->items->map(fn ($item) => [
-            'item' => $item->item,
-            'description' => $item->description,
-            'category' => $item->category,
-            'qty' => $item->qty,
-            'unit' => $item->unit,
-            'rate' => $item->rate,
-            'labour_cost' => $item->labour_cost,
-            'material_cost' => $item->material_cost,
-            'remarks' => $item->remarks,
-        ])->all();
-
-        $newBoq = $service->create($this->boq->project, [
-            'discount' => $this->boq->discount,
-            'tax' => $this->boq->tax,
-        ], $items);
+        $newBoq = $service->createNewVersion($this->boq);
 
         $this->dispatch('toast', message: "New BOQ version {$newBoq->boq_no} created.", type: 'success');
         $this->redirectRoute('boqs.edit', ['boq' => $newBoq->id], navigate: true);

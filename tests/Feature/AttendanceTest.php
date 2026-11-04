@@ -94,7 +94,7 @@ class AttendanceTest extends TestCase
             'status' => 'late',
         ]);
 
-        $this->assertSame(1, Attendance::where('employee_id', $employee->id)->where('date', '2026-10-01')->count());
-        $this->assertSame('late', Attendance::where('employee_id', $employee->id)->where('date', '2026-10-01')->first()->status->value);
+        $this->assertSame(1, Attendance::where('employee_id', $employee->id)->whereDate('date', '2026-10-01')->count());
+        $this->assertSame('late', Attendance::where('employee_id', $employee->id)->whereDate('date', '2026-10-01')->first()->status->value);
     }
 }

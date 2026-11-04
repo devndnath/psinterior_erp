@@ -45,7 +45,7 @@ class Show extends Component
 
         $this->myQuotation = $this->purchaseRequest->vendorQuotations()
             ->where('vendor_id', $vendor->id)
-            ->with('items')
+            ->with('items.product')
             ->first();
 
         if ($this->myQuotation) {
@@ -56,7 +56,7 @@ class Show extends Component
                 'rate' => (string) $item->rate,
             ])->all();
         } else {
-            $this->items = $this->purchaseRequest->items->map(fn ($item) => [
+            $this->items = $this->purchaseRequest->items()->with('product')->get()->map(fn ($item) => [
                 'product_id' => (string) $item->product_id,
                 'product_name' => $item->product?->name ?? '',
                 'qty' => (string) $item->quantity,
@@ -87,11 +87,25 @@ class Show extends Component
 
         $data = $this->validate();
 
-        $items = array_map(fn ($item) => [
-            'product_id' => $item['product_id'],
-            'qty' => $item['qty'],
-            'rate' => $item['rate'],
-        ], $data['items']);
+        // validate() only returns the validated keys (qty/rate), so the
+        // product comes from the request's own lines — never from the
+        // client-side payload, which a vendor could tamper with.
+        $productIds = $this->purchaseRequest->items()->orderBy('id')->pluck('product_id')->all();
+
+        $items = [];
+        foreach ($data['items'] as $i => $item) {
+            $productId = $this->items[$i]['product_id'] ?? null;
+
+            if (! in_array((int) $productId, array_map('intval', $productIds), true)) {
+                continue;
+            }
+
+            $items[] = [
+                'product_id' => (int) $productId,
+                'qty' => $item['qty'],
+                'rate' => $item['rate'],
+            ];
+        }
 
         try {
             if ($this->myQuotation) {

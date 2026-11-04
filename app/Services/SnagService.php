@@ -35,9 +35,9 @@ class SnagService
     public function update(Snag $snag, array $data): Snag
     {
         $snag->update([
-            'area' => $data['area'] ?? $snag->area,
-            'issue' => $data['issue'] ?? $snag->issue,
-            'deadline' => $data['deadline'] ?? $snag->deadline,
+            'area' => array_key_exists('area', $data) ? $data['area'] : $snag->area,
+            'issue' => array_key_exists('issue', $data) ? $data['issue'] : $snag->issue,
+            'deadline' => array_key_exists('deadline', $data) ? $data['deadline'] : $snag->deadline,
         ]);
 
         return $snag->fresh();

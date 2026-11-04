@@ -63,12 +63,12 @@ class ContractService
     {
         return DB::transaction(function () use ($contract, $data, $items) {
             $contract->update([
-                'amount' => $data['amount'] ?? $contract->amount,
-                'start_date' => $data['start_date'] ?? $contract->start_date,
-                'end_date' => $data['end_date'] ?? $contract->end_date,
-                'payment_terms' => $data['payment_terms'] ?? $contract->payment_terms,
-                'warranty_terms' => $data['warranty_terms'] ?? $contract->warranty_terms,
-                'terms' => $data['terms'] ?? $contract->terms,
+                'amount' => array_key_exists('amount', $data) ? $data['amount'] : $contract->amount,
+                'start_date' => array_key_exists('start_date', $data) ? $data['start_date'] : $contract->start_date,
+                'end_date' => array_key_exists('end_date', $data) ? $data['end_date'] : $contract->end_date,
+                'payment_terms' => array_key_exists('payment_terms', $data) ? $data['payment_terms'] : $contract->payment_terms,
+                'warranty_terms' => array_key_exists('warranty_terms', $data) ? $data['warranty_terms'] : $contract->warranty_terms,
+                'terms' => array_key_exists('terms', $data) ? $data['terms'] : $contract->terms,
             ]);
 
             $this->syncItems($contract, $items);

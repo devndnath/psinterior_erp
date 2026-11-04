@@ -37,8 +37,6 @@
             <thead>
                 <tr>
                     <th>Description</th>
-                    <th class="text-right">Qty</th>
-                    <th class="text-right">Rate</th>
                     <th class="text-right">Amount</th>
                 </tr>
             </thead>
@@ -46,8 +44,6 @@
                 @foreach ($contract->items as $item)
                     <tr>
                         <td>{{ $item->description }}</td>
-                        <td class="text-right">{{ $item->qty }}</td>
-                        <td class="text-right">{{ number_format($item->rate, 2) }}</td>
                         <td class="text-right">{{ number_format($item->amount, 2) }}</td>
                     </tr>
                 @endforeach

@@ -26,9 +26,12 @@ class Show extends Component
     {
         Gate::authorize('ship', $this->stockTransfer);
 
-        $this->stockTransfer = $service->ship($this->stockTransfer);
-
-        $this->dispatch('toast', message: "Stock transfer {$this->stockTransfer->transfer_no} marked in transit.", type: 'success');
+        try {
+            $this->stockTransfer = $service->ship($this->stockTransfer);
+            $this->dispatch('toast', message: "Stock transfer {$this->stockTransfer->transfer_no} marked in transit.", type: 'success');
+        } catch (\RuntimeException $e) {
+            $this->dispatch('toast', message: $e->getMessage(), type: 'error');
+        }
     }
 
     public function complete(StockTransferService $service): void

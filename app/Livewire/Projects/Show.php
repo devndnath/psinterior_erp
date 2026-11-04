@@ -170,8 +170,8 @@ class Show extends Component
     public function render(ProfitabilityService $profitability)
     {
         return view('livewire.projects.show', [
-            'milestones' => $this->project->milestones()->orderBy('due_date')->get(),
-            'tasks' => $this->project->tasks()->with('milestone')->orderBy('due_date')->get(),
+            'milestones' => $this->project->milestones()->with('assignee')->orderBy('due_date')->get(),
+            'tasks' => $this->project->tasks()->with(['milestone', 'assignee'])->orderBy('due_date')->get(),
             'siteVisits' => $this->project->siteVisits()->latest('visit_date')->get(),
             'designs' => Auth::user()->can('view_designs')
                 ? $this->project->designs()->with('revisions')->latest()->get()

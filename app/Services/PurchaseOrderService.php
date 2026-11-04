@@ -100,14 +100,14 @@ class PurchaseOrderService
 
         return DB::transaction(function () use ($po, $data, $items) {
             $po->update([
-                'vendor_id' => $data['vendor_id'] ?? $po->vendor_id,
-                'project_id' => $data['project_id'] ?? $po->project_id,
-                'warehouse_id' => $data['warehouse_id'] ?? $po->warehouse_id,
-                'date' => $data['date'] ?? $po->date,
-                'expected_delivery' => $data['expected_delivery'] ?? $po->expected_delivery,
-                'discount' => $data['discount'] ?? $po->discount,
-                'tax' => $data['tax'] ?? $po->tax,
-                'terms' => $data['terms'] ?? $po->terms,
+                'vendor_id' => array_key_exists('vendor_id', $data) ? $data['vendor_id'] : $po->vendor_id,
+                'project_id' => array_key_exists('project_id', $data) ? $data['project_id'] : $po->project_id,
+                'warehouse_id' => array_key_exists('warehouse_id', $data) ? $data['warehouse_id'] : $po->warehouse_id,
+                'date' => array_key_exists('date', $data) ? $data['date'] : $po->date,
+                'expected_delivery' => array_key_exists('expected_delivery', $data) ? $data['expected_delivery'] : $po->expected_delivery,
+                'discount' => array_key_exists('discount', $data) ? $data['discount'] : $po->discount,
+                'tax' => array_key_exists('tax', $data) ? $data['tax'] : $po->tax,
+                'terms' => array_key_exists('terms', $data) ? $data['terms'] : $po->terms,
             ]);
 
             $this->syncItems($po, $items);

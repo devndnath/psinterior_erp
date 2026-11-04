@@ -43,14 +43,12 @@ class ServiceRequestTest extends TestCase
         $project = Project::factory()->create(['client_id' => $client->id]);
         $warranty = Warranty::factory()->create(['project_id' => $project->id]);
 
-        // Set directly on the shared request singleton rather than via
-        // Livewire::test()'s mount parameters, since Form::mount() reads
+        // Passed as a query param rather than a mount parameter, since
+        // Form::mount() reads
         // request()->query('warranty') the same way every context-only
         // Form in this codebase does (GoodsReceives/Form,
         // VendorQuotations/Form).
-        request()->query->set('warranty', (string) $warranty->id);
-
-        Livewire::actingAs($warrantyStyleUser)->test(ServiceRequestForm::class)
+        Livewire::withQueryParams(['warranty' => (string) $warranty->id])->actingAs($warrantyStyleUser)->test(ServiceRequestForm::class)
             ->set('client_id', (string) $client->id)
             ->set('complaint', 'Leaking pipe under the sink')
             ->call('save')

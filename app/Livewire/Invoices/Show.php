@@ -25,9 +25,12 @@ class Show extends Component
     {
         Gate::authorize('issue', $this->invoice);
 
-        $this->invoice = $service->issue($this->invoice);
-
-        $this->dispatch('toast', message: "Invoice {$this->invoice->invoice_no} issued.", type: 'success');
+        try {
+            $this->invoice = $service->issue($this->invoice);
+            $this->dispatch('toast', message: "Invoice {$this->invoice->invoice_no} issued.", type: 'success');
+        } catch (\RuntimeException $e) {
+            $this->dispatch('toast', message: $e->getMessage(), type: 'error');
+        }
     }
 
     public function cancelInvoice(InvoiceService $service): void

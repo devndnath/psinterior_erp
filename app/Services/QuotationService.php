@@ -70,11 +70,11 @@ class QuotationService
             }
 
             $quotation->update([
-                'discount' => $data['discount'] ?? $quotation->discount,
-                'tax' => $data['tax'] ?? $quotation->tax,
-                'valid_until' => $data['valid_until'] ?? $quotation->valid_until,
-                'terms' => $data['terms'] ?? $quotation->terms,
-                'notes' => $data['notes'] ?? $quotation->notes,
+                'discount' => array_key_exists('discount', $data) ? $data['discount'] : $quotation->discount,
+                'tax' => array_key_exists('tax', $data) ? $data['tax'] : $quotation->tax,
+                'valid_until' => array_key_exists('valid_until', $data) ? $data['valid_until'] : $quotation->valid_until,
+                'terms' => array_key_exists('terms', $data) ? $data['terms'] : $quotation->terms,
+                'notes' => array_key_exists('notes', $data) ? $data['notes'] : $quotation->notes,
             ]);
 
             $this->syncItems($quotation, $items);

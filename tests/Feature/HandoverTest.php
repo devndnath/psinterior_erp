@@ -32,7 +32,7 @@ class HandoverTest extends TestCase
         $user = User::factory()->create();
         $project = Project::factory()->create();
 
-        $this->get(route('handovers.create', ['project' => $project->id]))
+        $this->actingAs($user)->get(route('handovers.create', ['project' => $project->id]))
             ->assertForbidden();
     }
 
@@ -40,14 +40,12 @@ class HandoverTest extends TestCase
     {
         $project = Project::factory()->create();
 
-        // Set directly on the shared request singleton rather than via
-        // Livewire::test()'s mount parameters, since Form::mount() reads
+        // Passed as a query param rather than a mount parameter, since
+        // Form::mount() reads
         // request()->query('project') the same way every context-only
         // Form in this codebase does (GoodsReceives/Form,
         // VendorQuotations/Form).
-        request()->query->set('project', (string) $project->id);
-
-        Livewire::actingAs($this->staff)->test(HandoverForm::class)
+        Livewire::withQueryParams(['project' => (string) $project->id])->actingAs($this->staff)->test(HandoverForm::class)
             ->assertSuccessful();
     }
 

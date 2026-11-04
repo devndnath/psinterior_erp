@@ -33,14 +33,14 @@ class ExpenseService
     public function update(Expense $expense, array $data): Expense
     {
         $expense->update([
-            'project_id' => $data['project_id'] ?? $expense->project_id,
-            'category_id' => $data['category_id'] ?? $expense->category_id,
-            'vendor_name' => $data['vendor_name'] ?? $expense->vendor_name,
+            'project_id' => array_key_exists('project_id', $data) ? $data['project_id'] : $expense->project_id,
+            'category_id' => array_key_exists('category_id', $data) ? $data['category_id'] : $expense->category_id,
+            'vendor_name' => array_key_exists('vendor_name', $data) ? $data['vendor_name'] : $expense->vendor_name,
             'vendor_id' => array_key_exists('vendor_id', $data) ? $data['vendor_id'] : $expense->vendor_id,
-            'amount' => $data['amount'] ?? $expense->amount,
-            'date' => $data['date'] ?? $expense->date,
-            'method' => $data['method'] ?? $expense->method->value,
-            'description' => $data['description'] ?? $expense->description,
+            'amount' => array_key_exists('amount', $data) ? $data['amount'] : $expense->amount,
+            'date' => array_key_exists('date', $data) ? $data['date'] : $expense->date,
+            'method' => array_key_exists('method', $data) ? $data['method'] : $expense->method->value,
+            'description' => array_key_exists('description', $data) ? $data['description'] : $expense->description,
         ]);
 
         return $expense->fresh();

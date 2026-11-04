@@ -25,6 +25,13 @@ class Index extends Component
 {
     use WithPagination;
 
+    public function mount(): void
+    {
+        // Also gated by route middleware; checked here too so the
+        // component can't be mounted without the ability.
+        abort_unless(auth()->user()?->can('view_inventory'), 403);
+    }
+
     #[Url]
     public string $product = '';
 

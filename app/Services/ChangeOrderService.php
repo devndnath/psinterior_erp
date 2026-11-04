@@ -44,8 +44,8 @@ class ChangeOrderService
     {
         return DB::transaction(function () use ($changeOrder, $data, $items) {
             $changeOrder->update([
-                'description' => $data['description'] ?? $changeOrder->description,
-                'cost' => $data['cost'] ?? $changeOrder->cost,
+                'description' => array_key_exists('description', $data) ? $data['description'] : $changeOrder->description,
+                'cost' => array_key_exists('cost', $data) ? $data['cost'] : $changeOrder->cost,
             ]);
 
             $this->syncItems($changeOrder, $items);

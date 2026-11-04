@@ -16,6 +16,13 @@ use Livewire\Component;
 #[Title('Profitability')]
 class Index extends Component
 {
+    public function mount(): void
+    {
+        // Also gated by route middleware; checked here too so the
+        // component can't be mounted without the ability.
+        abort_unless(auth()->user()?->can('view_finance'), 403);
+    }
+
     public function render(ProfitabilityService $service)
     {
         return view('livewire.profitability.index', [

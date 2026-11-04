@@ -45,7 +45,7 @@
                     <div><dt class="text-gray-500">Client decision</dt>
                         <dd class="font-medium text-gray-900">
                             @if ($design->client_approval_status)
-                                <x-status-badge :label="\App\Enums\ApprovalDecision::from($design->client_approval_status)->label()" :color="\App\Enums\ApprovalDecision::from($design->client_approval_status)->color()" />
+                                <x-status-badge :label="$design->client_approval_status->label()" :color="$design->client_approval_status->color()" />
                             @else
                                 Pending
                             @endif
@@ -69,26 +69,26 @@
                     <form wire:submit="addRevision" class="mb-6 space-y-3 rounded-lg border border-gray-100 p-4">
                         <div>
                             <label class="form-label">File *</label>
-                            <input wire:model="revisionFile" type="file" class="block w-full text-sm text-gray-600 file:mr-4 file:rounded-lg file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand-700 hover:file:bg-brand-100">
+                            <input wire:model="revisionFile" type="file" class="block w-full text-sm text-gray-600 file:mr-4 file:rounded-full file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand-700 hover:file:bg-brand-100">
                             @error('revisionFile') <p class="form-error">{{ $message }}</p> @enderror
                             <div wire:loading wire:target="revisionFile" class="mt-2 text-xs text-gray-400">Uploading…</div>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                                 <label class="form-label">Drawing No.</label>
-                                <input type="text" wire:model="revisionDrawingNo" placeholder="e.g. DRG-ELV-03" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                                <input type="text" wire:model="revisionDrawingNo" placeholder="e.g. DRG-ELV-03" class="field-input">
                                 @error('revisionDrawingNo') <p class="form-error">{{ $message }}</p> @enderror
                             </div>
                             <div>
                                 <label class="form-label">Issue Date</label>
-                                <input type="date" wire:model="revisionIssueDate" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                                <input type="date" wire:model="revisionIssueDate" class="field-input">
                                 @error('revisionIssueDate') <p class="form-error">{{ $message }}</p> @enderror
                                 <p class="mt-1 text-xs text-gray-400">Defaults to today if left blank.</p>
                             </div>
                         </div>
                         <div>
                             <label class="form-label">Notes</label>
-                            <textarea wire:model="revisionDescription" rows="2" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm"></textarea>
+                            <textarea wire:model="revisionDescription" rows="2" class="field-input"></textarea>
                             @error('revisionDescription') <p class="form-error">{{ $message }}</p> @enderror
                         </div>
                         <button type="submit" class="btn-primary">Upload revision</button>
@@ -145,7 +145,7 @@
                                     <div class="mt-3 space-y-1 border-t border-gray-100 pt-3">
                                         @foreach ($revision->approvals as $approval)
                                             <p class="text-xs text-gray-500">
-                                                <span class="font-medium text-gray-700">{{ \App\Enums\ApprovalDecision::from($approval->decision)->label() }}</span>
+                                                <span class="font-medium text-gray-700">{{ $approval->decision->label() }}</span>
                                                 by {{ $approval->client?->name ?? 'Client' }} on {{ $approval->decided_at?->format('d M, Y H:i') }}
                                             </p>
                                         @endforeach
@@ -158,7 +158,7 @@
                                             <form wire:submit="recordDecision" class="space-y-3">
                                                 <div>
                                                     <label class="form-label">Client decision *</label>
-                                                    <select wire:model="decision" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                                                    <select wire:model="decision" class="field-input">
                                                         <option value="">Select…</option>
                                                         @foreach ($decisionOptions as $value => $label)
                                                             <option value="{{ $value }}">{{ $label }}</option>
@@ -168,7 +168,7 @@
                                                 </div>
                                                 <div>
                                                     <label class="form-label">Comment</label>
-                                                    <textarea wire:model="decisionComment" rows="2" class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm"></textarea>
+                                                    <textarea wire:model="decisionComment" rows="2" class="field-input"></textarea>
                                                     @error('decisionComment') <p class="form-error">{{ $message }}</p> @enderror
                                                 </div>
                                                 <div class="flex items-center gap-3">

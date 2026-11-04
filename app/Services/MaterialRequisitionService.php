@@ -64,9 +64,9 @@ class MaterialRequisitionService
     {
         return DB::transaction(function () use ($mr, $data, $items) {
             $mr->update([
-                'warehouse_id' => $data['warehouse_id'] ?? $mr->warehouse_id,
-                'date' => $data['date'] ?? $mr->date,
-                'purpose' => $data['purpose'] ?? $mr->purpose,
+                'warehouse_id' => array_key_exists('warehouse_id', $data) ? $data['warehouse_id'] : $mr->warehouse_id,
+                'date' => array_key_exists('date', $data) ? $data['date'] : $mr->date,
+                'purpose' => array_key_exists('purpose', $data) ? $data['purpose'] : $mr->purpose,
             ]);
 
             $mr->items()->delete();

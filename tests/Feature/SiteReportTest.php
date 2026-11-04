@@ -149,7 +149,7 @@ class SiteReportTest extends TestCase
 
         $component = Livewire::actingAs($clientUser, 'client')->test(ClientSiteReportIndex::class);
 
-        $this->assertSame(1, $component->get('reports')->total());
+        $this->assertSame(1, $component->viewData('reports')->total());
         $this->assertTrue($ownReport->exists());
     }
 

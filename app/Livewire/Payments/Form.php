@@ -83,7 +83,12 @@ class Form extends Component
     {
         return [
             'project_id' => ['required', 'exists:projects,id'],
-            'invoice_id' => ['nullable', 'exists:invoices,id'],
+            'invoice_id' => [
+                'nullable',
+                \Illuminate\Validation\Rule::exists('invoices', 'id')
+                    ->where('project_id', $this->project_id ?: 0)
+                    ->where(fn ($q) => $q->where('status', '!=', \App\Enums\InvoiceStatus::Cancelled->value)),
+            ],
             'amount' => ['required', 'numeric', 'min:0.01'],
             'method' => ['required', 'string', 'in:'.implode(',', array_column(PaymentMethod::cases(), 'value'))],
             'date' => ['required', 'date'],

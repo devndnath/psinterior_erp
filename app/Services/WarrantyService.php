@@ -19,9 +19,9 @@ class WarrantyService
     public function update(Warranty $warranty, array $data): Warranty
     {
         $warranty->update([
-            'start_date' => $data['start_date'] ?? $warranty->start_date,
-            'end_date' => $data['end_date'] ?? $warranty->end_date,
-            'terms' => $data['terms'] ?? $warranty->terms,
+            'start_date' => array_key_exists('start_date', $data) ? $data['start_date'] : $warranty->start_date,
+            'end_date' => array_key_exists('end_date', $data) ? $data['end_date'] : $warranty->end_date,
+            'terms' => array_key_exists('terms', $data) ? $data['terms'] : $warranty->terms,
         ]);
 
         return $warranty->fresh();

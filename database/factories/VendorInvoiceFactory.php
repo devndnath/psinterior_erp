@@ -21,6 +21,7 @@ class VendorInvoiceFactory extends Factory
             'invoice_date' => $this->faker->dateTimeBetween('-1 month', 'now'),
             'amount' => $this->faker->randomFloat(2, 1000, 50000),
             'notes' => $this->faker->optional()->sentence(),
+            'status' => \App\Enums\VendorInvoiceStatus::Submitted->value,
         ];
     }
 }

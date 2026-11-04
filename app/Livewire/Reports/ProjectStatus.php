@@ -12,6 +12,13 @@ use Livewire\Component;
 #[Title('Project Status Report')]
 class ProjectStatus extends Component
 {
+    public function mount(): void
+    {
+        // Also gated by route middleware; checked here too so the
+        // component can't be mounted without the ability.
+        abort_unless(auth()->user()?->can('view_reports'), 403);
+    }
+
     public string $status = '';
 
     protected function projects()

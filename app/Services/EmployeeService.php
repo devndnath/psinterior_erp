@@ -38,18 +38,18 @@ class EmployeeService
     public function update(Employee $employee, array $data): Employee
     {
         $employee->update([
-            'user_id' => $data['user_id'] ?? $employee->user_id,
-            'name' => $data['name'] ?? $employee->name,
-            'phone' => $data['phone'] ?? $employee->phone,
-            'email' => $data['email'] ?? $employee->email,
-            'address' => $data['address'] ?? $employee->address,
-            'department_id' => $data['department_id'] ?? $employee->department_id,
-            'designation_id' => $data['designation_id'] ?? $employee->designation_id,
-            'joining_date' => $data['joining_date'] ?? $employee->joining_date,
-            'salary' => $data['salary'] ?? $employee->salary,
-            'employment_type' => $data['employment_type'] ?? $employee->employment_type->value,
-            'emergency_contact' => $data['emergency_contact'] ?? $employee->emergency_contact,
-            'status' => $data['status'] ?? $employee->status->value,
+            'user_id' => array_key_exists('user_id', $data) ? $data['user_id'] : $employee->user_id,
+            'name' => array_key_exists('name', $data) ? $data['name'] : $employee->name,
+            'phone' => array_key_exists('phone', $data) ? $data['phone'] : $employee->phone,
+            'email' => array_key_exists('email', $data) ? $data['email'] : $employee->email,
+            'address' => array_key_exists('address', $data) ? $data['address'] : $employee->address,
+            'department_id' => array_key_exists('department_id', $data) ? $data['department_id'] : $employee->department_id,
+            'designation_id' => array_key_exists('designation_id', $data) ? $data['designation_id'] : $employee->designation_id,
+            'joining_date' => array_key_exists('joining_date', $data) ? $data['joining_date'] : $employee->joining_date,
+            'salary' => array_key_exists('salary', $data) ? $data['salary'] : $employee->salary,
+            'employment_type' => array_key_exists('employment_type', $data) ? $data['employment_type'] : $employee->employment_type->value,
+            'emergency_contact' => array_key_exists('emergency_contact', $data) ? $data['emergency_contact'] : $employee->emergency_contact,
+            'status' => array_key_exists('status', $data) ? $data['status'] : $employee->status->value,
         ]);
 
         return $employee->fresh();

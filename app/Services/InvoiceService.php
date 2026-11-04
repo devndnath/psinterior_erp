@@ -56,17 +56,23 @@ class InvoiceService
 
         return DB::transaction(function () use ($invoice, $data, $items) {
             $invoice->update([
-                'contract_id' => $data['contract_id'] ?? $invoice->contract_id,
-                'type' => $data['type'] ?? $invoice->type->value,
-                'invoice_date' => $data['invoice_date'] ?? $invoice->invoice_date,
-                'due_date' => $data['due_date'] ?? $invoice->due_date,
-                'discount' => $data['discount'] ?? $invoice->discount,
-                'tax' => $data['tax'] ?? $invoice->tax,
-                'notes' => $data['notes'] ?? $invoice->notes,
+                'contract_id' => array_key_exists('contract_id', $data) ? $data['contract_id'] : $invoice->contract_id,
+                'type' => array_key_exists('type', $data) ? $data['type'] : $invoice->type->value,
+                'invoice_date' => array_key_exists('invoice_date', $data) ? $data['invoice_date'] : $invoice->invoice_date,
+                'due_date' => array_key_exists('due_date', $data) ? $data['due_date'] : $invoice->due_date,
+                'discount' => array_key_exists('discount', $data) ? $data['discount'] : $invoice->discount,
+                'tax' => array_key_exists('tax', $data) ? $data['tax'] : $invoice->tax,
+                'notes' => array_key_exists('notes', $data) ? $data['notes'] : $invoice->notes,
             ]);
 
             $this->syncItems($invoice, $items);
             $this->recalculateTotals($invoice);
+
+            // A changed total moves the paid/partially-paid line: an
+            // issued invoice whose total drops to what has already been
+            // paid is now Paid, and one whose total rises above it is
+            // PartiallyPaid again. Draft/Cancelled are left alone there.
+            $this->recalculatePaymentStatus($invoice->fresh());
 
             return $invoice->fresh(['items']);
         });
@@ -74,9 +80,15 @@ class InvoiceService
 
     public function issue(Invoice $invoice): Invoice
     {
+        if ($invoice->status !== InvoiceStatus::Draft) {
+            throw new \RuntimeException('Only a draft invoice can be issued.');
+        }
+
         $invoice->update(['status' => InvoiceStatus::Issued->value]);
 
-        return $invoice->fresh();
+        // Payments can be recorded against a draft, so issuing must pick
+        // them up rather than always landing on plain Issued.
+        return $this->recalculatePaymentStatus($invoice->fresh());
     }
 
     /**
