@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ClientType;
 use App\Models\Concerns\HasCompanyScope;
 use App\Models\Concerns\HasDocuments;
+use App\Models\Concerns\HasReference;
 use App\Models\Concerns\LogsActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -14,7 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Client extends Model
 {
-    use HasCompanyScope, HasDocuments, HasFactory, LogsActivity, SoftDeletes;
+    use HasCompanyScope, HasDocuments, HasFactory, HasReference, LogsActivity, SoftDeletes;
 
     protected $fillable = [
         'company_id', 'client_no', 'name', 'type', 'phone', 'email',
@@ -93,5 +94,17 @@ class Client extends Model
     public function serviceRequests(): HasMany
     {
         return $this->hasMany(ServiceRequest::class);
+    }
+
+    /** Clients this client introduced to the firm (Reference). */
+    public function referredClients(): HasMany
+    {
+        return $this->hasMany(Client::class, 'reference_client_id');
+    }
+
+    /** Leads this client introduced that haven't become clients yet. */
+    public function referredLeads(): HasMany
+    {
+        return $this->hasMany(Lead::class, 'reference_client_id')->whereNull('converted_client_id');
     }
 }

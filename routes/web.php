@@ -17,6 +17,7 @@ use App\Livewire\Boqs\Index as BoqIndex;
 use App\Livewire\Boqs\Show as BoqShow;
 use App\Livewire\Calendar\Index as CalendarIndex;
 use App\Livewire\Crm\Overview as CrmOverview;
+use App\Livewire\References\Index as ReferenceIndex;
 use App\Livewire\ChangeOrders\Form as ChangeOrderForm;
 use App\Livewire\ChangeOrders\Index as ChangeOrderIndex;
 use App\Livewire\ChangeOrders\Show as ChangeOrderShow;
@@ -183,6 +184,9 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
     // CRM overview (the dashboard's CRM card): calls, visits, meetings,
     // pipeline, projects, dues and new clients this year.
     Route::get('/crm', CrmOverview::class)->name('crm.overview')->middleware('can:view_leads');
+
+    // References: who introduced each client / lead.
+    Route::get('/references', ReferenceIndex::class)->name('references.index')->middleware('can:view_clients');
 
     // Self-service for ANY staff user with a linked Employee record — no
     // `can:` middleware, deliberately: these are the same reasoning as

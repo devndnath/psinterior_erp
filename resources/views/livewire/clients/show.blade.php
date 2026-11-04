@@ -38,6 +38,7 @@
                     <div><dt class="text-ink-500">Company</dt><dd class="font-medium text-ink-900">{{ $client->company_name ?: '—' }}</dd></div>
                     <div><dt class="text-ink-500">Tax ID</dt><dd class="font-medium text-ink-900">{{ $client->tax_id ?: '—' }}</dd></div>
                     <div><dt class="text-ink-500">Assigned to</dt><dd class="font-medium text-ink-900">{{ $client->assignee?->name ?? '—' }}</dd></div>
+                    <div><dt class="text-ink-500">Referred by</dt><dd><x-referrer :model="$client" /></dd></div>
                     <div>
                         <dt class="text-ink-500">Portal login</dt>
                         <dd class="font-medium text-ink-900">
@@ -163,6 +164,30 @@
                     @endif
                 </div>
             @endcan
+
+            {{-- Reference: who this client has brought to the firm. --}}
+            @if ($referredClients->isNotEmpty() || $referredLeads->isNotEmpty())
+                <div class="panel p-6">
+                    <div class="mb-4 flex items-center justify-between gap-2">
+                        <h2 class="text-sm font-semibold uppercase tracking-wide text-ink-500">Referrals</h2>
+                        <span class="chip">{{ $referredClients->count() + $referredLeads->count() }} referred</span>
+                    </div>
+                    <ul class="divide-y divide-ink-100">
+                        @foreach ($referredClients as $rc)
+                            <li class="flex items-center justify-between gap-2 py-2 text-sm">
+                                <a href="{{ route('clients.show', $rc) }}" wire:navigate class="font-medium text-accent-600 hover:underline">{{ $rc->name }}</a>
+                                <span class="text-xs text-ink-500">Client · {{ $rc->projects_count }} {{ \Illuminate\Support\Str::plural('project', $rc->projects_count) }}</span>
+                            </li>
+                        @endforeach
+                        @foreach ($referredLeads as $rl)
+                            <li class="flex items-center justify-between gap-2 py-2 text-sm">
+                                <a href="{{ route('leads.show', $rl) }}" wire:navigate class="font-medium text-accent-600 hover:underline">{{ $rl->name }}</a>
+                                <span class="text-xs text-ink-500">Lead · {{ $rl->status->label() }}</span>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
             @can('view_invoices')
                 <div class="panel p-6">

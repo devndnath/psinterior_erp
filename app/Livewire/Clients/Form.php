@@ -17,6 +17,8 @@ use Livewire\Component;
 #[Layout('layouts.admin')]
 class Form extends Component
 {
+    use \App\Livewire\Concerns\WithReferenceFields;
+
     public ?Client $client = null;
 
     public string $name = '';
@@ -71,6 +73,7 @@ class Form extends Component
                 'assigned_to' => (string) $this->client->assigned_to,
                 'notes' => $this->client->notes ?? '',
             ]);
+            $this->fillReference($this->client);
         }
     }
 
@@ -90,12 +93,17 @@ class Form extends Component
             'tax_id' => ['nullable', 'string', 'max:100'],
             'assigned_to' => ['nullable', 'exists:users,id'],
             'notes' => ['nullable', 'string', 'max:2000'],
-        ];
+        ] + $this->referenceRules($this->client?->id);
+    }
+
+    protected function messages(): array
+    {
+        return $this->referenceMessages();
     }
 
     public function save(ClientService $service, UserService $users): void
     {
-        $data = $this->validate();
+        $data = $this->referenceData($this->validate());
         $data['assigned_to'] = $data['assigned_to'] !== '' ? $data['assigned_to'] : null;
 
         $wantsAccount = $this->create_account && ! $this->client?->user_id;
@@ -140,6 +148,6 @@ class Form extends Component
         return view('livewire.clients.form', [
             'types' => ClientType::options(),
             'assignees' => User::staff()->orderBy('name')->get(['id', 'name']),
-        ]);
+        ] + $this->referenceOptions($this->client?->id));
     }
 }

@@ -7,6 +7,7 @@ use App\Enums\LeadStatus;
 use App\Enums\ProjectType;
 use App\Models\Concerns\HasCompanyScope;
 use App\Models\Concerns\HasDocuments;
+use App\Models\Concerns\HasReference;
 use App\Models\Concerns\LogsActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,7 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Lead extends Model
 {
-    use HasCompanyScope, HasDocuments, HasFactory, LogsActivity, SoftDeletes;
+    use HasCompanyScope, HasDocuments, HasFactory, HasReference, LogsActivity, SoftDeletes;
 
     protected $fillable = [
         'company_id', 'lead_no', 'name', 'phone', 'email', 'company_name',

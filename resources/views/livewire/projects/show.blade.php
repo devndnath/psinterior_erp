@@ -417,24 +417,59 @@
                 @endcan
 
                 @can('view_expenses')
-                    <div class="panel p-6">
-                        <div class="mb-4 flex items-center justify-between">
+                    <div class="panel overflow-hidden">
+                        <div class="flex items-center justify-between px-6 pb-3 pt-6">
                             <h2 class="text-sm font-semibold uppercase tracking-wide text-ink-500">Expenses</h2>
                             @can('create', \App\Models\Expense::class)
                                 <a href="{{ route('expenses.create', ['project' => $project->id]) }}" wire:navigate class="text-sm text-accent-600 hover:underline">+ New Expense</a>
                             @endcan
                         </div>
                         @if ($expenses->isEmpty())
-                            <p class="text-sm text-ink-500">No expenses recorded for this project yet.</p>
+                            <p class="px-6 pb-6 text-sm text-ink-500">No expenses recorded for this project yet.</p>
                         @else
-                            <ul class="divide-y divide-ink-100">
-                                @foreach ($expenses as $expense)
-                                    <li class="flex items-center justify-between py-2 text-sm">
-                                        <a href="{{ route('expenses.show', $expense) }}" wire:navigate class="font-medium text-accent-600 hover:underline">{{ $expense->expense_no }}</a>
-                                        <span class="text-ink-500">{{ number_format($expense->amount, 2) }}</span>
-                                    </li>
-                                @endforeach
-                            </ul>
+                            <div class="overflow-x-auto">
+                                <table class="table-base">
+                                    <thead>
+                                        <tr>
+                                            <th>Expense #</th>
+                                            <th>Date</th>
+                                            <th>Category</th>
+                                            <th>Purpose</th>
+                                            <th class="!text-right">Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($expenses as $expense)
+                                            <tr>
+                                                <td class="whitespace-nowrap">
+                                                    <a href="{{ route('expenses.show', $expense) }}" wire:navigate class="font-medium text-accent-600 hover:underline">{{ $expense->expense_no }}</a>
+                                                </td>
+                                                <td class="whitespace-nowrap text-ink-500">{{ $expense->date?->format('d M Y') }}</td>
+                                                <td>
+                                                    @if ($expense->category)
+                                                        <span class="chip whitespace-nowrap">{{ $expense->category->name }}</span>
+                                                    @else
+                                                        <span class="text-ink-400">—</span>
+                                                    @endif
+                                                </td>
+                                                <td class="max-w-[280px]">
+                                                    <span class="block truncate text-ink-800" title="{{ $expense->description }}">{{ $expense->description ?: '—' }}</span>
+                                                    @if ($paidTo = $expense->vendor?->company_name ?? $expense->vendor_name)
+                                                        <span class="block truncate text-xs text-ink-500">Paid to {{ $paidTo }}</span>
+                                                    @endif
+                                                </td>
+                                                <td class="whitespace-nowrap text-right font-medium tabular-nums text-ink-900">{{ number_format($expense->amount, 2) }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="border-t border-ink-200">
+                                            <td colspan="4" class="px-5 py-3 pl-6 text-sm font-semibold text-ink-700">Total ({{ $expenses->count() }})</td>
+                                            <td class="whitespace-nowrap px-5 py-3 pr-6 text-right font-bold tabular-nums text-ink-900">{{ number_format($expenses->sum('amount'), 2) }}</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
                         @endif
                     </div>
                 @endcan
@@ -643,6 +678,60 @@
         </div>
 
         <div>
+            {{-- Who the project is for, at a glance. --}}
+            @if ($client = $project->client)
+                <div class="panel mb-6 p-6">
+                    <div class="mb-4 flex items-center justify-between gap-2">
+                        <h2 class="text-sm font-semibold uppercase tracking-wide text-ink-500">Client</h2>
+                        <span class="chip">{{ $client->type->label() }}</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-charcoal text-sm font-bold text-accent-400 dark:bg-accent-500 dark:text-charcoal">
+                            {{ \Illuminate\Support\Str::of($client->name)->explode(' ')->map(fn ($w) => mb_substr($w, 0, 1))->take(2)->implode('') }}
+                        </span>
+                        <div class="min-w-0">
+                            @can('view', $client)
+                                <a href="{{ route('clients.show', $client) }}" wire:navigate class="block truncate text-base font-semibold text-ink-900 hover:underline">{{ $client->name }}</a>
+                            @else
+                                <span class="block truncate text-base font-semibold text-ink-900">{{ $client->name }}</span>
+                            @endcan
+                            <span class="block truncate text-xs text-ink-500">{{ $client->client_no }}{{ $client->company_name && $client->company_name !== $client->name ? ' · '.$client->company_name : '' }}</span>
+                        </div>
+                    </div>
+                    <dl class="mt-4 space-y-2.5 text-sm">
+                        @foreach ([
+                            ['icon' => 'id-badge', 'label' => 'Phone', 'value' => $client->phone, 'href' => $client->phone ? 'tel:'.preg_replace('/[^\d+]/', '', $client->phone) : null],
+                            ['icon' => 'file-text', 'label' => 'Email', 'value' => $client->email, 'href' => $client->email ? 'mailto:'.$client->email : null],
+                            ['icon' => 'map-pin', 'label' => 'Address', 'value' => $client->site_address ?: $client->address, 'href' => null],
+                        ] as $row)
+                            <div class="flex items-start gap-3">
+                                <x-icon :name="$row['icon']" class="mt-0.5 h-4 w-4 shrink-0 text-ink-400" />
+                                <div class="min-w-0">
+                                    <dt class="sr-only">{{ $row['label'] }}</dt>
+                                    <dd class="break-words text-ink-800">
+                                        @if ($row['value'] && $row['href'])
+                                            <a href="{{ $row['href'] }}" class="hover:underline">{{ $row['value'] }}</a>
+                                        @else
+                                            {{ $row['value'] ?: '—' }}
+                                        @endif
+                                    </dd>
+                                </div>
+                            </div>
+                        @endforeach
+                        @if ($contact = $client->contacts->firstWhere('is_primary', true) ?? $client->contacts->first())
+                            <div class="flex items-start gap-3">
+                                <x-icon name="users" class="mt-0.5 h-4 w-4 shrink-0 text-ink-400" />
+                                <dd class="min-w-0 text-ink-800">{{ $contact->name }}<span class="block text-xs text-ink-500">{{ $contact->designation ?: 'Contact' }}{{ $contact->phone ? ' · '.$contact->phone : '' }}</span></dd>
+                            </div>
+                        @endif
+                    </dl>
+                    <div class="mt-4 flex items-center justify-between gap-3 border-t border-ink-100 pt-4 text-sm">
+                        <span class="text-ink-500">Referred by</span>
+                        <x-referrer :model="$client" class="text-right" />
+                    </div>
+                </div>
+            @endif
+
             @can('view_finance')
                 @if ($profitability)
                     <div class="panel mb-6 p-6">

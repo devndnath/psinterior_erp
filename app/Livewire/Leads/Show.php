@@ -83,6 +83,8 @@ class Show extends Component
     #[Title('Lead')]
     public function render()
     {
+        $this->lead->loadMissing(['referenceClient', 'referenceEmployee']);
+
         return view('livewire.leads.show', [
             'followups' => $this->lead->followups,
             'statuses' => LeadStatus::options(),

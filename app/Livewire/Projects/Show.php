@@ -169,6 +169,8 @@ class Show extends Component
     #[Title('Project')]
     public function render(ProfitabilityService $profitability)
     {
+        $this->project->loadMissing(['client.contacts', 'client.referenceClient', 'client.referenceEmployee']);
+
         return view('livewire.projects.show', [
             'milestones' => $this->project->milestones()->with('assignee')->orderBy('due_date')->get(),
             'tasks' => $this->project->tasks()->with(['milestone', 'assignee'])->orderBy('due_date')->get(),
@@ -195,7 +197,7 @@ class Show extends Component
                 ? $this->project->payments()->latest('date')->get()
                 : collect(),
             'expenses' => Auth::user()->can('view_expenses')
-                ? $this->project->expenses()->latest('date')->get()
+                ? $this->project->expenses()->with(['category:id,name', 'vendor:id,company_name'])->latest('date')->get()
                 : collect(),
             'materialRequisitions' => Auth::user()->can('view_material_requisitions')
                 ? $this->project->materialRequisitions()->latest('date')->get()

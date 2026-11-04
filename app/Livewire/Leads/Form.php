@@ -17,6 +17,8 @@ use Livewire\Component;
 #[Layout('layouts.admin')]
 class Form extends Component
 {
+    use \App\Livewire\Concerns\WithReferenceFields;
+
     public ?Lead $lead = null;
 
     public string $name = '';
@@ -64,6 +66,7 @@ class Form extends Component
                 'expected_closing_date' => $this->lead->expected_closing_date?->format('Y-m-d') ?? '',
                 'notes' => $this->lead->notes ?? '',
             ]);
+            $this->fillReference($this->lead);
         }
     }
 
@@ -84,12 +87,17 @@ class Form extends Component
             'status' => ['required', 'string', 'in:'.implode(',', array_column(LeadStatus::cases(), 'value'))],
             'expected_closing_date' => ['nullable', 'date'],
             'notes' => ['nullable', 'string', 'max:2000'],
-        ];
+        ] + $this->referenceRules();
+    }
+
+    protected function messages(): array
+    {
+        return $this->referenceMessages();
     }
 
     public function save(LeadService $service): void
     {
-        $data = $this->validate();
+        $data = $this->referenceData($this->validate());
         $data['estimated_budget'] = $data['estimated_budget'] !== '' ? $data['estimated_budget'] : null;
         $data['lead_source_id'] = $data['lead_source_id'] !== '' ? $data['lead_source_id'] : null;
         $data['assigned_to'] = $data['assigned_to'] !== '' ? $data['assigned_to'] : null;
@@ -116,6 +124,6 @@ class Form extends Component
             'projectTypes' => ProjectType::options(),
             'priorities' => LeadPriority::options(),
             'statuses' => LeadStatus::options(),
-        ]);
+        ] + $this->referenceOptions());
     }
 }

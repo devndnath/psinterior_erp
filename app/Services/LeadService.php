@@ -77,7 +77,7 @@ class LeadService
                 'address' => $lead->address,
                 'assigned_to' => $lead->assigned_to,
                 'notes' => "Converted from lead {$lead->lead_no}.",
-            ], $overrides));
+            ] + $lead->referenceAttributes(), $overrides));
 
             $lead->update([
                 'converted_client_id' => $client->id,

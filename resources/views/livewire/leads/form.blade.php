@@ -50,6 +50,7 @@
             <div class="col-span-2">
                 <x-textarea label="Notes" name="notes" rows="3" wire:model="notes" />
             </div>
+            <x-reference-fields :type="$reference_type" :clients="$referenceClients" :employees="$referenceEmployees" />
         </div>
 
         <div class="flex items-center gap-3 border-t border-ink-100 pt-5">

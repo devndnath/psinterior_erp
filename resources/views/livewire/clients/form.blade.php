@@ -33,6 +33,7 @@
             <div class="col-span-2">
                 <x-textarea label="Notes" name="notes" rows="3" wire:model="notes" />
             </div>
+            <x-reference-fields :type="$reference_type" :clients="$referenceClients" :employees="$referenceEmployees" />
         </div>
 
         @if (! ($client && $client->user_id))

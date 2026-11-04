@@ -46,6 +46,7 @@
                     <div><dt class="text-ink-500">Company</dt><dd class="font-medium text-ink-900">{{ $lead->company_name ?: '—' }}</dd></div>
                     <div><dt class="text-ink-500">Project type</dt><dd class="font-medium text-ink-900">{{ $lead->project_type?->label() ?? '—' }}</dd></div>
                     <div><dt class="text-ink-500">Source</dt><dd class="font-medium text-ink-900">{{ $lead->source?->name ?? '—' }}</dd></div>
+                    <div><dt class="text-ink-500">Referred by</dt><dd><x-referrer :model="$lead" /></dd></div>
                     <div><dt class="text-ink-500">Estimated budget</dt><dd class="font-medium text-ink-900">{{ $lead->estimated_budget ? number_format($lead->estimated_budget, 2) : '—' }}</dd></div>
                     <div><dt class="text-ink-500">Assigned to</dt><dd class="font-medium text-ink-900">{{ $lead->assignee?->name ?? '—' }}</dd></div>
                     <div><dt class="text-ink-500">Expected closing</dt><dd class="font-medium text-ink-900">{{ $lead->expected_closing_date?->format('d M, Y') ?? '—' }}</dd></div>

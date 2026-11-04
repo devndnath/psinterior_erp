@@ -9,6 +9,7 @@ use App\Models\Employee;
 use App\Models\ExpenseCategory;
 use App\Models\ExpenseClaim;
 use App\Models\Invoice;
+use App\Models\Lead;
 use App\Models\LeadSource;
 use App\Models\Product;
 use App\Models\ProductCategory;
@@ -141,6 +142,7 @@ class SampleDataSeeder extends Seeder
             $this->loadDemoFoundation();
             $this->seedEmployees();
             $this->seedClientsAndCrm();
+            $this->seedReferences();
             $this->seedProjects();
             $this->seedDesigns();
             $this->seedSalesAndBilling();
@@ -187,6 +189,46 @@ class SampleDataSeeder extends Seeder
     private function allProjects(): array
     {
         return array_merge(...array_values($this->projects));
+    }
+
+    /**
+     * Who introduced whom (Reference): a couple of existing clients who
+     * keep sending friends, staff referrals and outside people. Fixed
+     * picks (no mt_rand) so the rest of the dataset is unchanged.
+     */
+    private function seedReferences(): void
+    {
+        $c = $this->clients;
+        $n = count($c);
+        $staff = $this->employees[0] ?? null;
+
+        foreach ([[3, 0], [5, 0], [9, 0], [7, 2], [12, 2]] as [$who, $by]) {
+            if ($who < $n && $by < $n) {
+                $c[$who]->update(['reference_type' => 'client', 'reference_client_id' => $c[$by]->id]);
+            }
+        }
+        if ($staff) {
+            foreach ([4, 10] as $who) {
+                if ($who < $n) {
+                    $c[$who]->update(['reference_type' => 'employee', 'reference_employee_id' => $staff->id]);
+                }
+            }
+        }
+        foreach ([[6, 'Ar. Kamal Uddin', '+8801711000111'], [14, 'Ar. Kamal Uddin', '+8801711000111'], [8, 'Rehana (Facebook group)', null]] as [$who, $name, $phone]) {
+            if ($who < $n) {
+                $c[$who]->update(['reference_type' => 'other', 'reference_name' => $name, 'reference_phone' => $phone]);
+            }
+        }
+
+        // A few open leads that came the same way.
+        $open = Lead::whereNull('converted_client_id')->orderBy('id')->take(4)->get();
+        foreach ($open as $i => $lead) {
+            $lead->update(match ($i) {
+                0, 1 => ['reference_type' => 'client', 'reference_client_id' => $c[0]->id],
+                2 => ['reference_type' => 'other', 'reference_name' => 'Ar. Kamal Uddin', 'reference_phone' => '+8801711000111'],
+                default => $staff ? ['reference_type' => 'employee', 'reference_employee_id' => $staff->id] : [],
+            });
+        }
     }
 
     // -----------------------------------------------------------------

@@ -147,9 +147,12 @@ class Show extends Component
         // Re-loaded on every render (not just in mount()), matching
         // Employees\Show's convention — see Vendors\Show::render()'s
         // comment for why.
-        $this->client->load('portalUser');
+        $this->client->load(['portalUser', 'referenceClient', 'referenceEmployee']);
 
         return view('livewire.clients.show', [
+            // Reference: the clients and open leads this client brought in.
+            'referredClients' => $this->client->referredClients()->withCount('projects')->orderBy('name')->get(['id', 'name', 'client_no', 'created_at', 'reference_client_id']),
+            'referredLeads' => $this->client->referredLeads()->latest()->get(['id', 'lead_no', 'name', 'status', 'reference_client_id', 'converted_client_id']),
             'contacts' => $this->client->contacts,
             'leads' => $this->client->leads()->latest()->get(),
             'siteVisits' => $this->client->siteVisits()->latest('visit_date')->get(),
