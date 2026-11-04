@@ -7,15 +7,42 @@
 
     <form wire:submit="save" class="max-w-3xl space-y-6">
         <div class="card grid grid-cols-1 sm:grid-cols-2 gap-4 p-6">
+            {{-- A design is either for a project, or sold on its own to a client. --}}
             <div class="col-span-2">
-                <label class="form-label">Project *</label>
-                <select wire:model="project_id" class="field-input">
-                    <option value="">Select…</option>
-                    @foreach ($projects as $proj)
-                        <option value="{{ $proj->id }}">{{ $proj->project_code }} — {{ $proj->name }}</option>
+                <span class="form-label">Design for *</span>
+                <div class="inline-flex flex-wrap gap-1 rounded-full border border-ink-200 bg-surface p-1">
+                    @foreach (['project' => 'A project', 'sold' => 'Sold design (no project)'] as $value => $label)
+                        <label @class([
+                            'cursor-pointer rounded-full px-4 py-1.5 text-sm font-medium transition',
+                            'bg-charcoal text-white dark:bg-accent-500 dark:text-charcoal' => $for === $value,
+                            'text-ink-600 hover:text-ink-900' => $for !== $value,
+                        ])>
+                            <input type="radio" class="sr-only" name="for" value="{{ $value }}" wire:model.live="for">
+                            {{ $label }}
+                        </label>
                     @endforeach
-                </select>
-                @error('project_id') <p class="form-error">{{ $message }}</p> @enderror
+                </div>
+            </div>
+            <div class="col-span-2">
+                @if ($for === 'project')
+                    <label class="form-label">Project *</label>
+                    <select wire:model="project_id" class="field-input">
+                        <option value="">Select…</option>
+                        @foreach ($projects as $proj)
+                            <option value="{{ $proj->id }}">{{ $proj->project_code }} — {{ $proj->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('project_id') <p class="form-error">{{ $message }}</p> @enderror
+                @else
+                    <label class="form-label">Client *</label>
+                    <select wire:model="client_id" class="field-input">
+                        <option value="">Select…</option>
+                        @foreach ($clients as $c)
+                            <option value="{{ $c->id }}">{{ $c->client_no }} — {{ $c->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('client_id') <p class="form-error">{{ $message }}</p> @enderror
+                @endif
             </div>
             <div class="col-span-2">
                 <label class="form-label">Title *</label>
@@ -31,6 +58,11 @@
                     @endforeach
                 </select>
                 @error('category') <p class="form-error">{{ $message }}</p> @enderror
+            </div>
+            <div>
+                <label class="form-label">Design price{{ $for === 'sold' ? ' *' : '' }}</label>
+                <input wire:model="price" type="number" step="0.01" min="0" class="field-input" placeholder="0.00">
+                @error('price') <p class="form-error">{{ $message }}</p> @enderror
             </div>
             <div class="col-span-2">
                 <label class="form-label">Description</label>

@@ -20,7 +20,7 @@
                     <tr wire:key="design-{{ $design->id }}">
                         <td class="font-mono">{{ $design->design_no }}</td>
                         <td class="font-medium text-ink-900">{{ $design->title }}</td>
-                        <td>{{ $design->project?->name }}</td>
+                        <td>{{ $design->project?->name ?? 'Design purchase' }}</td>
                         <td><x-status-badge :label="$design->status->label()" :color="$design->status->color()" /></td>
                         <td class="text-right">
                             <a href="{{ route('client.designs.show', $design) }}" wire:navigate class="text-accent-600 hover:underline">View</a>

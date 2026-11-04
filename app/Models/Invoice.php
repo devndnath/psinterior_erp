@@ -17,7 +17,7 @@ class Invoice extends Model
     use HasDocuments, HasFactory, LogsActivity, SoftDeletes;
 
     protected $fillable = [
-        'invoice_no', 'client_id', 'project_id', 'contract_id', 'type',
+        'invoice_no', 'client_id', 'project_id', 'design_id', 'contract_id', 'type',
         'invoice_date', 'due_date', 'subtotal', 'discount', 'tax',
         'grand_total', 'paid_amount', 'status', 'notes',
     ];
@@ -45,6 +45,12 @@ class Invoice extends Model
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
+    }
+
+    /** The sold design this Design Sale invoice bills, if any. */
+    public function design(): BelongsTo
+    {
+        return $this->belongsTo(Design::class);
     }
 
     public function project(): BelongsTo

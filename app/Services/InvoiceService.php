@@ -32,6 +32,7 @@ class InvoiceService
         return DB::transaction(function () use ($project, $data, $items) {
             $invoice = Invoice::create([
                 'project_id' => $project?->id,
+                'design_id' => $data['design_id'] ?? null,
                 'invoice_no' => $this->numbering->next('INV'),
                 'client_id' => $data['client_id'] ?? $project->client_id,
                 'contract_id' => $data['contract_id'] ?? null,

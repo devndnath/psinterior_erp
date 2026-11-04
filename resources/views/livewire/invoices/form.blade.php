@@ -41,7 +41,13 @@
                 </x-select>
             @else
                 <div class="sm:col-span-2">
-                    <x-select label="Client *" name="client_id" wire:model="client_id">
+                    @if ($linkedDesign)
+                        <p class="mb-3 flex items-center gap-2 rounded-2xl bg-accent-500/10 px-4 py-2.5 text-sm text-ink-700">
+                            <x-icon name="palette" class="h-4 w-4 text-accent-700 dark:text-accent-400" />
+                            For sold design <a href="{{ route('designs.show', $linkedDesign->id) }}" wire:navigate class="font-semibold text-accent-700 hover:underline dark:text-accent-400">{{ $linkedDesign->design_no }}</a> — {{ $linkedDesign->title }}
+                        </p>
+                    @endif
+                    <x-select label="Client *" name="client_id" wire:model.live="client_id">
                         <option value="">Select…</option>
                         @foreach ($clients as $c)
                             <option value="{{ $c->id }}">{{ $c->client_no }} — {{ $c->name }}</option>

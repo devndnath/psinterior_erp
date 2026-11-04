@@ -8,7 +8,7 @@
         </x-slot:actions>
     </x-page-header>
 
-    <p class="-mt-4 mb-6 text-sm text-ink-500">{{ $design->project?->name }}</p>
+    <p class="-mt-4 mb-6 text-sm text-ink-500">{{ $design->project?->name ?? 'Design purchase' }}</p>
 
     @if ($design->latestRevision())
         <div class="mb-6 panel p-6">

@@ -24,10 +24,8 @@ class Index extends Component
     public function render()
     {
         $client = Auth::guard('client')->user()->client;
-        $projectIds = Project::where('client_id', $client->id)->pluck('id');
-
         return view('livewire.client.designs.index', [
-            'designs' => Design::whereIn('project_id', $projectIds)
+            'designs' => Design::forClient($client->id)
                 ->with('project')
                 ->orderByDesc('created_at')
                 ->paginate(10),

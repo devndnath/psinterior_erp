@@ -721,18 +721,38 @@ class SampleDataSeeder extends Seeder
         // Design work sold on its own, with no project — billed straight
         // to the client. Fixed values (no mt_rand) so the rest of the
         // seeded dataset stays identical.
+        // Each is a sold design (no project) with its own price, invoiced
+        // through a Design Sale invoice linked back to it.
+        $designSvc = app(DesignService::class);
         foreach ([
-            [0, 'Duplex interior concept — 3D renders', 65000, 150, 1.0],
-            [3, 'Office reception design package', 48000, 95, 1.0],
-            [5, 'Kitchen layout & elevation drawings', 22000, 52, 1.0],
-            [8, 'Master bedroom 3D walkthrough', 35000, 20, 0.5],
-            [11, 'Restaurant façade concept', 40000, 6, 0.0],
-        ] as [$clientIndex, $description, $rate, $daysAgo, $paidShare]) {
+            [0, 'Duplex interior concept — 3D renders', '3d_design', 65000, 150, 1.0],
+            [3, 'Office reception design package', '2d_drawing', 48000, 95, 1.0],
+            [5, 'Kitchen layout & elevation drawings', 'elevation', 22000, 52, 1.0],
+            [8, 'Master bedroom 3D walkthrough', 'walkthrough', 35000, 20, 0.5],
+            [11, 'Restaurant façade concept', 'rendering', 40000, 6, 0.0],
+            [14, 'Café seating floor plan', 'floor_plan', 18000, 2, null],
+        ] as [$clientIndex, $description, $category, $rate, $daysAgo, $paidShare]) {
             $client = $this->clients[$clientIndex % count($this->clients)];
             $date = $this->today->subDays($daysAgo);
 
+            $design = $designSvc->create([
+                'project_id' => null,
+                'client_id' => $client->id,
+                'title' => $description,
+                'category' => $category,
+                'price' => $rate,
+                'status' => $paidShare === null ? 'submitted' : 'approved',
+                'uploaded_by' => $this->staff['designer']->id,
+            ]);
+
+            // The newest one hasn't been invoiced yet.
+            if ($paidShare === null) {
+                continue;
+            }
+
             $invoice = $invoiceSvc->issue($invoiceSvc->create(null, [
                 'client_id' => $client->id,
+                'design_id' => $design->id,
                 'invoice_date' => $date->toDateString(),
                 'due_date' => $date->addDays(10)->toDateString(),
             ], [

@@ -51,6 +51,9 @@
             — {{ $invoice->project->name }}
         @else
             Design sale (no project)
+            @if ($invoice->design)
+                — <a href="{{ route('designs.show', $invoice->design) }}" wire:navigate class="text-accent-600 hover:underline">{{ $invoice->design->design_no }}</a> {{ $invoice->design->title }}
+            @endif
         @endif
         @if ($invoice->client)
             — {{ $invoice->client->name }}

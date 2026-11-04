@@ -28,7 +28,7 @@ class Show extends Component
     {
         $client = Auth::guard('client')->user()->client;
         abort_unless($client, 403, 'No client record linked to this account.');
-        abort_unless($design->project && $design->project->client_id === $client->id, 403);
+        abort_unless($design->customerId() === $client->id, 403);
 
         $this->design = $design;
     }

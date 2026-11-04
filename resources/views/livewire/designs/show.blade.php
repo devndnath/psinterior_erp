@@ -14,6 +14,8 @@
                     @if ($design->project->client)
                         — {{ $design->project->client->name }}
                     @endif
+                @else
+                    — Sold design{{ $design->client ? ' — '.$design->client->name : '' }}
                 @endif
             </p>
         </div>
@@ -191,17 +193,59 @@
         </div>
 
         <div>
-            <div class="card p-6">
-                <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Project</h2>
-                @if ($design->project)
+            @if ($design->isSold())
+                {{-- A design sold on its own: client, price and what's
+                     been invoiced / paid for it. --}}
+                <div class="card p-6">
+                    <div class="mb-4 flex items-center justify-between gap-2">
+                        <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500">Sale</h2>
+                        <span class="chip !border-accent-500/40 !bg-accent-500/10 !text-accent-700 dark:!text-accent-400">Sold design</span>
+                    </div>
+                    <dl class="space-y-2 text-sm">
+                        <div class="flex items-center justify-between gap-3">
+                            <dt class="text-ink-500">Client</dt>
+                            <dd class="truncate font-medium text-ink-900">
+                                @if ($design->client)
+                                    <a href="{{ route('clients.show', $design->client) }}" wire:navigate class="hover:underline">{{ $design->client->name }}</a>
+                                @else
+                                    —
+                                @endif
+                            </dd>
+                        </div>
+                        <div class="flex items-center justify-between gap-3">
+                            <dt class="text-ink-500">Design price</dt>
+                            <dd class="font-semibold tabular-nums text-ink-900">{{ $design->price !== null ? number_format((float) $design->price, 2) : '—' }}</dd>
+                        </div>
+                    </dl>
+                    @can('view_invoices')
+                        @php($active = $design->invoices->where('status', '!=', \App\Enums\InvoiceStatus::Cancelled))
+                        <div class="mt-4 border-t border-ink-100 pt-4">
+                            @forelse ($active as $inv)
+                                <div class="flex items-center justify-between gap-2 py-1 text-sm">
+                                    <a href="{{ route('invoices.show', $inv) }}" wire:navigate class="font-medium text-accent-600 hover:underline">{{ $inv->invoice_no }}</a>
+                                    <span class="tabular-nums text-ink-600">{{ number_format((float) $inv->paid_amount, 2) }} / {{ number_format((float) $inv->grand_total, 2) }}</span>
+                                </div>
+                            @empty
+                                <p class="text-sm text-ink-500">Not invoiced yet.</p>
+                            @endforelse
+                        </div>
+                    @endcan
+                    @can('create', \App\Models\Invoice::class)
+                        <a href="{{ route('invoices.create', ['billing' => 'design', 'design' => $design->id]) }}" wire:navigate class="btn-primary mt-4 w-full justify-center">Create invoice</a>
+                    @endcan
+                </div>
+            @else
+                <div class="card p-6">
+                    <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Project</h2>
                     <p class="text-sm font-medium text-gray-900">
                         <a href="{{ route('projects.show', $design->project) }}" wire:navigate class="text-brand-600 hover:underline">{{ $design->project->project_code }}</a>
                     </p>
                     <p class="mt-1 text-sm text-gray-500">{{ $design->project->name }}</p>
-                @else
-                    <p class="text-sm text-gray-500">No project linked.</p>
-                @endif
-            </div>
+                    @if ($design->price !== null)
+                        <p class="mt-3 flex items-center justify-between text-sm"><span class="text-ink-500">Design price</span><span class="font-semibold tabular-nums text-ink-900">{{ number_format((float) $design->price, 2) }}</span></p>
+                    @endif
+                </div>
+            @endif
         </div>
     </div>
 </div>

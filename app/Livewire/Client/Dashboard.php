@@ -40,7 +40,7 @@ class Dashboard extends Component
             'activeProjects' => Project::where('client_id', $client->id)
                 ->whereNotIn('status', [ProjectStatus::Completed->value, ProjectStatus::Cancelled->value])
                 ->count(),
-            'pendingDesignApprovals' => Design::whereIn('project_id', $projectIds)
+            'pendingDesignApprovals' => Design::forClient($client->id)
                 ->whereIn('status', [DesignStatus::Submitted->value, DesignStatus::UnderReview->value])
                 ->count(),
             'pendingQuotationApprovals' => Quotation::where('client_id', $client->id)

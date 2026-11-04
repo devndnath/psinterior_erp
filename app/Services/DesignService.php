@@ -103,7 +103,7 @@ class DesignService
             $design = $revision->design;
 
             $revision->approvals()->create([
-                'client_id' => $design->project->client_id,
+                'client_id' => $design->customerId(),
                 'decision' => $decision,
                 'comment' => $comment,
                 'ip_address' => $ipAddress,

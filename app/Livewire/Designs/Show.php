@@ -138,6 +138,8 @@ class Show extends Component
     {
         $this->design->load([
             'project.client',
+            'client',
+            'invoices',
             'uploader',
             'revisions.file',
             'revisions.uploader',

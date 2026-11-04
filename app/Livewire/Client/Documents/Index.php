@@ -36,7 +36,7 @@ class Index extends Component
 
         $documents = collect()
             ->concat(Document::where('documentable_type', Project::class)->whereIn('documentable_id', $projectIds)->get())
-            ->concat(Document::where('documentable_type', Design::class)->whereIn('documentable_id', Design::whereIn('project_id', $projectIds)->pluck('id'))->get())
+            ->concat(Document::where('documentable_type', Design::class)->whereIn('documentable_id', Design::forClient($client->id)->pluck('id'))->get())
             ->concat(Document::where('documentable_type', Quotation::class)->whereIn('documentable_id', Quotation::where('client_id', $client->id)->pluck('id'))->get())
             ->concat(Document::where('documentable_type', Contract::class)->whereIn('documentable_id', Contract::where('client_id', $client->id)->pluck('id'))->get())
             ->concat(Document::where('documentable_type', Invoice::class)->whereIn('documentable_id', Invoice::where('client_id', $client->id)->pluck('id'))->get())

@@ -29,6 +29,8 @@ class Form extends Component
     public string $billing = 'project';
     public string $project_id = '';
     public string $client_id = '';
+    /** The sold design this invoice bills, when raised from it. */
+    public string $design_id = '';
     public string $contract_id = '';
     public string $type = 'progress';
     public string $invoice_date = '';
@@ -76,7 +78,21 @@ class Form extends Component
                 $this->billing = 'design';
                 $this->type = InvoiceType::Design->value;
 
-                $clientId = request()->query('client');
+                // Raised from a sold design: bill its client for it.
+                $design = ($designId = request()->query('design'))
+                    ? \App\Models\Design::whereKey($designId)->whereNull('project_id')->first()
+                    : null;
+                if ($design) {
+                    $this->design_id = (string) $design->id;
+                    $this->client_id = (string) $design->client_id;
+                    $this->items = [[
+                        'description' => "{$design->design_no} — {$design->title}",
+                        'qty' => '1',
+                        'rate' => $design->price !== null ? (string) $design->price : '0',
+                    ]];
+                }
+
+                $clientId = $design ? null : request()->query('client');
                 if ($clientId && Client::whereKey($clientId)->exists()) {
                     $this->client_id = (string) $clientId;
                 }
@@ -94,9 +110,18 @@ class Form extends Component
             $this->project_id = '';
             $this->contract_id = '';
             $this->type = InvoiceType::Design->value;
-        } elseif ($this->type === InvoiceType::Design->value) {
-            $this->type = InvoiceType::Progress->value;
+        } else {
+            $this->design_id = '';
+            if ($this->type === InvoiceType::Design->value) {
+                $this->type = InvoiceType::Progress->value;
+            }
         }
+    }
+
+    public function updatedClientId(): void
+    {
+        // A linked design belongs to one client.
+        $this->design_id = '';
     }
 
     public function addItem(): void
@@ -120,6 +145,9 @@ class Form extends Component
             'billing' => ['required', 'in:project,design'],
             'project_id' => ['required_if:billing,project', 'nullable', 'exists:projects,id'],
             'client_id' => ['required_if:billing,design', 'nullable', 'exists:clients,id'],
+            // Must be a sold design belonging to the chosen client.
+            'design_id' => ['nullable', \Illuminate\Validation\Rule::exists('designs', 'id')
+                ->whereNull('project_id')->where('client_id', $this->client_id ?: 0)],
             'contract_id' => ['nullable', 'exists:contracts,id'],
             'type' => ['required', 'string', 'in:'.implode(',', array_column(InvoiceType::cases(), 'value'))],
             'invoice_date' => ['required', 'date'],
@@ -158,6 +186,7 @@ class Form extends Component
             $message = "Invoice {$invoice->invoice_no} updated.";
         } elseif ($isDesignSale) {
             $invoiceData['client_id'] = $data['client_id'];
+            $invoiceData['design_id'] = $data['design_id'] ?: null;
 
             $invoice = $service->create(null, $invoiceData, $data['items']);
             $message = "Invoice {$invoice->invoice_no} created.";
@@ -181,6 +210,7 @@ class Form extends Component
             : collect();
 
         return view('livewire.invoices.form', [
+            'linkedDesign' => $this->design_id ? \App\Models\Design::find($this->design_id, ['id', 'design_no', 'title']) : null,
             'projects' => Project::orderBy('name')->get(['id', 'name', 'project_code']),
             'clients' => Client::orderBy('name')->get(['id', 'name', 'client_no']),
             'contracts' => $contracts,

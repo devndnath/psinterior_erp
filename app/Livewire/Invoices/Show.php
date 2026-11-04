@@ -76,7 +76,7 @@ class Show extends Component
     #[Title('Invoice')]
     public function render()
     {
-        $this->invoice->load(['project', 'client', 'contract', 'items', 'payments']);
+        $this->invoice->load(['project', 'client', 'contract', 'design', 'items', 'payments']);
 
         return view('livewire.invoices.show');
     }
