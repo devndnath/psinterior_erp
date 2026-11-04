@@ -303,7 +303,7 @@ class Index extends Component
     private function modules($user): array
     {
         return array_values(array_filter([
-            $user->can('view_leads') ? ['label' => 'CRM', 'icon' => 'funnel', 'href' => route('leads.index'),
+            $user->can('view_leads') ? ['label' => 'CRM', 'icon' => 'funnel', 'href' => route('crm.overview'),
                 'stat' => Lead::whereIn('status', array_filter(LeadStatus::cases(), fn (LeadStatus $s) => $s->isOpen()))->count(), 'unit' => 'open leads'] : null,
             $user->can('view_designs') ? ['label' => 'Design', 'icon' => 'palette', 'href' => route('designs.index'),
                 'stat' => Design::whereIn('status', [DesignStatus::Submitted->value, DesignStatus::UnderReview->value])->count(), 'unit' => 'in review'] : null,

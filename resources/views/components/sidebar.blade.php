@@ -23,6 +23,7 @@
             'label' => 'CRM Section',
             'entries' => [
                 ['label' => 'CRM', 'icon' => 'funnel', 'children' => [
+                    ['label' => 'Overview', 'route' => 'crm.overview', 'icon' => 'layout-dashboard', 'permission' => 'view_leads'],
                     ['label' => 'Leads', 'route' => 'leads.index', 'active' => 'leads.*', 'icon' => 'funnel', 'permission' => 'view_leads'],
                     ['label' => 'Site Visits', 'route' => 'site-visits.index', 'active' => 'site-visits.*', 'icon' => 'map-pin', 'permission' => 'view_site_visits'],
                     ['label' => 'Clients', 'route' => 'clients.index', 'active' => 'clients.*', 'icon' => 'users', 'permission' => 'view_clients'],

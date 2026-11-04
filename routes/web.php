@@ -16,6 +16,7 @@ use App\Livewire\Boqs\Form as BoqForm;
 use App\Livewire\Boqs\Index as BoqIndex;
 use App\Livewire\Boqs\Show as BoqShow;
 use App\Livewire\Calendar\Index as CalendarIndex;
+use App\Livewire\Crm\Overview as CrmOverview;
 use App\Livewire\ChangeOrders\Form as ChangeOrderForm;
 use App\Livewire\ChangeOrders\Index as ChangeOrderIndex;
 use App\Livewire\ChangeOrders\Show as ChangeOrderShow;
@@ -178,6 +179,10 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
     // `view_*` ability, so any authenticated staff user can open the
     // page even if every section on it happens to be empty for them.
     Route::get('/calendar', CalendarIndex::class)->name('calendar.index');
+
+    // CRM overview (the dashboard's CRM card): calls, visits, meetings,
+    // pipeline, projects, dues and new clients this year.
+    Route::get('/crm', CrmOverview::class)->name('crm.overview')->middleware('can:view_leads');
 
     // Self-service for ANY staff user with a linked Employee record — no
     // `can:` middleware, deliberately: these are the same reasoning as

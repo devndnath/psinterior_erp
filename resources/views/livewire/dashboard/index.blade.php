@@ -162,6 +162,40 @@
             </div>
         @endif
 
+        {{-- Quick links: the everyday actions, one tap from the dashboard.
+             Each shows only when the user may do it. --}}
+        @php
+            $quick = array_values(array_filter([
+                ['label' => 'New Lead', 'icon' => 'funnel', 'href' => route('leads.create'), 'can' => 'create_leads'],
+                ['label' => 'Site Visit', 'icon' => 'map-pin', 'href' => route('site-visits.create'), 'can' => 'create_site_visits'],
+                ['label' => 'Meeting', 'icon' => 'calendar', 'href' => route('meetings.create'), 'can' => 'create_meetings'],
+                ['label' => 'Quotation', 'icon' => 'file-text', 'href' => route('quotations.create'), 'can' => 'create_quotations'],
+                ['label' => 'Invoice', 'icon' => 'receipt', 'href' => route('invoices.create'), 'can' => 'create_invoices'],
+                ['label' => 'Design Sale', 'icon' => 'palette', 'href' => route('designs.create', ['for' => 'sold']), 'can' => 'create_designs'],
+                ['label' => 'Record Payment', 'icon' => 'credit-card', 'href' => route('payments.create'), 'can' => 'create_payments'],
+                ['label' => 'Expense', 'icon' => 'wallet', 'href' => route('expenses.create'), 'can' => 'create_expenses'],
+                ['label' => 'Purchase Order', 'icon' => 'shopping-cart', 'href' => route('purchase-orders.create'), 'can' => 'create_purchase_orders'],
+                ['label' => 'Vendor Bills', 'icon' => 'truck', 'href' => route('vendor-invoices.index'), 'can' => 'view_vendor_invoices'],
+                ['label' => 'Contractors', 'icon' => 'hard-hat', 'href' => route('subcontractors.index'), 'can' => 'view_subcontractors'],
+                ['label' => 'Reports', 'icon' => 'bar-chart', 'href' => route('reports.index'), 'can' => 'view_reports'],
+            ], fn ($q) => auth()->user()?->can($q['can'])));
+        @endphp
+        @if ($quick)
+            <div class="panel mb-5 p-4 sm:p-5">
+                <p class="mb-3 px-1 text-xs font-semibold text-ink-500">Quick links</p>
+                <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6">
+                    @foreach ($quick as $q)
+                        <a href="{{ $q['href'] }}" wire:navigate class="group flex items-center gap-2.5 rounded-full border border-ink-200/70 bg-surface py-1.5 pl-1.5 pr-3 text-sm font-medium text-ink-700 transition hover:border-transparent hover:bg-charcoal hover:text-white dark:border-white/[0.06] dark:hover:bg-accent-500 dark:hover:text-charcoal">
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent-500/15 text-accent-700 transition group-hover:bg-white/10 group-hover:text-accent-400 dark:text-accent-400 dark:group-hover:bg-charcoal/15 dark:group-hover:text-charcoal">
+                                <x-icon :name="$q['icon']" class="h-4 w-4" />
+                            </span>
+                            <span class="truncate">{{ $q['label'] }}</span>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
         {{-- Row 1: year at a glance (circles) + revenue trend -------------- --}}
         @if ($income || $expenses)
             <div class="grid grid-cols-1 gap-5 lg:grid-cols-12">
