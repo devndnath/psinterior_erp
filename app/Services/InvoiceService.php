@@ -18,14 +18,24 @@ class InvoiceService
 {
     public function __construct(protected NumberingService $numbering) {}
 
-    public function create(Project $project, array $data, array $items = []): Invoice
+    /**
+     * $project is null for a design sold on its own: the invoice is then
+     * billed to $data['client_id'] directly and defaults to the Design
+     * type.
+     */
+    public function create(?Project $project, array $data, array $items = []): Invoice
     {
+        if (! $project && empty($data['client_id'])) {
+            throw new \InvalidArgumentException('An invoice without a project needs a client.');
+        }
+
         return DB::transaction(function () use ($project, $data, $items) {
-            $invoice = $project->invoices()->create([
+            $invoice = Invoice::create([
+                'project_id' => $project?->id,
                 'invoice_no' => $this->numbering->next('INV'),
                 'client_id' => $data['client_id'] ?? $project->client_id,
                 'contract_id' => $data['contract_id'] ?? null,
-                'type' => $data['type'] ?? \App\Enums\InvoiceType::Progress->value,
+                'type' => $data['type'] ?? ($project ? \App\Enums\InvoiceType::Progress : \App\Enums\InvoiceType::Design)->value,
                 'invoice_date' => $data['invoice_date'] ?? now()->toDateString(),
                 'due_date' => $data['due_date'] ?? null,
                 'discount' => $data['discount'] ?? 0,
@@ -55,6 +65,12 @@ class InvoiceService
         }
 
         return DB::transaction(function () use ($invoice, $data, $items) {
+            // A design sale has no project to take its client from, so its
+            // client stays editable; a project invoice's client never is.
+            if (! $invoice->project_id && ! empty($data['client_id'])) {
+                $invoice->client_id = $data['client_id'];
+            }
+
             $invoice->update([
                 'contract_id' => array_key_exists('contract_id', $data) ? $data['contract_id'] : $invoice->contract_id,
                 'type' => array_key_exists('type', $data) ? $data['type'] : $invoice->type->value,

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-paper" x-data="{ sidebarOpen: false }">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-paper">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -30,7 +30,10 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
-<body class="app-canvas h-full font-sans antialiased">
+{{-- Mobile-menu state lives on <body>, not <html>: logging in reaches
+     this layout via wire:navigate, which swaps <body> but keeps the
+     login page's <html>, so state on <html> would be missing. --}}
+<body class="app-canvas h-full font-sans antialiased" x-data="{ sidebarOpen: false }">
     {{-- Soft-canvas pass: header across the top on the canvas, then the
          floating sidebar pill and the scrolling content side by side. --}}
     <div class="flex h-full flex-col">

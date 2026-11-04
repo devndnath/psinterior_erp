@@ -27,8 +27,13 @@ class PaymentService
             // The payment and the invoice it settles must be for the same
             // project, or project profitability and the invoice's paid
             // status would disagree about where the money went.
-            if ((int) $invoice->project_id !== (int) $data['project_id']) {
+            // Both may be null: a design sold without a project.
+            if ((int) $invoice->project_id !== (int) ($data['project_id'] ?? 0)) {
                 throw new \InvalidArgumentException('The selected invoice belongs to a different project.');
+            }
+
+            if ((int) $invoice->client_id !== (int) $data['client_id']) {
+                throw new \InvalidArgumentException('The selected invoice belongs to a different client.');
             }
 
             if ($invoice->status === \App\Enums\InvoiceStatus::Cancelled) {
@@ -40,7 +45,7 @@ class PaymentService
             $payment = Payment::create([
                 'payment_no' => $this->numbering->next('PAY'),
                 'client_id' => $data['client_id'],
-                'project_id' => $data['project_id'],
+                'project_id' => $data['project_id'] ?? null,
                 'invoice_id' => $data['invoice_id'] ?? null,
                 'date' => $data['date'],
                 'amount' => $data['amount'],

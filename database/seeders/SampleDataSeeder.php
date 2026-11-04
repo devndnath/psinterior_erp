@@ -717,6 +717,40 @@ class SampleDataSeeder extends Seeder
             ['description' => 'Duplicate billing — cancelled', 'qty' => 1, 'rate' => 45000],
         ]));
         $invoiceSvc->cancel($cancel);
+
+        // Design work sold on its own, with no project — billed straight
+        // to the client. Fixed values (no mt_rand) so the rest of the
+        // seeded dataset stays identical.
+        foreach ([
+            [0, 'Duplex interior concept — 3D renders', 65000, 150, 1.0],
+            [3, 'Office reception design package', 48000, 95, 1.0],
+            [5, 'Kitchen layout & elevation drawings', 22000, 52, 1.0],
+            [8, 'Master bedroom 3D walkthrough', 35000, 20, 0.5],
+            [11, 'Restaurant façade concept', 40000, 6, 0.0],
+        ] as [$clientIndex, $description, $rate, $daysAgo, $paidShare]) {
+            $client = $this->clients[$clientIndex % count($this->clients)];
+            $date = $this->today->subDays($daysAgo);
+
+            $invoice = $invoiceSvc->issue($invoiceSvc->create(null, [
+                'client_id' => $client->id,
+                'invoice_date' => $date->toDateString(),
+                'due_date' => $date->addDays(10)->toDateString(),
+            ], [
+                ['description' => $description, 'qty' => 1, 'rate' => $rate],
+            ]));
+
+            if ($paidShare > 0) {
+                $paymentSvc->create([
+                    'client_id' => $client->id,
+                    'project_id' => null,
+                    'invoice_id' => $invoice->id,
+                    'date' => $date->addDays(3)->min($this->today)->toDateString(),
+                    'amount' => round($rate * $paidShare, 2),
+                    'method' => 'bank',
+                    'reference' => 'DS-'.$invoice->invoice_no,
+                ]);
+            }
+        }
     }
 
     /**

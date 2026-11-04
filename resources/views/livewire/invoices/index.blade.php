@@ -1,10 +1,11 @@
 <div>
-    <x-page-header title="Invoices" description="Bill clients for work done on a project and track what's outstanding.">
+    <x-page-header title="Invoices" description="Bill clients for project work or a design sold on its own, and track what's outstanding.">
         <x-slot:breadcrumbs>
             <x-breadcrumbs :items="['Invoices' => null]" />
         </x-slot:breadcrumbs>
         <x-slot:actions>
             @can('create', \App\Models\Invoice::class)
+                <x-button variant="secondary" href="{{ route('invoices.create', ['billing' => 'design']) }}" wire:navigate>+ Design Sale</x-button>
                 <x-button href="{{ route('invoices.create') }}" wire:navigate>+ New Invoice</x-button>
             @endcan
         </x-slot:actions>
@@ -71,7 +72,7 @@
                             @if ($invoice->project)
                                 <a href="{{ route('projects.show', $invoice->project) }}" wire:navigate class="hover:underline">{{ $invoice->project->project_code }}</a>
                             @else
-                                —
+                                <span class="text-ink-500">No project</span>
                             @endif
                         </td>
                         <td>{{ $invoice->type->label() }}</td>

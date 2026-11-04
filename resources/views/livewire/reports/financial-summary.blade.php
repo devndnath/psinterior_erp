@@ -35,6 +35,36 @@
         </div>
     </div>
 
+    {{-- Design work is also sold on its own (no project), so income is
+         split by source: Design sales = invoices of type Design Sale plus
+         any payment received without a project. --}}
+    <div class="panel mb-6 p-6">
+        <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Income by Source</h2>
+        <div class="overflow-x-auto">
+            <table class="table-base">
+                <thead>
+                    <tr>
+                        <th>Source</th>
+                        <th class="!text-right">Invoiced</th>
+                        <th class="!text-right">Received</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="font-medium text-ink-900">Project work</td>
+                        <td class="text-right tabular-nums">{{ number_format($totals['project_invoiced'], 2) }}</td>
+                        <td class="text-right tabular-nums">{{ number_format($totals['project_received'], 2) }}</td>
+                    </tr>
+                    <tr>
+                        <td class="font-medium text-ink-900">Design sales</td>
+                        <td class="text-right tabular-nums">{{ number_format($totals['design_invoiced'], 2) }}</td>
+                        <td class="text-right tabular-nums">{{ number_format($totals['design_received'], 2) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <div class="panel p-6">
         <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Invoice Ageing (outstanding amount, by days past due)</h2>
         <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">

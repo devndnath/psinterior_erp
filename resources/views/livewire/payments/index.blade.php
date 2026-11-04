@@ -63,7 +63,7 @@
                             @if ($payment->project)
                                 <a href="{{ route('projects.show', $payment->project) }}" wire:navigate class="hover:underline">{{ $payment->project->project_code }}</a>
                             @else
-                                —
+                                <span class="text-ink-500">Design sale</span>
                             @endif
                         </td>
                         <td>

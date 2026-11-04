@@ -4,6 +4,7 @@ namespace App\Livewire\Payments;
 
 use App\Enums\InvoiceStatus;
 use App\Enums\PaymentMethod;
+use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Project;
@@ -22,7 +23,10 @@ use Livewire\Component;
 #[Layout('layouts.admin')]
 class Form extends Component
 {
+    /** 'project' = received against a project; 'design' = for a design sold without a project. */
+    public string $billing = 'project';
     public string $project_id = '';
+    public string $client_id = '';
     public string $invoice_id = '';
     public string $amount = '';
     public string $method = 'bank';
@@ -42,6 +46,8 @@ class Form extends Component
         if ($invoiceId && ($invoice = Invoice::find($invoiceId))) {
             $this->invoice_id = (string) $invoice->id;
             $this->project_id = (string) $invoice->project_id;
+            $this->client_id = (string) $invoice->client_id;
+            $this->billing = $invoice->project_id ? 'project' : 'design';
 
             return;
         }
@@ -50,6 +56,19 @@ class Form extends Component
 
         if ($projectId && Project::whereKey($projectId)->exists()) {
             $this->project_id = (string) $projectId;
+        }
+    }
+
+    public function updatedBilling(): void
+    {
+        $this->project_id = '';
+        $this->invoice_id = '';
+    }
+
+    public function updatedClientId(): void
+    {
+        if ($this->invoice_id && ! Invoice::where('id', $this->invoice_id)->whereNull('project_id')->where('client_id', $this->client_id)->exists()) {
+            $this->invoice_id = '';
         }
     }
 
@@ -69,11 +88,19 @@ class Form extends Component
      */
     protected function availableInvoices()
     {
-        if (! $this->project_id) {
+        if ($this->billing === 'design') {
+            if (! $this->client_id) {
+                return collect();
+            }
+
+            $query = Invoice::whereNull('project_id')->where('client_id', $this->client_id);
+        } elseif ($this->project_id) {
+            $query = Invoice::where('project_id', $this->project_id);
+        } else {
             return collect();
         }
 
-        return Invoice::where('project_id', $this->project_id)
+        return $query
             ->whereNotIn('status', [InvoiceStatus::Cancelled->value, InvoiceStatus::Draft->value])
             ->get(['id', 'invoice_no', 'grand_total', 'paid_amount'])
             ->filter(fn ($invoice) => $invoice->outstandingAmount() > 0 || (string) $invoice->id === $this->invoice_id);
@@ -82,11 +109,15 @@ class Form extends Component
     protected function rules(): array
     {
         return [
-            'project_id' => ['required', 'exists:projects,id'],
+            'billing' => ['required', 'in:project,design'],
+            'project_id' => ['required_if:billing,project', 'nullable', 'exists:projects,id'],
+            'client_id' => ['required_if:billing,design', 'nullable', 'exists:clients,id'],
             'invoice_id' => [
                 'nullable',
                 \Illuminate\Validation\Rule::exists('invoices', 'id')
-                    ->where('project_id', $this->project_id ?: 0)
+                    ->where(fn ($q) => $this->billing === 'design'
+                        ? $q->whereNull('project_id')->where('client_id', $this->client_id ?: 0)
+                        : $q->where('project_id', $this->project_id ?: 0))
                     ->where(fn ($q) => $q->where('status', '!=', \App\Enums\InvoiceStatus::Cancelled->value)),
             ],
             'amount' => ['required', 'numeric', 'min:0.01'],
@@ -102,11 +133,11 @@ class Form extends Component
     {
         $data = $this->validate();
 
-        $project = Project::findOrFail($data['project_id']);
+        $project = $data['billing'] === 'project' ? Project::findOrFail($data['project_id']) : null;
 
         $payment = $service->create([
-            'client_id' => $project->client_id,
-            'project_id' => $project->id,
+            'client_id' => $project ? $project->client_id : $data['client_id'],
+            'project_id' => $project?->id,
             'invoice_id' => $data['invoice_id'] ?: null,
             'date' => $data['date'],
             'amount' => $data['amount'],
@@ -125,6 +156,7 @@ class Form extends Component
     {
         return view('livewire.payments.form', [
             'projects' => Project::orderBy('name')->get(['id', 'name', 'project_code']),
+            'clients' => Client::orderBy('name')->get(['id', 'name', 'client_no']),
             'methods' => PaymentMethod::options(),
             'invoices' => $this->availableInvoices(),
         ]);

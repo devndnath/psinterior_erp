@@ -7,18 +7,48 @@
 
     <form wire:submit="save" class="max-w-4xl space-y-6">
         <div class="panel grid grid-cols-1 sm:grid-cols-2 gap-4 p-6">
-            <x-select label="Project *" name="project_id" wire:model.live="project_id" :disabled="(bool) $invoice">
-                <option value="">Select…</option>
-                @foreach ($projects as $proj)
-                    <option value="{{ $proj->id }}">{{ $proj->project_code }} — {{ $proj->name }}</option>
-                @endforeach
-            </x-select>
-            <x-select label="Contract" name="contract_id" wire:model="contract_id">
-                <option value="">None</option>
-                @foreach ($contracts as $contract)
-                    <option value="{{ $contract->id }}">{{ $contract->contract_no }}</option>
-                @endforeach
-            </x-select>
+            {{-- Design work is also sold on its own, without a project:
+                 then the client is billed directly. Fixed once created. --}}
+            <div class="sm:col-span-2">
+                <span class="form-label">Bill for *</span>
+                <div class="inline-flex flex-wrap gap-1 rounded-full border border-ink-200 bg-surface p-1">
+                    @foreach (['project' => 'A project', 'design' => 'Design sale (no project)'] as $value => $label)
+                        <label @class([
+                            'cursor-pointer rounded-full px-4 py-1.5 text-sm font-medium transition',
+                            'bg-charcoal text-white dark:bg-accent-500 dark:text-charcoal' => $billing === $value,
+                            'text-ink-600 hover:text-ink-900' => $billing !== $value,
+                            'pointer-events-none opacity-60' => $invoice && $billing !== $value,
+                        ])>
+                            <input type="radio" class="sr-only" name="billing" value="{{ $value }}" wire:model.live="billing" @disabled($invoice)>
+                            {{ $label }}
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+
+            @if ($billing === 'project')
+                <x-select label="Project *" name="project_id" wire:model.live="project_id" :disabled="(bool) $invoice">
+                    <option value="">Select…</option>
+                    @foreach ($projects as $proj)
+                        <option value="{{ $proj->id }}">{{ $proj->project_code }} — {{ $proj->name }}</option>
+                    @endforeach
+                </x-select>
+                <x-select label="Contract" name="contract_id" wire:model="contract_id">
+                    <option value="">None</option>
+                    @foreach ($contracts as $contract)
+                        <option value="{{ $contract->id }}">{{ $contract->contract_no }}</option>
+                    @endforeach
+                </x-select>
+            @else
+                <div class="sm:col-span-2">
+                    <x-select label="Client *" name="client_id" wire:model="client_id">
+                        <option value="">Select…</option>
+                        @foreach ($clients as $c)
+                            <option value="{{ $c->id }}">{{ $c->client_no }} — {{ $c->name }}</option>
+                        @endforeach
+                    </x-select>
+                </div>
+            @endif
             <x-select label="Type *" name="type" wire:model="type">
                 @foreach ($types as $value => $label)
                     <option value="{{ $value }}">{{ $label }}</option>

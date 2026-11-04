@@ -8,12 +8,36 @@
     <form wire:submit="save" class="max-w-2xl space-y-6">
         <div class="panel grid grid-cols-1 sm:grid-cols-2 gap-4 p-6">
             <div class="col-span-2">
-                <x-select label="Project *" name="project_id" wire:model.live="project_id">
-                    <option value="">Select…</option>
-                    @foreach ($projects as $proj)
-                        <option value="{{ $proj->id }}">{{ $proj->project_code }} — {{ $proj->name }}</option>
+                <span class="form-label">Received for *</span>
+                <div class="inline-flex flex-wrap gap-1 rounded-full border border-ink-200 bg-surface p-1">
+                    @foreach (['project' => 'A project', 'design' => 'Design sale (no project)'] as $value => $label)
+                        <label @class([
+                            'cursor-pointer rounded-full px-4 py-1.5 text-sm font-medium transition',
+                            'bg-charcoal text-white dark:bg-accent-500 dark:text-charcoal' => $billing === $value,
+                            'text-ink-600 hover:text-ink-900' => $billing !== $value,
+                        ])>
+                            <input type="radio" class="sr-only" name="billing" value="{{ $value }}" wire:model.live="billing">
+                            {{ $label }}
+                        </label>
                     @endforeach
-                </x-select>
+                </div>
+            </div>
+            <div class="col-span-2">
+                @if ($billing === 'project')
+                    <x-select label="Project *" name="project_id" wire:model.live="project_id">
+                        <option value="">Select…</option>
+                        @foreach ($projects as $proj)
+                            <option value="{{ $proj->id }}">{{ $proj->project_code }} — {{ $proj->name }}</option>
+                        @endforeach
+                    </x-select>
+                @else
+                    <x-select label="Client *" name="client_id" wire:model.live="client_id">
+                        <option value="">Select…</option>
+                        @foreach ($clients as $c)
+                            <option value="{{ $c->id }}">{{ $c->client_no }} — {{ $c->name }}</option>
+                        @endforeach
+                    </x-select>
+                @endif
             </div>
             <div class="col-span-2">
                 <x-select label="Invoice" name="invoice_id" wire:model="invoice_id">

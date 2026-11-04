@@ -137,6 +137,13 @@ class Index extends Component
                 'spark' => $daily($rows->filter(fn ($r) => $toDate($r->date)->gte($sparkStart)), 'date', 'amount'),
                 'monthly' => $monthly($rows, 'date', 'amount'),
                 'ytd' => $sumBetween(Payment::query(), 'date', 'amount', $yearStart, $today),
+                // Design income YTD: payments with no project (a design
+                // sold on its own) or against a Design Sale invoice.
+                'designYtd' => $sumBetween(
+                    Payment::query()->where(fn ($q) => $q->whereNull('project_id')
+                        ->orWhereHas('invoice', fn ($i) => $i->where('type', \App\Enums\InvoiceType::Design->value))),
+                    'date', 'amount', $yearStart, $today,
+                ),
             ];
         }
 

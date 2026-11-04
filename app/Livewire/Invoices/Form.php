@@ -3,6 +3,7 @@
 namespace App\Livewire\Invoices;
 
 use App\Enums\InvoiceType;
+use App\Models\Client;
 use App\Models\Contract;
 use App\Models\Invoice;
 use App\Models\Project;
@@ -13,16 +14,21 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 
 /**
- * Create/edit an invoice. The client is always derived from the chosen
+ * Create/edit an invoice. A project invoice takes its client from the
  * project (never picked independently) — mirrors how Quotations/Form
- * sets client_id from the project on save.
+ * sets client_id from the project on save. A design sold on its own
+ * (`billing = design`) has no project, so the client is picked directly
+ * and the type defaults to Design Sale.
  */
 #[Layout('layouts.admin')]
 class Form extends Component
 {
     public ?Invoice $invoice = null;
 
+    /** 'project' = billed against a project; 'design' = design sold without a project. */
+    public string $billing = 'project';
     public string $project_id = '';
+    public string $client_id = '';
     public string $contract_id = '';
     public string $type = 'progress';
     public string $invoice_date = '';
@@ -42,6 +48,8 @@ class Form extends Component
 
         if ($this->invoice) {
             $this->fill([
+                'billing' => $this->invoice->project_id ? 'project' : 'design',
+                'client_id' => (string) $this->invoice->client_id,
                 'project_id' => (string) $this->invoice->project_id,
                 'contract_id' => (string) $this->invoice->contract_id,
                 'type' => $this->invoice->type->value,
@@ -64,11 +72,30 @@ class Form extends Component
 
             if ($projectId && Project::whereKey($projectId)->exists()) {
                 $this->project_id = (string) $projectId;
+            } elseif (request()->query('billing') === 'design') {
+                $this->billing = 'design';
+                $this->type = InvoiceType::Design->value;
+
+                $clientId = request()->query('client');
+                if ($clientId && Client::whereKey($clientId)->exists()) {
+                    $this->client_id = (string) $clientId;
+                }
             }
         }
 
         if (empty($this->items)) {
             $this->addItem();
+        }
+    }
+
+    public function updatedBilling(): void
+    {
+        if ($this->billing === 'design') {
+            $this->project_id = '';
+            $this->contract_id = '';
+            $this->type = InvoiceType::Design->value;
+        } elseif ($this->type === InvoiceType::Design->value) {
+            $this->type = InvoiceType::Progress->value;
         }
     }
 
@@ -90,7 +117,9 @@ class Form extends Component
     protected function rules(): array
     {
         return [
-            'project_id' => ['required', 'exists:projects,id'],
+            'billing' => ['required', 'in:project,design'],
+            'project_id' => ['required_if:billing,project', 'nullable', 'exists:projects,id'],
+            'client_id' => ['required_if:billing,design', 'nullable', 'exists:clients,id'],
             'contract_id' => ['nullable', 'exists:contracts,id'],
             'type' => ['required', 'string', 'in:'.implode(',', array_column(InvoiceType::cases(), 'value'))],
             'invoice_date' => ['required', 'date'],
@@ -108,8 +137,10 @@ class Form extends Component
     {
         $data = $this->validate();
 
+        $isDesignSale = $data['billing'] === 'design';
+
         $invoiceData = [
-            'contract_id' => $data['contract_id'] ?: null,
+            'contract_id' => $isDesignSale ? null : ($data['contract_id'] ?: null),
             'type' => $data['type'],
             'invoice_date' => $data['invoice_date'],
             'due_date' => $data['due_date'] ?: null,
@@ -119,8 +150,17 @@ class Form extends Component
         ];
 
         if ($this->invoice) {
+            if ($isDesignSale) {
+                $invoiceData['client_id'] = $data['client_id'];
+            }
+
             $invoice = $service->update($this->invoice, $invoiceData, $data['items']);
             $message = "Invoice {$invoice->invoice_no} updated.";
+        } elseif ($isDesignSale) {
+            $invoiceData['client_id'] = $data['client_id'];
+
+            $invoice = $service->create(null, $invoiceData, $data['items']);
+            $message = "Invoice {$invoice->invoice_no} created.";
         } else {
             $project = Project::findOrFail($data['project_id']);
             $invoiceData['client_id'] = $project->client_id;
@@ -136,12 +176,13 @@ class Form extends Component
     #[Title('Invoice')]
     public function render()
     {
-        $contracts = $this->project_id
+        $contracts = $this->billing === 'project' && $this->project_id
             ? Contract::where('project_id', $this->project_id)->get(['id', 'contract_no'])
             : collect();
 
         return view('livewire.invoices.form', [
             'projects' => Project::orderBy('name')->get(['id', 'name', 'project_code']),
+            'clients' => Client::orderBy('name')->get(['id', 'name', 'client_no']),
             'contracts' => $contracts,
             'types' => InvoiceType::options(),
         ]);

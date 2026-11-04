@@ -3,6 +3,7 @@
 namespace App\Livewire\Reports;
 
 use App\Enums\InvoiceStatus;
+use App\Enums\InvoiceType;
 use App\Models\Expense;
 use App\Models\Invoice;
 use App\Models\Payment;
@@ -51,7 +52,23 @@ class FinancialSummary extends Component
             ->when($this->dateTo, fn ($q) => $q->whereDate('date', '<=', $this->dateTo))
             ->sum('amount');
 
+        // Design income: anything billed as a Design Sale, plus money
+        // received with no project at all (a design sold on its own).
+        $designInvoiced = (float) $this->invoicesQuery()
+            ->where('type', InvoiceType::Design->value)
+            ->sum('grand_total');
+        $designReceived = (float) Payment::query()
+            ->when($this->dateFrom, fn ($q) => $q->whereDate('date', '>=', $this->dateFrom))
+            ->when($this->dateTo, fn ($q) => $q->whereDate('date', '<=', $this->dateTo))
+            ->where(fn ($q) => $q->whereNull('project_id')
+                ->orWhereHas('invoice', fn ($i) => $i->where('type', InvoiceType::Design->value)))
+            ->sum('amount');
+
         return [
+            'design_invoiced' => $designInvoiced,
+            'design_received' => $designReceived,
+            'project_invoiced' => $totalInvoiced - $designInvoiced,
+            'project_received' => $totalReceived - $designReceived,
             'total_invoiced' => $totalInvoiced,
             'total_received' => $totalReceived,
             'total_outstanding' => $totalInvoiced - $totalReceived,
@@ -85,15 +102,12 @@ class FinancialSummary extends Component
             ->when($this->dateTo, fn ($q) => $q->whereDate('invoice_date', '<=', $this->dateTo))
             ->get()
             ->each(function (Invoice $invoice) use (&$buckets) {
-                // Carbon's diffInDays() is absolute (always >= 0); the
-                // sign ("past due" vs "not yet due") is applied
-                // explicitly here rather than relying on a
-                // signed-diff convention, to avoid getting it backwards.
-                $dueDate = $invoice->due_date->copy()->startOfDay();
-                $today = now()->startOfDay();
-                $daysPastDue = $dueDate->isPast()
-                    ? $today->diffInDays($dueDate)
-                    : -1 * $dueDate->diffInDays($today);
+                // Carbon 3's diffInDays() is signed: due->diffInDays(today)
+                // is positive once the due date has passed, negative
+                // before it. (The old code assumed Carbon 2's absolute
+                // value, which put every overdue invoice in 0-30.)
+                $daysPastDue = (int) $invoice->due_date->copy()->startOfDay()
+                    ->diffInDays(now()->startOfDay());
                 $outstanding = $invoice->outstandingAmount();
 
                 if ($outstanding <= 0) {
@@ -125,6 +139,10 @@ class FinancialSummary extends Component
             fputcsv($out, ['Total Received', $totals['total_received']]);
             fputcsv($out, ['Total Outstanding', $totals['total_outstanding']]);
             fputcsv($out, ['Total Expenses', $totals['total_expenses']]);
+            fputcsv($out, []);
+            fputcsv($out, ['Income by source', 'Invoiced', 'Received']);
+            fputcsv($out, ['Project work', $totals['project_invoiced'], $totals['project_received']]);
+            fputcsv($out, ['Design sales', $totals['design_invoiced'], $totals['design_received']]);
             fputcsv($out, []);
             fputcsv($out, ['Ageing Bucket (days overdue)', 'Outstanding Amount']);
             foreach ($ageing as $bucket => $amount) {

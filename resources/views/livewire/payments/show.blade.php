@@ -24,6 +24,8 @@
         @if ($payment->project)
             <a href="{{ route('projects.show', $payment->project) }}" wire:navigate class="text-accent-600 hover:underline">{{ $payment->project->project_code }}</a>
             — {{ $payment->project->name }}
+        @else
+            Design sale (no project)
         @endif
         @if ($payment->client)
             — {{ $payment->client->name }}

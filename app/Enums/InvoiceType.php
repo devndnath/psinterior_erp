@@ -14,6 +14,9 @@ enum InvoiceType: string
     case Material = 'material';
     case AdditionalWork = 'additional_work';
     case Final = 'final';
+    // A design sold on its own (or billed as design work) — the only
+    // type an invoice without a project uses by default.
+    case Design = 'design';
     case Other = 'other';
 
     public function label(): string
@@ -24,6 +27,7 @@ enum InvoiceType: string
             self::Material => 'Material',
             self::AdditionalWork => 'Additional Work',
             self::Final => 'Final',
+            self::Design => 'Design Sale',
             self::Other => 'Other',
         };
     }
@@ -36,6 +40,7 @@ enum InvoiceType: string
             self::Material => 'yellow',
             self::AdditionalWork => 'purple',
             self::Final => 'green',
+            self::Design => 'purple',
             self::Other => 'gray',
         };
     }

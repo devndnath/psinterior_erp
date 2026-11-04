@@ -166,14 +166,24 @@
 
             @can('view_invoices')
                 <div class="panel p-6">
-                    <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Invoices</h2>
+                    <div class="mb-4 flex items-center justify-between gap-3">
+                        <h2 class="text-sm font-semibold uppercase tracking-wide text-ink-500">Invoices</h2>
+                        @can('create', \App\Models\Invoice::class)
+                            <a href="{{ route('invoices.create', ['billing' => 'design', 'client' => $client->id]) }}" wire:navigate class="text-sm font-medium text-accent-600 hover:underline">+ Design sale</a>
+                        @endcan
+                    </div>
                     @if ($invoices->isEmpty())
                         <p class="text-sm text-ink-500">No invoices raised for this client yet.</p>
                     @else
                         <ul class="divide-y divide-ink-100">
                             @foreach ($invoices as $invoice)
                                 <li class="flex items-center justify-between py-2 text-sm">
-                                    <a href="{{ route('invoices.show', $invoice) }}" wire:navigate class="font-medium text-accent-600 hover:underline">{{ $invoice->invoice_no }}</a>
+                                    <span class="flex items-center gap-2">
+                                        <a href="{{ route('invoices.show', $invoice) }}" wire:navigate class="font-medium text-accent-600 hover:underline">{{ $invoice->invoice_no }}</a>
+                                        @if ($invoice->type === \App\Enums\InvoiceType::Design)
+                                            <span class="chip">Design sale</span>
+                                        @endif
+                                    </span>
                                     <x-status-badge :label="$invoice->status->label()" :color="$invoice->status->color()" />
                                 </li>
                             @endforeach

@@ -155,6 +155,22 @@
                             </div>
                         @endforeach
                     </dl>
+
+                    @if ($income)
+                        {{-- Design work is also sold without a project; show
+                             how much of this year's income came from it. --}}
+                        <p class="mt-3 flex items-center justify-between gap-2 rounded-2xl bg-ink-50 px-4 py-2.5 text-xs text-ink-600 dark:bg-white/[0.04]">
+                            <span class="inline-flex items-center gap-1.5 font-medium">
+                                <x-icon name="palette" class="h-3.5 w-3.5 text-ink-500" /> Design sales {{ $yearLabel }}
+                            </span>
+                            <span class="font-semibold tabular-nums text-ink-900">
+                                {{ number_format($income['designYtd'], 2) }}
+                                @if ($income['ytd'] > 0)
+                                    <span class="font-medium text-ink-500">· {{ round($income['designYtd'] / $income['ytd'] * 100) }}% of received</span>
+                                @endif
+                            </span>
+                        </p>
+                    @endif
                 </div>
 
                 @if ($income)
