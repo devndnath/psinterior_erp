@@ -3,6 +3,9 @@
 namespace App\Livewire\Dashboard;
 
 use App\Enums\ChangeOrderStatus;
+use App\Enums\ExpenseClaimStatus;
+use App\Enums\InvoiceType;
+use App\Enums\VendorInvoiceStatus;
 use App\Enums\DesignStatus;
 use App\Enums\InvoiceStatus;
 use App\Enums\LeadStatus;
@@ -18,6 +21,7 @@ use App\Models\ChangeOrder;
 use App\Models\Client;
 use App\Models\Design;
 use App\Models\Expense;
+use App\Models\ExpenseClaim;
 use App\Models\Invoice;
 use App\Models\Lead;
 use App\Models\Leave;
@@ -31,6 +35,8 @@ use App\Models\Quotation;
 use App\Models\ServiceRequest;
 use App\Models\SiteVisit;
 use App\Models\Snag;
+use App\Models\SubcontractorAssignment;
+use App\Models\VendorInvoice;
 use App\Models\Setting;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
@@ -230,6 +236,84 @@ class Index extends Component
         ];
     }
 
+    /**
+     * Receivables / Payables at a glance, the layout the firm's previous
+     * system used: what clients still owe (split into project work and
+     * design sales) beside what the firm still owes (vendors,
+     * contractors, staff conveyance). Each part is null when the user
+     * can't see the underlying records, and a whole side is null when
+     * none of its parts are visible.
+     */
+    private function ledger($user, ?Collection $openInvoices): array
+    {
+        $receivables = null;
+        if ($openInvoices) {
+            [$design, $project] = $openInvoices->partition(fn (Invoice $i) => $i->type === InvoiceType::Design);
+            $rows = [
+                ['key' => 'client', 'label' => 'Client', 'hint' => 'Project invoices', 'icon' => 'briefcase',
+                    'amount' => (float) $project->sum(fn (Invoice $i) => $i->outstandingAmount()),
+                    'count' => $project->filter(fn (Invoice $i) => $i->outstandingAmount() > 0)->count(),
+                    'href' => route('invoices.index')],
+                ['key' => 'design', 'label' => 'Design Sell', 'hint' => 'Design sale invoices', 'icon' => 'palette',
+                    'amount' => (float) $design->sum(fn (Invoice $i) => $i->outstandingAmount()),
+                    'count' => $design->filter(fn (Invoice $i) => $i->outstandingAmount() > 0)->count(),
+                    'href' => route('invoices.index', ['type' => InvoiceType::Design->value])],
+            ];
+            $receivables = ['total' => array_sum(array_column($rows, 'amount')), 'rows' => $rows];
+        }
+
+        $rows = [];
+
+        // Vendor bills filed but not yet approved — approving one posts
+        // it as a paid Expense, so a submitted bill is what's still owed.
+        if ($user->can('view_vendor_invoices')) {
+            $bills = VendorInvoice::where('status', VendorInvoiceStatus::Submitted->value);
+            $rows[] = ['key' => 'vendor', 'label' => 'Vendor', 'hint' => 'Bills awaiting approval', 'icon' => 'truck',
+                'amount' => (float) (clone $bills)->sum('amount'), 'count' => (clone $bills)->count(),
+                'href' => route('vendor-invoices.index')];
+        }
+
+        // Contractors: work done (agreed amount x progress) less what has
+        // been paid against each assignment, never below zero per job.
+        if ($user->can('view_subcontractors')) {
+            $owed = SubcontractorAssignment::query()
+                ->withSum('payments', 'amount')
+                ->get(['id', 'rate', 'progress'])
+                ->map(fn ($a) => max(0, round((float) $a->rate * $a->progress / 100 - (float) $a->payments_sum_amount, 2)))
+                ->filter(fn ($v) => $v > 0);
+            $rows[] = ['key' => 'contractor', 'label' => 'Contractor', 'hint' => 'Work done, not yet paid', 'icon' => 'hard-hat',
+                'amount' => (float) $owed->sum(), 'count' => $owed->count(),
+                'href' => route('subcontractors.index')];
+        }
+
+        // Approved staff claims not yet paid out through payroll.
+        if ($user->can('view_expense_claims')) {
+            $claims = ExpenseClaim::where('status', ExpenseClaimStatus::Approved->value)->whereNull('payroll_id');
+            $rows[] = ['key' => 'conveyance', 'label' => 'Conveyance', 'hint' => 'Approved claims, unpaid', 'icon' => 'banknote',
+                'amount' => (float) (clone $claims)->sum('amount'), 'count' => (clone $claims)->count(),
+                'href' => route('expense-claims.index')];
+        }
+
+        $payables = $rows ? ['total' => array_sum(array_column($rows, 'amount')), 'rows' => $rows] : null;
+
+        return ['ledgerReceivables' => $receivables, 'ledgerPayables' => $payables];
+    }
+
+    /** The four big module shortcuts across the top, each with one live count. */
+    private function modules($user): array
+    {
+        return array_values(array_filter([
+            $user->can('view_leads') ? ['label' => 'CRM', 'icon' => 'funnel', 'href' => route('leads.index'),
+                'stat' => Lead::whereIn('status', array_filter(LeadStatus::cases(), fn (LeadStatus $s) => $s->isOpen()))->count(), 'unit' => 'open leads'] : null,
+            $user->can('view_designs') ? ['label' => 'Design', 'icon' => 'palette', 'href' => route('designs.index'),
+                'stat' => Design::whereIn('status', [DesignStatus::Submitted->value, DesignStatus::UnderReview->value])->count(), 'unit' => 'in review'] : null,
+            $user->can('view_projects') ? ['label' => 'Project', 'icon' => 'briefcase', 'href' => route('projects.index'),
+                'stat' => Project::whereNotIn('status', [ProjectStatus::Completed->value, ProjectStatus::Cancelled->value])->count(), 'unit' => 'active'] : null,
+            $user->can('view_invoices') ? ['label' => 'Accounts', 'icon' => 'calculator', 'href' => route('invoices.index'),
+                'stat' => Invoice::whereIn('status', array_map(fn ($s) => $s->value, self::OPEN_INVOICE_STATUSES))->count(), 'unit' => 'unpaid'] : null,
+        ]));
+    }
+
     public function render()
     {
         $user = Auth::user();
@@ -242,7 +326,8 @@ class Index extends Component
                 ->get()
             : null;
 
-        return view('livewire.dashboard.index', $this->finance($user, $openInvoices) + [
+        return view('livewire.dashboard.index', $this->finance($user, $openInvoices) + $this->ledger($user, $openInvoices) + [
+            'modules' => $this->modules($user),
             'totalLeads' => $user->can('view_leads') ? Lead::count() : null,
             'newLeads' => $user->can('view_leads') ? Lead::where('status', LeadStatus::New)->count() : null,
             'openLeads' => $user->can('view_leads') ? Lead::whereIn('status', array_filter(

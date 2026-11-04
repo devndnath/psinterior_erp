@@ -63,6 +63,105 @@
             description="Your account doesn't have access to any modules yet. Ask an administrator to assign you a role."
         />
     @else
+        {{-- Module shortcuts + receivables/payables — the layout of the
+             firm's previous system, kept because it's how the team reads
+             the business at a glance, redrawn in the soft-canvas style. --}}
+        @if ($modules)
+            <div @class([
+                'mb-5 grid grid-cols-2 gap-3 sm:gap-5',
+                'lg:grid-cols-4' => count($modules) >= 4,
+                'lg:grid-cols-3' => count($modules) === 3,
+            ])>
+                @foreach ($modules as $m)
+                    <a href="{{ $m['href'] }}" wire:navigate
+                       class="group relative flex items-center gap-3 overflow-hidden rounded-3xl border border-ink-200/70 bg-surface p-4 transition duration-200 hover:-translate-y-0.5 hover:border-transparent hover:bg-charcoal hover:shadow-lg hover:shadow-black/10 sm:gap-4 sm:p-5 dark:border-white/[0.06] dark:hover:bg-accent-500">
+                        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-accent-500/15 text-accent-700 transition group-hover:bg-white/10 group-hover:text-accent-400 sm:h-12 sm:w-12 dark:text-accent-400 dark:group-hover:bg-charcoal/15 dark:group-hover:text-charcoal">
+                            <x-icon :name="$m['icon']" class="h-5 w-5 sm:h-6 sm:w-6" />
+                        </span>
+                        <span class="min-w-0 flex-1">
+                            <span class="block truncate text-base font-bold tracking-tight text-ink-900 transition group-hover:text-white sm:text-lg dark:group-hover:text-charcoal">{{ $m['label'] }}</span>
+                            <span class="block truncate text-xs text-ink-500 transition group-hover:text-white/70 dark:group-hover:text-charcoal/70">
+                                <span class="font-semibold tabular-nums text-ink-700 group-hover:text-white dark:group-hover:text-charcoal">{{ number_format($m['stat']) }}</span> {{ $m['unit'] }}
+                            </span>
+                        </span>
+                        <x-icon name="arrow-up-right" class="absolute right-4 top-4 hidden h-4 w-4 text-ink-400 transition group-hover:text-accent-400 sm:block dark:group-hover:text-charcoal" />
+                    </a>
+                @endforeach
+            </div>
+        @endif
+
+        @if ($ledgerReceivables || $ledgerPayables)
+            <div class="mb-5 grid grid-cols-1 gap-5 lg:grid-cols-2">
+                @foreach (array_filter(['receivables' => $ledgerReceivables, 'payables' => $ledgerPayables]) as $side => $card)
+                    @php
+                        $isIn = $side === 'receivables';
+                        [$tInt, $tDec] = $money($card['total']);
+                    @endphp
+                    <div class="panel flex flex-col p-2">
+                        {{-- Tinted header block carrying the side's total. --}}
+                        <div @class([
+                            'relative overflow-hidden rounded-[22px] px-5 py-5 sm:px-6',
+                            'bg-gradient-to-br from-success-600 to-success-800 text-white' => $isIn,
+                            'bg-charcoal text-white dark:bg-white/[0.06]' => ! $isIn,
+                        ])>
+                            <div class="pointer-events-none absolute -right-10 -top-14 h-40 w-40 rounded-full bg-white/[0.07]"></div>
+                            <div class="pointer-events-none absolute -right-2 top-10 h-24 w-24 rounded-full bg-white/[0.05]"></div>
+                            <div class="relative flex items-start justify-between gap-3">
+                                <div>
+                                    <p class="flex items-center gap-2 text-sm font-medium text-white/80">
+                                        <x-icon :name="$isIn ? 'arrow-down-right' : 'arrow-up-right'" class="h-4 w-4" />
+                                        {{ $isIn ? 'Receivables' : 'Payables' }}
+                                    </p>
+                                    <p class="mt-2 flex items-baseline gap-1.5">
+                                        <span class="text-sm font-semibold text-white/70">{{ $currency }}</span>
+                                        <span @class(['text-3xl font-bold tracking-tight tabular-nums sm:text-[34px]', 'text-accent-400' => ! $isIn])>{{ $tInt }}</span>
+                                        <span class="text-base font-semibold text-white/60">.{{ $tDec }}</span>
+                                    </p>
+                                </div>
+                                <span class="rounded-full bg-white/10 px-3 py-1 text-[11px] font-medium text-white/80">{{ $isIn ? 'Owed to us' : 'We owe' }}</span>
+                            </div>
+                        </div>
+
+                        {{-- One row per source: share bar (single series, so one
+                             color on a neutral track) + the exact amount. --}}
+                        <ul class="flex-1 divide-y divide-ink-100 px-3 py-2 sm:px-4">
+                            @foreach ($card['rows'] as $r)
+                                @php $pct = $card['total'] > 0 ? round($r['amount'] / $card['total'] * 100) : 0; @endphp
+                                <li>
+                                    <a href="{{ $r['href'] }}" wire:navigate class="group flex items-center gap-3 py-3.5">
+                                        <span @class([
+                                            'flex h-10 w-10 shrink-0 items-center justify-center rounded-full',
+                                            'bg-success-50 text-success-700 dark:bg-success-500/10 dark:text-success-400' => $isIn,
+                                            'bg-accent-500/15 text-accent-700 dark:text-accent-400' => ! $isIn,
+                                        ])>
+                                            <x-icon :name="$r['icon']" class="h-[18px] w-[18px]" />
+                                        </span>
+                                        <span class="min-w-0 flex-1">
+                                            <span class="flex items-baseline justify-between gap-3">
+                                                <span class="truncate text-sm font-semibold text-ink-900 group-hover:underline">{{ $r['label'] }}</span>
+                                                <span class="shrink-0 text-sm font-bold tabular-nums text-ink-900">{{ number_format($r['amount'], 2) }}</span>
+                                            </span>
+                                            <span class="mt-1.5 flex items-center gap-3">
+                                                <span class="h-1.5 flex-1 overflow-hidden rounded-full bg-ink-100">
+                                                    <span @class([
+                                                        'block h-full rounded-full',
+                                                        'bg-[#059669] dark:bg-[#12A372]' => $isIn,
+                                                        'bg-[#C68F00] dark:bg-[#BD8A00]' => ! $isIn,
+                                                    ]) style="width: {{ $r['amount'] > 0 ? max(2, $r['amount'] / $card['total'] * 100) : 0 }}%"></span>
+                                                </span>
+                                                <span class="w-9 shrink-0 text-right text-[11px] font-semibold tabular-nums text-ink-500">{{ $pct }}%</span>
+                                            </span>
+                                            <span class="mt-1 block truncate text-[11px] text-ink-500">{{ $r['hint'] }} · {{ number_format($r['count']) }} {{ \Illuminate\Support\Str::plural('item', $r['count']) }}</span>
+                                        </span>
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+
         {{-- Row 1: year at a glance (circles) + revenue trend -------------- --}}
         @if ($income || $expenses)
             <div class="grid grid-cols-1 gap-5 lg:grid-cols-12">
