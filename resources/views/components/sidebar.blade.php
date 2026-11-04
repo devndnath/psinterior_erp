@@ -1,165 +1,160 @@
 @php
-    // Phase 14: the flat 32-item $menu list from Phases 2-13 is reorganized
-    // into collapsible groups so the sidebar stays scannable as modules
-    // keep being added. Each group is ['label' => ..., 'items' => [...]];
-    // each item keeps the exact same shape it always had — label, route,
-    // optional active pattern, icon, optional permission — and the
-    // active-item highlighting / permission-gating logic below is
-    // unchanged from before, just nested one level deeper. A menu item
-    // with no 'permission' key is always shown (e.g. Dashboard). Later
-    // phases append their own module's entries to the matching group (or
-    // add a new group) — this component itself never changes beyond
-    // that.
-    $groups = [
+    // Menu order follows the firm's previous system: Dashboard, then a
+    // CRM section, a Project section (procurement, vendors, contractors,
+    // projects), Accounts and HR, and a Report section — with each module
+    // a dropdown of its pages. $sections = [['label' => ?string,
+    // 'entries' => [...]]]; an entry is either a link (label, route,
+    // optional active pattern, icon, optional permission — a link with no
+    // 'permission' is always shown) or a dropdown (label, icon,
+    // 'children' => [links]). A dropdown only shows when at least one of
+    // its children is visible to the user, and a section only shows when
+    // it has a visible entry. No standalone task pages exist (tasks live
+    // inside each project), so there is no Task menu.
+    $sections = [
         [
-            'label' => 'Overview',
-            'items' => [
+            'label' => null,
+            'entries' => [
                 ['label' => 'Dashboard', 'route' => 'dashboard', 'icon' => 'layout-dashboard'],
-                // No 'permission' key — like Dashboard, every source on
-                // the page is gated individually inside Calendar\Index,
-                // so the nav entry itself stays visible to any staff user.
+                // Every source on the calendar is gated inside Calendar\Index.
                 ['label' => 'Calendar', 'route' => 'calendar.index', 'icon' => 'calendar'],
             ],
         ],
         [
-            'label' => 'My Workspace',
-            'items' => [
-                // Self-service — no 'permission' key, same reasoning as
-                // Dashboard/Calendar above: any staff login can reach
-                // these, authorization happens inside the component
-                // against "is this your own Employee record" (see
-                // MyLeaves\Index's / MyExpenseClaims\Index's docblocks),
-                // not a granular view_*/create_* ability.
-                ['label' => 'My Leaves', 'route' => 'my-leaves.index', 'active' => 'my-leaves.*', 'icon' => 'calendar-off'],
-                ['label' => 'My Expense Claims', 'route' => 'my-expense-claims.index', 'active' => 'my-expense-claims.*', 'icon' => 'map-pin'],
+            'label' => 'CRM Section',
+            'entries' => [
+                ['label' => 'CRM', 'icon' => 'funnel', 'children' => [
+                    ['label' => 'Leads', 'route' => 'leads.index', 'active' => 'leads.*', 'icon' => 'funnel', 'permission' => 'view_leads'],
+                    ['label' => 'Site Visits', 'route' => 'site-visits.index', 'active' => 'site-visits.*', 'icon' => 'map-pin', 'permission' => 'view_site_visits'],
+                    ['label' => 'Clients', 'route' => 'clients.index', 'active' => 'clients.*', 'icon' => 'users', 'permission' => 'view_clients'],
+                    ['label' => 'Meetings', 'route' => 'meetings.index', 'active' => 'meetings.*', 'icon' => 'calendar', 'permission' => 'view_meetings'],
+                    ['label' => 'Quotations', 'route' => 'quotations.index', 'active' => 'quotations.*', 'icon' => 'file-text', 'permission' => 'view_quotations'],
+                    ['label' => 'Contracts', 'route' => 'contracts.index', 'active' => 'contracts.*', 'icon' => 'file-signature', 'permission' => 'view_contracts'],
+                    ['label' => 'Change Orders', 'route' => 'change-orders.index', 'active' => 'change-orders.*', 'icon' => 'git-pull-request', 'permission' => 'view_change_orders'],
+                ]],
+                ['label' => 'Design', 'icon' => 'palette', 'children' => [
+                    ['label' => 'Designs', 'route' => 'designs.index', 'active' => 'designs.*', 'icon' => 'palette', 'permission' => 'view_designs'],
+                    ['label' => 'Material Selections', 'route' => 'material-selections.index', 'active' => 'material-selections.*', 'icon' => 'tag', 'permission' => 'view_material_selections'],
+                ]],
             ],
         ],
         [
-            'label' => 'CRM & Sales',
-            'items' => [
-                ['label' => 'Leads', 'route' => 'leads.index', 'active' => 'leads.*', 'icon' => 'funnel', 'permission' => 'view_leads'],
-                ['label' => 'Site Visits', 'route' => 'site-visits.index', 'active' => 'site-visits.*', 'icon' => 'map-pin', 'permission' => 'view_site_visits'],
-                ['label' => 'Clients', 'route' => 'clients.index', 'active' => 'clients.*', 'icon' => 'users', 'permission' => 'view_clients'],
-                ['label' => 'Meetings', 'route' => 'meetings.index', 'active' => 'meetings.*', 'icon' => 'calendar', 'permission' => 'view_meetings'],
-                ['label' => 'Quotations', 'route' => 'quotations.index', 'active' => 'quotations.*', 'icon' => 'file-text', 'permission' => 'view_quotations'],
-                ['label' => 'Contracts', 'route' => 'contracts.index', 'active' => 'contracts.*', 'icon' => 'file-signature', 'permission' => 'view_contracts'],
-                ['label' => 'Change Orders', 'route' => 'change-orders.index', 'active' => 'change-orders.*', 'icon' => 'git-pull-request', 'permission' => 'view_change_orders'],
+            'label' => 'Project Section',
+            'entries' => [
+                // Vendor Quotations / Goods Receives have no index route —
+                // reached from a Purchase Request / Purchase Order.
+                ['label' => 'Procurement', 'icon' => 'shopping-cart', 'children' => [
+                    ['label' => 'Purchase Requests', 'route' => 'purchase-requests.index', 'active' => 'purchase-requests.*', 'icon' => 'file-plus', 'permission' => 'view_purchase_orders'],
+                    ['label' => 'Purchase Orders', 'route' => 'purchase-orders.index', 'active' => 'purchase-orders.*', 'icon' => 'shopping-cart', 'permission' => 'view_purchase_orders'],
+                    ['label' => 'Material Requisitions', 'route' => 'material-requisitions.index', 'active' => 'material-requisitions.*', 'icon' => 'clipboard-list', 'permission' => 'view_material_requisitions'],
+                    ['label' => 'Products', 'route' => 'products.index', 'active' => 'products.*', 'icon' => 'package', 'permission' => 'view_inventory'],
+                    ['label' => 'Warehouses', 'route' => 'warehouses.index', 'active' => 'warehouses.*', 'icon' => 'warehouse', 'permission' => 'view_warehouses'],
+                    ['label' => 'Stock Transfers', 'route' => 'stock-transfers.index', 'active' => 'stock-transfers.*', 'icon' => 'arrow-left-right', 'permission' => 'view_warehouses'],
+                    ['label' => 'Stock Movements', 'route' => 'stock-movements.index', 'icon' => 'list', 'permission' => 'view_inventory'],
+                ]],
+                ['label' => 'Vendor', 'icon' => 'truck', 'children' => [
+                    ['label' => 'List', 'route' => 'vendors.index', 'active' => 'vendors.*', 'icon' => 'truck', 'permission' => 'view_vendors'],
+                    ['label' => 'Vendor Invoices', 'route' => 'vendor-invoices.index', 'active' => 'vendor-invoices.*', 'icon' => 'receipt', 'permission' => 'view_vendor_invoices'],
+                ]],
+                // Assignments are reached from a Subcontractor's page.
+                ['label' => 'Contractor', 'icon' => 'hard-hat', 'children' => [
+                    ['label' => 'List', 'route' => 'subcontractors.index', 'active' => 'subcontractors.*', 'icon' => 'hard-hat', 'permission' => 'view_subcontractors'],
+                ]],
+                // Milestones/Tasks/Team and Handovers live inside Project Show.
+                ['label' => 'Project', 'icon' => 'briefcase', 'children' => [
+                    ['label' => 'Projects', 'route' => 'projects.index', 'active' => 'projects.*', 'icon' => 'briefcase', 'permission' => 'view_projects'],
+                    ['label' => 'BOQs', 'route' => 'boqs.index', 'active' => 'boqs.*', 'icon' => 'calculator', 'permission' => 'view_boqs'],
+                    ['label' => 'Site Reports', 'route' => 'site-reports.index', 'active' => 'site-reports.*', 'icon' => 'file-plus', 'permission' => 'view_site_reports'],
+                    ['label' => 'Inspections', 'route' => 'inspections.index', 'active' => 'inspections.*', 'icon' => 'clipboard-check', 'permission' => 'view_inspections'],
+                    ['label' => 'Snags', 'route' => 'snags.index', 'active' => 'snags.*', 'icon' => 'alert-triangle', 'permission' => 'view_snags'],
+                    ['label' => 'Warranties', 'route' => 'warranties.index', 'active' => 'warranties.*', 'icon' => 'shield-check', 'permission' => 'view_warranties'],
+                ]],
             ],
         ],
         [
-            'label' => 'Projects',
-            'items' => [
-                // Milestones/Tasks/Team stay inline within Project Show —
-                // there are no dedicated index routes for them, so no
-                // separate nav entries here (same off-nav reasoning as
-                // the rest of this file).
-                ['label' => 'Projects', 'route' => 'projects.index', 'active' => 'projects.*', 'icon' => 'briefcase', 'permission' => 'view_projects'],
+            'label' => 'Accounts Section',
+            'entries' => [
+                ['label' => 'Accounts', 'icon' => 'calculator', 'children' => [
+                    ['label' => 'Invoices', 'route' => 'invoices.index', 'active' => 'invoices.*', 'icon' => 'receipt', 'permission' => 'view_invoices'],
+                    ['label' => 'Payments', 'route' => 'payments.index', 'active' => 'payments.*', 'icon' => 'credit-card', 'permission' => 'view_payments'],
+                    ['label' => 'Expenses', 'route' => 'expenses.index', 'active' => 'expenses.*', 'icon' => 'wallet', 'permission' => 'view_expenses'],
+                    ['label' => 'Expense Categories', 'route' => 'expense-categories.index', 'active' => 'expense-categories.*', 'icon' => 'folder', 'permission' => 'manage_settings'],
+                ]],
             ],
         ],
         [
-            'label' => 'Design Studio',
-            'items' => [
-                ['label' => 'Designs', 'route' => 'designs.index', 'active' => 'designs.*', 'icon' => 'palette', 'permission' => 'view_designs'],
-                ['label' => 'Material Selections', 'route' => 'material-selections.index', 'active' => 'material-selections.*', 'icon' => 'tag', 'permission' => 'view_material_selections'],
+            'label' => 'HR Section',
+            'entries' => [
+                ['label' => 'Employees', 'icon' => 'users', 'children' => [
+                    ['label' => 'List', 'route' => 'employees.index', 'active' => 'employees.*', 'icon' => 'users', 'permission' => 'view_employees'],
+                    ['label' => 'Departments', 'route' => 'departments.index', 'active' => 'departments.*', 'icon' => 'building', 'permission' => 'manage_employees'],
+                    ['label' => 'Designations', 'route' => 'designations.index', 'active' => 'designations.*', 'icon' => 'id-badge', 'permission' => 'manage_employees'],
+                ]],
+                ['label' => 'Attendance & Payroll', 'icon' => 'clock', 'children' => [
+                    ['label' => 'Attendance', 'route' => 'attendance.index', 'active' => 'attendance.*', 'icon' => 'clock', 'permission' => 'view_attendance'],
+                    ['label' => 'Leaves', 'route' => 'leaves.index', 'active' => 'leaves.*', 'icon' => 'calendar-off', 'permission' => 'view_leaves'],
+                    ['label' => 'Expense Claims', 'route' => 'expense-claims.index', 'active' => 'expense-claims.*', 'icon' => 'wallet', 'permission' => 'view_expense_claims'],
+                    ['label' => 'Payroll', 'route' => 'payroll.index', 'active' => 'payroll.*', 'icon' => 'banknote', 'permission' => 'view_payroll'],
+                ]],
+                // Self-service: any staff login, checked inside each page
+                // against "is this your own Employee record".
+                ['label' => 'My Workspace', 'icon' => 'id-badge', 'children' => [
+                    ['label' => 'My Leaves', 'route' => 'my-leaves.index', 'active' => 'my-leaves.*', 'icon' => 'calendar-off'],
+                    ['label' => 'My Expense Claims', 'route' => 'my-expense-claims.index', 'active' => 'my-expense-claims.*', 'icon' => 'map-pin'],
+                ]],
             ],
         ],
         [
-            'label' => 'Estimation & Billing',
-            'items' => [
-                ['label' => 'BOQs', 'route' => 'boqs.index', 'active' => 'boqs.*', 'icon' => 'calculator', 'permission' => 'view_boqs'],
-                ['label' => 'Invoices', 'route' => 'invoices.index', 'active' => 'invoices.*', 'icon' => 'receipt', 'permission' => 'view_invoices'],
-                ['label' => 'Payments', 'route' => 'payments.index', 'active' => 'payments.*', 'icon' => 'credit-card', 'permission' => 'view_payments'],
-                ['label' => 'Profitability', 'route' => 'profitability.index', 'icon' => 'trending-up', 'permission' => 'view_finance'],
-            ],
-        ],
-        [
-            'label' => 'Procurement',
-            'items' => [
-                // Vendor Quotations and Goods Receives have no index
-                // route — reached only from a Purchase Request's /
-                // Purchase Order's Show page — so they don't get a
-                // standalone entry here (it would be a dead-feeling link).
-                ['label' => 'Vendors', 'route' => 'vendors.index', 'active' => 'vendors.*', 'icon' => 'truck', 'permission' => 'view_vendors'],
-                ['label' => 'Purchase Requests', 'route' => 'purchase-requests.index', 'active' => 'purchase-requests.*', 'icon' => 'file-plus', 'permission' => 'view_purchase_orders'],
-                ['label' => 'Purchase Orders', 'route' => 'purchase-orders.index', 'active' => 'purchase-orders.*', 'icon' => 'shopping-cart', 'permission' => 'view_purchase_orders'],
-                ['label' => 'Vendor Invoices', 'route' => 'vendor-invoices.index', 'active' => 'vendor-invoices.*', 'icon' => 'receipt', 'permission' => 'view_vendor_invoices'],
-            ],
-        ],
-        [
-            'label' => 'Inventory & Warehouse',
-            'items' => [
-                ['label' => 'Products', 'route' => 'products.index', 'active' => 'products.*', 'icon' => 'package', 'permission' => 'view_inventory'],
-                ['label' => 'Product Categories', 'route' => 'product-categories.index', 'active' => 'product-categories.*', 'icon' => 'tag', 'permission' => 'manage_settings'],
-                ['label' => 'Units', 'route' => 'units.index', 'active' => 'units.*', 'icon' => 'ruler', 'permission' => 'manage_settings'],
-                ['label' => 'Warehouses', 'route' => 'warehouses.index', 'active' => 'warehouses.*', 'icon' => 'warehouse', 'permission' => 'view_warehouses'],
-                ['label' => 'Stock Movements', 'route' => 'stock-movements.index', 'icon' => 'list', 'permission' => 'view_inventory'],
-                ['label' => 'Stock Transfers', 'route' => 'stock-transfers.index', 'active' => 'stock-transfers.*', 'icon' => 'arrow-left-right', 'permission' => 'view_warehouses'],
-                ['label' => 'Material Requisitions', 'route' => 'material-requisitions.index', 'active' => 'material-requisitions.*', 'icon' => 'clipboard-list', 'permission' => 'view_material_requisitions'],
-            ],
-        ],
-        [
-            'label' => 'Finance',
-            'items' => [
-                ['label' => 'Expenses', 'route' => 'expenses.index', 'active' => 'expenses.*', 'icon' => 'wallet', 'permission' => 'view_expenses'],
-                ['label' => 'Expense Categories', 'route' => 'expense-categories.index', 'active' => 'expense-categories.*', 'icon' => 'folder', 'permission' => 'manage_settings'],
-            ],
-        ],
-        [
-            'label' => 'Workforce',
-            'items' => [
-                // Subcontractor Assignments have no index route —
-                // reached from a Subcontractor's Show page — so no
-                // standalone entry here.
-                ['label' => 'Employees', 'route' => 'employees.index', 'active' => 'employees.*', 'icon' => 'users', 'permission' => 'view_employees'],
-                ['label' => 'Departments', 'route' => 'departments.index', 'active' => 'departments.*', 'icon' => 'building', 'permission' => 'manage_employees'],
-                ['label' => 'Designations', 'route' => 'designations.index', 'active' => 'designations.*', 'icon' => 'id-badge', 'permission' => 'manage_employees'],
-                ['label' => 'Attendance', 'route' => 'attendance.index', 'active' => 'attendance.*', 'icon' => 'clock', 'permission' => 'view_attendance'],
-                ['label' => 'Leaves', 'route' => 'leaves.index', 'active' => 'leaves.*', 'icon' => 'calendar-off', 'permission' => 'view_leaves'],
-                ['label' => 'Expense Claims', 'route' => 'expense-claims.index', 'active' => 'expense-claims.*', 'icon' => 'wallet', 'permission' => 'view_expense_claims'],
-                ['label' => 'Payroll', 'route' => 'payroll.index', 'active' => 'payroll.*', 'icon' => 'banknote', 'permission' => 'view_payroll'],
-                ['label' => 'Subcontractors', 'route' => 'subcontractors.index', 'active' => 'subcontractors.*', 'icon' => 'hard-hat', 'permission' => 'view_subcontractors'],
-            ],
-        ],
-        [
-            'label' => 'Site Operations & Completion',
-            'items' => [
-                // Handovers and Service Requests have no index route —
-                // reached from a Project's / Warranty's Show page — so
-                // no standalone entry here.
-                ['label' => 'Site Reports', 'route' => 'site-reports.index', 'active' => 'site-reports.*', 'icon' => 'file-plus', 'permission' => 'view_site_reports'],
-                ['label' => 'Inspections', 'route' => 'inspections.index', 'active' => 'inspections.*', 'icon' => 'clipboard-check', 'permission' => 'view_inspections'],
-                ['label' => 'Snags', 'route' => 'snags.index', 'active' => 'snags.*', 'icon' => 'alert-triangle', 'permission' => 'view_snags'],
-                ['label' => 'Warranties', 'route' => 'warranties.index', 'active' => 'warranties.*', 'icon' => 'shield-check', 'permission' => 'view_warranties'],
-            ],
-        ],
-        [
-            'label' => 'Reports',
-            'items' => [
-                // The 5 sub-reports are reached from within the hub, not
-                // given their own top-level entries.
-                ['label' => 'Reports', 'route' => 'reports.index', 'active' => 'reports.*', 'icon' => 'bar-chart', 'permission' => 'view_reports'],
+            'label' => 'Report Section',
+            'entries' => [
+                ['label' => 'Accounts Report', 'icon' => 'bar-chart', 'children' => [
+                    ['label' => 'Financial Summary', 'route' => 'reports.financial-summary', 'icon' => 'bar-chart', 'permission' => 'view_reports'],
+                    ['label' => 'Profitability', 'route' => 'profitability.index', 'icon' => 'trending-up', 'permission' => 'view_finance'],
+                ]],
+                ['label' => 'CRM Report', 'icon' => 'funnel', 'children' => [
+                    ['label' => 'Sales Funnel', 'route' => 'reports.sales-funnel', 'icon' => 'funnel', 'permission' => 'view_reports'],
+                ]],
+                ['label' => 'All Report', 'icon' => 'list', 'children' => [
+                    ['label' => 'All Reports', 'route' => 'reports.index', 'icon' => 'list', 'permission' => 'view_reports'],
+                    ['label' => 'Project Status', 'route' => 'reports.project-status', 'icon' => 'briefcase', 'permission' => 'view_reports'],
+                    ['label' => 'Inventory', 'route' => 'reports.inventory', 'icon' => 'package', 'permission' => 'view_reports'],
+                    ['label' => 'HR', 'route' => 'reports.hr', 'icon' => 'users', 'permission' => 'view_reports'],
+                    ['label' => 'Audit Log', 'route' => 'audit-log.index', 'icon' => 'history', 'permission' => 'view_reports'],
+                ]],
             ],
         ],
         [
             'label' => 'System',
-            'items' => [
-                ['label' => 'Settings', 'route' => 'settings.index', 'icon' => 'settings', 'permission' => 'manage_settings'],
-                // Closes the "User management" / "Role & permission
-                // management" audit gap — both use the `users`/`roles`
-                // CRUD permissions RolePermissionSeeder has generated
-                // since Phase 1 but no role was granted until now
-                // (only Admin/Super Admin by default — see
-                // UserPolicy/RolePolicy docblocks).
-                ['label' => 'Users', 'route' => 'users.index', 'active' => 'users.*', 'icon' => 'users', 'permission' => 'view_users'],
-                ['label' => 'Roles', 'route' => 'roles.index', 'active' => 'roles.*', 'icon' => 'shield', 'permission' => 'view_roles'],
-                // Phase 14: backend (ActivityLogService + LogsActivity
-                // trait) has existed since early phases with zero UI —
-                // see App\Livewire\ActivityLogs\Index's docblock for the
-                // `view_reports` gate reasoning.
-                ['label' => 'Audit Log', 'route' => 'audit-log.index', 'icon' => 'history', 'permission' => 'view_reports'],
+            'entries' => [
+                ['label' => 'Settings', 'icon' => 'settings', 'children' => [
+                    ['label' => 'Settings', 'route' => 'settings.index', 'icon' => 'settings', 'permission' => 'manage_settings'],
+                    ['label' => 'Users', 'route' => 'users.index', 'active' => 'users.*', 'icon' => 'users', 'permission' => 'view_users'],
+                    ['label' => 'Roles', 'route' => 'roles.index', 'active' => 'roles.*', 'icon' => 'shield', 'permission' => 'view_roles'],
+                    ['label' => 'Product Categories', 'route' => 'product-categories.index', 'active' => 'product-categories.*', 'icon' => 'tag', 'permission' => 'manage_settings'],
+                    ['label' => 'Units', 'route' => 'units.index', 'active' => 'units.*', 'icon' => 'ruler', 'permission' => 'manage_settings'],
+                ]],
             ],
         ],
     ];
+
+    $user = auth()->user();
+    $canSee = fn (array $link) => ! isset($link['permission']) || $user?->can($link['permission']);
+    $isActive = fn (array $link) => request()->routeIs($link['active'] ?? $link['route'].'*');
+
+    // Resolve visibility once: drop hidden links, empty dropdowns and
+    // empty sections.
+    $sections = collect($sections)->map(function ($section) use ($canSee) {
+        $section['entries'] = collect($section['entries'])->map(function ($entry) use ($canSee) {
+            if (isset($entry['children'])) {
+                $entry['children'] = array_values(array_filter($entry['children'], $canSee));
+
+                return $entry['children'] ? $entry : null;
+            }
+
+            return $canSee($entry) ? $entry : null;
+        })->filter()->values()->all();
+
+        return $section;
+    })->filter(fn ($section) => $section['entries'])->values();
 @endphp
 
 {{--
@@ -173,8 +168,10 @@
     the choice is remembered in localStorage ('sidebar-collapsed'). On
     mobile it is an off-canvas drawer that always shows labels.
 
-    The $groups data, permission gating, active-route logic and per-group
-    open/close persistence are unchanged — only presentation changed.
+    Menu sections and dropdowns are defined in $sections above. In the
+    collapsed rail each dropdown shows as its icon (solid when it holds
+    the current page); clicking it expands the menu with that dropdown
+    open.
 --}}
 <aside
     x-data="{
@@ -226,94 +223,128 @@
     </div>
 
     <nav class="flex-1 overflow-y-auto overscroll-contain px-3 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" @scroll="tip.show = false">
-        @foreach ($groups as $group)
-            @php
-                $visibleItems = array_values(array_filter(
-                    $group['items'],
-                    fn ($item) => ! isset($item['permission']) || auth()->user()?->can($item['permission'])
-                ));
+        @foreach ($sections as $section)
+            @if ($section['label'])
+                <p x-show="! rail" class="px-3 pb-1.5 pt-4 text-[11px] font-bold uppercase tracking-[0.1em] text-ink-400">{{ $section['label'] }}</p>
+            @endif
+            @unless ($loop->first)
+                <div x-show="rail" x-cloak class="mx-auto my-2 h-1 w-1 rounded-full bg-ink-300"></div>
+            @endunless
 
-                $groupIsActive = collect($visibleItems)->contains(
-                    fn ($item) => request()->routeIs($item['active'] ?? $item['route'].'*')
-                );
-
-                $storageKey = 'sidebar-group-open:'.\Illuminate\Support\Str::slug($group['label']);
-            @endphp
-
-            @if (count($visibleItems))
-                <div
-                    x-data="{
-                        open: {{ $groupIsActive ? 'true' : 'false' }},
-                        storageKey: '{{ $storageKey }}',
-                        init() {
-                            // A stored preference wins over the server-
-                            // computed default (auto-expand the group that
-                            // holds the current route); survives
-                            // wire:navigate since localStorage persists.
-                            try {
-                                const stored = localStorage.getItem(this.storageKey);
-                                if (stored !== null) {
-                                    this.open = JSON.parse(stored);
-                                }
-                            } catch (e) {}
-                        },
-                        toggle() {
-                            this.open = ! this.open;
-                            try {
-                                localStorage.setItem(this.storageKey, JSON.stringify(this.open));
-                            } catch (e) {}
-                        },
-                    }"
-                    class="py-0.5"
-                >
-                    <button
-                        type="button"
-                        @click="toggle()"
-                        x-show="! rail"
-                        class="flex w-full items-center justify-between rounded-full px-3 pb-1.5 pt-3 text-[11px] font-bold uppercase tracking-[0.1em] text-ink-400 transition hover:text-ink-700"
-                    >
-                        <span>{{ $group['label'] }}</span>
-                        <x-icon
-                            name="chevron-down"
-                            class="h-3.5 w-3.5 shrink-0 transition-transform duration-150"
-                            x-bind:class="open ? 'rotate-180' : ''"
-                        />
-                    </button>
-                    @unless ($loop->first)
-                        <div x-show="rail" x-cloak class="mx-auto my-2 h-1 w-1 rounded-full bg-ink-300"></div>
-                    @endunless
-
-                    <div x-show="open || rail" x-cloak class="space-y-1">
-                        @foreach ($visibleItems as $item)
-                            @php $isActive = request()->routeIs($item['active'] ?? $item['route'].'*'); @endphp
-                            <a
-                                href="{{ route($item['route']) }}"
-                                wire:navigate
-                                aria-label="{{ $item['label'] }}"
-                                @if ($isActive) aria-current="page" @endif
-                                @mouseenter="showTip($el, @js($item['label']))"
+            <div class="space-y-1">
+                @foreach ($section['entries'] as $entry)
+                    @if (isset($entry['children']))
+                        @php
+                            $childActive = collect($entry['children'])->contains(fn ($c) => $isActive($c));
+                            $storageKey = 'sidebar-menu-open:'.\Illuminate\Support\Str::slug(($section['label'] ?? 'top').'-'.$entry['label']);
+                        @endphp
+                        <div
+                            x-data="{
+                                open: {{ $childActive ? 'true' : 'false' }},
+                                key: @js($storageKey),
+                                init() {
+                                    // The menu holding the current page always
+                                    // starts open; otherwise the last choice wins.
+                                    if (! this.open) {
+                                        try { this.open = localStorage.getItem(this.key) === '1'; } catch (e) {}
+                                    }
+                                },
+                                toggle() {
+                                    if (rail) { toggleCollapsed(); this.open = true; }
+                                    else { this.open = ! this.open; }
+                                    try { localStorage.setItem(this.key, this.open ? '1' : '0'); } catch (e) {}
+                                },
+                            }"
+                        >
+                            <button
+                                type="button"
+                                @click="toggle()"
+                                aria-label="{{ $entry['label'] }}"
+                                :aria-expanded="open && ! rail"
+                                @mouseenter="showTip($el, @js($entry['label']))"
                                 @mouseleave="tip.show = false"
                                 @class([
-                                    'group/nav flex items-center rounded-full text-[13.5px] transition-colors',
-                                    'bg-charcoal font-semibold text-white dark:bg-accent-500 dark:text-charcoal' => $isActive,
-                                    'font-medium text-ink-600 hover:bg-ink-100 hover:text-ink-900' => ! $isActive,
+                                    'group/nav flex w-full items-center rounded-full text-[13.5px] transition-colors',
+                                    'font-semibold text-ink-900' => $childActive,
+                                    'font-medium text-ink-600 hover:bg-ink-100 hover:text-ink-900' => ! $childActive,
                                 ])
-                                :class="rail ? 'mx-auto h-11 w-11 justify-center' : 'gap-3 px-3.5 py-2.5'"
+                                :class="rail
+                                    ? 'mx-auto h-11 w-11 justify-center {{ $childActive ? '!bg-charcoal !text-white dark:!bg-accent-500 dark:!text-charcoal' : '' }}'
+                                    : 'gap-3 px-3.5 py-2.5'"
                             >
                                 <x-icon
-                                    :name="$item['icon']"
+                                    :name="$entry['icon']"
                                     @class([
                                         'h-[18px] w-[18px] shrink-0',
-                                        'text-accent-500 dark:text-charcoal' => $isActive,
-                                        'text-ink-400 group-hover/nav:text-ink-700' => ! $isActive,
+                                        'text-accent-600 dark:text-accent-400' => $childActive,
+                                        'text-ink-400 group-hover/nav:text-ink-700' => ! $childActive,
                                     ])
+                                    x-bind:class="rail && {{ $childActive ? 'true' : 'false' }} ? '!text-accent-500 dark:!text-charcoal' : ''"
                                 />
-                                <span class="truncate" x-show="! rail">{{ $item['label'] }}</span>
-                            </a>
-                        @endforeach
-                    </div>
-                </div>
-            @endif
+                                <span class="flex-1 truncate text-left" x-show="! rail">{{ $entry['label'] }}</span>
+                                <x-icon
+                                    name="chevron-down"
+                                    class="h-4 w-4 shrink-0 text-ink-400 transition-transform duration-150"
+                                    x-show="! rail"
+                                    x-bind:class="open ? 'rotate-180' : ''"
+                                />
+                            </button>
+
+                            <div x-show="open && ! rail" x-cloak x-collapse.duration.150ms class="relative ml-[22px] mt-1 space-y-0.5 border-l border-ink-200 pl-3 dark:border-white/10">
+                                @foreach ($entry['children'] as $child)
+                                    @php $active = $isActive($child); @endphp
+                                    <a
+                                        href="{{ route($child['route']) }}"
+                                        wire:navigate
+                                        @if ($active) aria-current="page" @endif
+                                        @class([
+                                            'group/sub flex items-center gap-2.5 rounded-full px-3 py-2 text-[13px] transition-colors',
+                                            'bg-charcoal font-semibold text-white dark:bg-accent-500 dark:text-charcoal' => $active,
+                                            'font-medium text-ink-600 hover:bg-ink-100 hover:text-ink-900' => ! $active,
+                                        ])
+                                    >
+                                        <x-icon
+                                            :name="$child['icon']"
+                                            @class([
+                                                'h-4 w-4 shrink-0',
+                                                'text-accent-500 dark:text-charcoal' => $active,
+                                                'text-ink-400 group-hover/sub:text-ink-700' => ! $active,
+                                            ])
+                                        />
+                                        <span class="truncate">{{ $child['label'] }}</span>
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    @else
+                        @php $active = $isActive($entry); @endphp
+                        <a
+                            href="{{ route($entry['route']) }}"
+                            wire:navigate
+                            aria-label="{{ $entry['label'] }}"
+                            @if ($active) aria-current="page" @endif
+                            @mouseenter="showTip($el, @js($entry['label']))"
+                            @mouseleave="tip.show = false"
+                            @class([
+                                'group/nav flex items-center rounded-full text-[13.5px] transition-colors',
+                                'bg-charcoal font-semibold text-white dark:bg-accent-500 dark:text-charcoal' => $active,
+                                'font-medium text-ink-600 hover:bg-ink-100 hover:text-ink-900' => ! $active,
+                            ])
+                            :class="rail ? 'mx-auto h-11 w-11 justify-center' : 'gap-3 px-3.5 py-2.5'"
+                        >
+                            <x-icon
+                                :name="$entry['icon']"
+                                @class([
+                                    'h-[18px] w-[18px] shrink-0',
+                                    'text-accent-500 dark:text-charcoal' => $active,
+                                    'text-ink-400 group-hover/nav:text-ink-700' => ! $active,
+                                ])
+                            />
+                            <span class="truncate" x-show="! rail">{{ $entry['label'] }}</span>
+                        </a>
+                    @endif
+                @endforeach
+            </div>
         @endforeach
     </nav>
 
