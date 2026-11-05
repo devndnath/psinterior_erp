@@ -59,6 +59,7 @@ use App\Livewire\Leads\Show as LeadShow;
 use App\Livewire\Reports\FinancialSummary as ReportFinancialSummary;
 use App\Livewire\Reports\Hr as ReportHr;
 use App\Livewire\Reports\Index as ReportIndex;
+use App\Livewire\Reports\Viewer as ReportViewer;
 use App\Livewire\Reports\Inventory as ReportInventory;
 use App\Livewire\Reports\ProjectStatus as ReportProjectStatus;
 use App\Livewire\Reports\SalesFunnel as ReportSalesFunnel;
@@ -588,5 +589,7 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
         Route::get('/financial-summary', ReportFinancialSummary::class)->name('financial-summary');
         Route::get('/inventory', ReportInventory::class)->name('inventory');
         Route::get('/hr', ReportHr::class)->name('hr');
+        // Report engine (App\Reports\Registry): every other report.
+        Route::get('/r/{report}', ReportViewer::class)->name('view');
     });
 });

@@ -17,7 +17,7 @@
 
     <table style="margin-bottom: 16px;">
         <tr>
-            <td><strong>Project:</strong> {{ $expense->project?->name ?? '—' }}</td>
+            <td><strong>Project:</strong> {{ $expense->project?->name ?? 'Office (head office)' }}</td>
             <td class="text-right"><strong>Date:</strong> {{ $expense->date?->format('d M, Y') }}</td>
         </tr>
         <tr>

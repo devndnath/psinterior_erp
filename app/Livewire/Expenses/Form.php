@@ -19,6 +19,8 @@ class Form extends Component
 {
     public ?Expense $expense = null;
 
+    /** 'project' = a project's expense; 'office' = head-office expense, no project. */
+    public string $for = 'project';
     public string $project_id = '';
     public string $category_id = '';
     public string $vendor_name = '';
@@ -36,6 +38,7 @@ class Form extends Component
 
         if ($this->expense) {
             $this->fill([
+                'for' => $this->expense->project_id ? 'project' : 'office',
                 'project_id' => (string) $this->expense->project_id,
                 'category_id' => (string) $this->expense->category_id,
                 'vendor_name' => (string) $this->expense->vendor_name,
@@ -53,7 +56,9 @@ class Form extends Component
 
         $projectId = request()->query('project');
 
-        if ($projectId && Project::whereKey($projectId)->exists()) {
+        if (request()->query('for') === 'office') {
+            $this->for = 'office';
+        } elseif ($projectId && Project::whereKey($projectId)->exists()) {
             $this->project_id = (string) $projectId;
         }
     }
@@ -61,7 +66,8 @@ class Form extends Component
     protected function rules(): array
     {
         return [
-            'project_id' => ['required', 'exists:projects,id'],
+            'for' => ['required', 'in:project,office'],
+            'project_id' => ['required_if:for,project', 'nullable', 'exists:projects,id'],
             'category_id' => ['required', 'exists:expense_categories,id'],
             'vendor_name' => ['nullable', 'string', 'max:255'],
             'vendor_id' => ['nullable', 'exists:vendors,id'],
@@ -75,6 +81,8 @@ class Form extends Component
     public function save(ExpenseService $service): void
     {
         $data = $this->validate();
+        $data['project_id'] = $data['for'] === 'office' ? null : $data['project_id'];
+        unset($data['for']);
         $data['vendor_name'] = $data['vendor_name'] ?: null;
         $data['vendor_id'] = $data['vendor_id'] ?: null;
         $data['description'] = $data['description'] ?: null;

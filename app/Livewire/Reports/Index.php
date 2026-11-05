@@ -33,6 +33,15 @@ class Index extends Component
             ['label' => 'HR', 'route' => 'reports.hr', 'description' => 'Attendance summary and pending leave approvals.'],
         ];
 
-        return view('livewire.reports.index', ['reports' => $reports]);
+        // Engine reports (App\Reports\Registry), grouped like the sidebar.
+        $user = auth()->user();
+        $groups = collect(\App\Reports\Registry::classes())
+            ->filter(fn ($c) => $user->can($c::permission()))
+            ->groupBy(fn ($c) => $c::group())
+            ->map(fn ($classes) => $classes->map(fn ($c) => [
+                'label' => $c::title(), 'url' => route('reports.view', $c::key()), 'description' => $c::description(),
+            ])->values());
+
+        return view('livewire.reports.index', ['reports' => $reports, 'groups' => $groups]);
     }
 }

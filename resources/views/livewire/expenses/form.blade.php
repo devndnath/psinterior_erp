@@ -7,16 +7,34 @@
 
     <form wire:submit="save" class="max-w-2xl space-y-6">
         <div class="card grid grid-cols-1 sm:grid-cols-2 gap-4 p-6">
-            <div>
-                <label class="form-label">Project *</label>
-                <select wire:model="project_id" class="field-input">
-                    <option value="">Select…</option>
-                    @foreach ($projects as $proj)
-                        <option value="{{ $proj->id }}">{{ $proj->project_code }} — {{ $proj->name }}</option>
+            {{-- A project's expense, or a head-office one with no project. --}}
+            <div class="col-span-2">
+                <span class="form-label">Expense for *</span>
+                <div class="inline-flex flex-wrap gap-1 rounded-full border border-ink-200 bg-surface p-1">
+                    @foreach (['project' => 'A project', 'office' => 'Office (head office)'] as $value => $label)
+                        <label @class([
+                            'cursor-pointer rounded-full px-4 py-1.5 text-sm font-medium transition',
+                            'bg-charcoal text-white dark:bg-accent-500 dark:text-charcoal' => $for === $value,
+                            'text-ink-600 hover:text-ink-900' => $for !== $value,
+                        ])>
+                            <input type="radio" class="sr-only" name="for" value="{{ $value }}" wire:model.live="for">
+                            {{ $label }}
+                        </label>
                     @endforeach
-                </select>
-                @error('project_id') <p class="form-error">{{ $message }}</p> @enderror
+                </div>
             </div>
+            @if ($for === 'project')
+                <div>
+                    <label class="form-label">Project *</label>
+                    <select wire:model="project_id" class="field-input">
+                        <option value="">Select…</option>
+                        @foreach ($projects as $proj)
+                            <option value="{{ $proj->id }}">{{ $proj->project_code }} — {{ $proj->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('project_id') <p class="form-error">{{ $message }}</p> @enderror
+                </div>
+            @endif
             <div>
                 <label class="form-label">Category *</label>
                 <select wire:model="category_id" class="field-input">

@@ -8,6 +8,8 @@
                 @if ($expense->project)
                     <a href="{{ route('projects.show', $expense->project) }}" wire:navigate class="text-brand-600 hover:underline">{{ $expense->project->project_code }}</a>
                     — {{ $expense->project->name }}
+                @else
+                    — Office expense
                 @endif
             </p>
         </div>

@@ -8,6 +8,7 @@
         </x-slot:breadcrumbs>
         <x-slot:actions>
             @can('create', \App\Models\Expense::class)
+                <a href="{{ route('expenses.create', ['for' => 'office']) }}" wire:navigate class="btn-secondary">+ Office Expense</a>
                 <a href="{{ route('expenses.create') }}" wire:navigate class="btn-primary">+ New Expense</a>
             @endcan
         </x-slot:actions>
@@ -68,7 +69,7 @@
                                 @if ($expense->project)
                                     <a href="{{ route('projects.show', $expense->project) }}" wire:navigate class="hover:underline">{{ $expense->project->project_code }}</a>
                                 @else
-                                    —
+                                    <span class="chip">Office</span>
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-sm text-gray-500">{{ $expense->category?->name ?? '—' }}</td>

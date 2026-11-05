@@ -10,6 +10,11 @@
     // its children is visible to the user, and a section only shows when
     // it has a visible entry. No standalone task pages exist (tasks live
     // inside each project), so there is no Task menu.
+    $engine = fn (string $group) => array_map(
+        fn ($r) => $r + ['icon' => 'file-text'],
+        \App\Reports\Registry::menu($group),
+    );
+
     $sections = [
         [
             'label' => null,
@@ -108,20 +113,29 @@
         [
             'label' => 'Report Section',
             'entries' => [
-                ['label' => 'Accounts Report', 'icon' => 'bar-chart', 'children' => [
-                    ['label' => 'Financial Summary', 'route' => 'reports.financial-summary', 'icon' => 'bar-chart', 'permission' => 'view_reports'],
-                    ['label' => 'Profitability', 'route' => 'profitability.index', 'icon' => 'trending-up', 'permission' => 'view_finance'],
-                ]],
-                ['label' => 'CRM Report', 'icon' => 'funnel', 'children' => [
-                    ['label' => 'Sales Funnel', 'route' => 'reports.sales-funnel', 'icon' => 'funnel', 'permission' => 'view_reports'],
-                ]],
-                ['label' => 'All Report', 'icon' => 'list', 'children' => [
-                    ['label' => 'All Reports', 'route' => 'reports.index', 'icon' => 'list', 'permission' => 'view_reports'],
-                    ['label' => 'Project Status', 'route' => 'reports.project-status', 'icon' => 'briefcase', 'permission' => 'view_reports'],
-                    ['label' => 'Inventory', 'route' => 'reports.inventory', 'icon' => 'package', 'permission' => 'view_reports'],
-                    ['label' => 'HR', 'route' => 'reports.hr', 'icon' => 'users', 'permission' => 'view_reports'],
-                    ['label' => 'Audit Log', 'route' => 'audit-log.index', 'icon' => 'history', 'permission' => 'view_reports'],
-                ]],
+                // Engine reports come from App\Reports\Registry (already
+                // filtered to what the user may open), in the old menu's order.
+                ['label' => 'Accounts Report', 'icon' => 'bar-chart', 'children' => array_merge(
+                    $engine('accounts'),
+                    [
+                        ['label' => 'Financial Summary', 'route' => 'reports.financial-summary', 'icon' => 'file-text', 'permission' => 'view_reports'],
+                        ['label' => 'Profitability', 'route' => 'profitability.index', 'icon' => 'trending-up', 'permission' => 'view_finance'],
+                    ],
+                )],
+                ['label' => 'CRM Report', 'icon' => 'funnel', 'children' => array_merge(
+                    $engine('crm'),
+                    [['label' => 'Sales Funnel', 'route' => 'reports.sales-funnel', 'icon' => 'file-text', 'permission' => 'view_reports']],
+                )],
+                ['label' => 'All Report', 'icon' => 'list', 'children' => array_merge(
+                    [['label' => 'All Reports', 'route' => 'reports.index', 'icon' => 'list', 'permission' => 'view_reports']],
+                    $engine('all'),
+                    [
+                        ['label' => 'Project Status', 'route' => 'reports.project-status', 'icon' => 'file-text', 'permission' => 'view_reports'],
+                        ['label' => 'Inventory', 'route' => 'reports.inventory', 'icon' => 'file-text', 'permission' => 'view_reports'],
+                        ['label' => 'HR', 'route' => 'reports.hr', 'icon' => 'file-text', 'permission' => 'view_reports'],
+                        ['label' => 'Audit Log', 'route' => 'audit-log.index', 'icon' => 'history', 'permission' => 'view_reports'],
+                    ],
+                )],
             ],
         ],
         [
@@ -140,7 +154,11 @@
 
     $user = auth()->user();
     $canSee = fn (array $link) => ! isset($link['permission']) || $user?->can($link['permission']);
-    $isActive = fn (array $link) => request()->routeIs($link['active'] ?? $link['route'].'*');
+    // Engine report links share one route; they match on its {report} too.
+    $isActive = fn (array $link) => isset($link['params'])
+        ? request()->routeIs($link['route']) && request()->route('report') === ($link['params']['report'] ?? null)
+        : request()->routeIs($link['active'] ?? $link['route'].'*');
+    $href = fn (array $link) => route($link['route'], $link['params'] ?? []);
 
     // Resolve visibility once: drop hidden links, empty dropdowns and
     // empty sections.
@@ -296,11 +314,11 @@
                                 @foreach ($entry['children'] as $child)
                                     @php $active = $isActive($child); @endphp
                                     <a
-                                        href="{{ route($child['route']) }}"
+                                        href="{{ $href($child) }}"
                                         wire:navigate
                                         @if ($active) aria-current="page" @endif
                                         @class([
-                                            'group/sub flex items-center gap-2.5 rounded-full px-3 py-2 text-[13px] transition-colors',
+                                            'group/sub flex items-center gap-2.5 rounded-[18px] px-3 py-2 text-[13px] transition-colors',
                                             'bg-charcoal font-semibold text-white dark:bg-accent-500 dark:text-charcoal' => $active,
                                             'font-medium text-ink-600 hover:bg-ink-100 hover:text-ink-900' => ! $active,
                                         ])
@@ -313,7 +331,7 @@
                                                 'text-ink-400 group-hover/sub:text-ink-700' => ! $active,
                                             ])
                                         />
-                                        <span class="truncate">{{ $child['label'] }}</span>
+                                        <span class="min-w-0 leading-snug">{{ $child['label'] }}</span>
                                     </a>
                                 @endforeach
                             </div>
@@ -321,7 +339,7 @@
                     @else
                         @php $active = $isActive($entry); @endphp
                         <a
-                            href="{{ route($entry['route']) }}"
+                            href="{{ $href($entry) }}"
                             wire:navigate
                             aria-label="{{ $entry['label'] }}"
                             @if ($active) aria-current="page" @endif

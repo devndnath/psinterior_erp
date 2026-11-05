@@ -905,6 +905,34 @@ class SampleDataSeeder extends Seeder
                 ]);
             }
         }
+
+        // Head-office running costs (no project) for the last six months —
+        // fixed amounts, no mt_rand, so the rest of the dataset is unchanged.
+        foreach (range(0, 5) as $m) {
+            $month = $this->today->startOfMonth()->subMonthsNoOverflow($m);
+            foreach ([
+                [1, 'office', 'Office rent — Banani', 85000, 'bank'],
+                [5, 'office', 'Office electricity and internet', 14500 + $m * 300, 'bkash'],
+                [8, 'office', 'Tea, snacks and cleaning', 6200 + $m * 150, 'cash'],
+                [12, 'marketing', 'Facebook page promotion', 18000, 'card'],
+                [15, 'office', 'Stationery and printing', 3800 + $m * 120, 'cash'],
+            ] as [$day, $cat, $desc, $amount, $method]) {
+                $date = $month->addDays($day - 1);
+                if ($date->gt($this->today)) {
+                    continue;
+                }
+                $svc->create([
+                    'project_id' => null,
+                    'category_id' => $this->expenseCategories[$cat]->id,
+                    'vendor_name' => null,
+                    'amount' => $amount,
+                    'date' => $date->toDateString(),
+                    'method' => $method,
+                    'description' => $desc,
+                    'created_by' => $this->staff['accountant']->id,
+                ]);
+            }
+        }
     }
 
     // -----------------------------------------------------------------
