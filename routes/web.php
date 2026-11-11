@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\PwaController;
 use App\Http\Controllers\Pdf\BoqPdfController;
 use App\Http\Controllers\Pdf\ContractPdfController;
 use App\Http\Controllers\Pdf\ExpensePdfController;
@@ -170,6 +171,9 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::post('/logout', LogoutController::class)->name('logout')->defaults('guard', 'web');
+
+// Installable app (PWA) manifest — public, the browser fetches it before sign-in.
+Route::get('/manifest.webmanifest', [PwaController::class, 'manifest'])->name('pwa.manifest');
 
 Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
     Route::get('/', fn () => redirect()->route('dashboard'));

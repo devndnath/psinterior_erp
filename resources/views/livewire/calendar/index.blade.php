@@ -7,9 +7,9 @@
             </p>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex min-w-0 max-w-full flex-wrap items-center gap-3">
             @if ($projects->isNotEmpty())
-                <select wire:model.live="project" class="field-input w-auto">
+                <select wire:model.live="project" class="field-input w-full sm:w-auto sm:max-w-xs">
                     <option value="">All projects</option>
                     @foreach ($projects as $p)
                         <option value="{{ $p->id }}">{{ $p->project_code }} — {{ $p->name }}</option>

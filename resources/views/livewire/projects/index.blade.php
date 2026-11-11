@@ -42,7 +42,7 @@
                     </div>
                     <p class="mt-2 flex items-baseline gap-1 truncate">
                         <span @class(['text-xs font-semibold', 'text-white/60' => in_array($card['tone'], ['dark', 'red'], true), 'text-ink-400' => ! in_array($card['tone'], ['dark', 'red'], true)])>{{ $currency }}</span>
-                        <span @class(['text-xl font-bold tracking-tight tabular-nums sm:text-2xl', 'text-accent-400' => $card['tone'] === 'dark', 'text-ink-900' => ! in_array($card['tone'], ['dark', 'red'], true)])>{{ number_format($card['value'], 2) }}</span>
+                        <span @class(['text-lg font-bold tracking-tight tabular-nums sm:text-2xl', 'text-accent-400' => $card['tone'] === 'dark', 'text-ink-900' => ! in_array($card['tone'], ['dark', 'red'], true)])>{{ number_format((int) $card['value']) }}<span class="max-sm:hidden">.{{ str_pad((string) round(fmod(abs($card['value']), 1) * 100), 2, '0', STR_PAD_LEFT) }}</span></span>
                     </p>
                     <p @class(['mt-1 truncate text-[11px]', 'text-white/60' => in_array($card['tone'], ['dark', 'red'], true), 'text-ink-500' => ! in_array($card['tone'], ['dark', 'red'], true)])>{{ $card['note'] }}</p>
                 </div>
@@ -50,7 +50,7 @@
         </div>
     @endif
 
-    <div class="panel mb-4 flex flex-wrap items-end gap-4 p-4">
+    <x-filter-panel>
         <div class="min-w-[220px] flex-1">
             <x-input label="Search" name="search" wire:model.live.debounce.400ms="search" placeholder="Name, project code, client…" />
         </div>
@@ -71,7 +71,7 @@
             </x-select>
         </div>
         <x-button variant="secondary" wire:click="resetFilters">Reset</x-button>
-    </div>
+    </x-filter-panel>
 
     @if ($projects->isEmpty())
         <div class="panel overflow-hidden">

@@ -8,7 +8,7 @@
         </x-slot:actions>
     </x-page-header>
 
-    <div class="panel mb-4 flex flex-wrap items-end gap-4 p-4">
+    <x-filter-panel>
         <div>
             <x-select label="Type" name="type" wire:model.live="type">
                 <option value="">Any type</option>
@@ -17,7 +17,7 @@
                 @endforeach
             </x-select>
         </div>
-    </div>
+    </x-filter-panel>
 
     @if ($leaves->isEmpty())
         <div class="panel overflow-hidden">

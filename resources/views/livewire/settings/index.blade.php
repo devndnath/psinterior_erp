@@ -7,7 +7,7 @@
     <x-page-header title="Settings" />
 
     <div class="border-b border-gray-200">
-        <nav class="-mb-px flex gap-6">
+        <nav class="-mb-px flex gap-6 overflow-x-auto [scrollbar-width:none]">
             @foreach (['company' => 'Company', 'finance' => 'Finance & Tax', 'prefixes' => 'Numbering Prefixes', 'email' => 'Email'] as $key => $label)
                 <button
                     type="button"

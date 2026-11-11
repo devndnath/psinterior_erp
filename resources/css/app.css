@@ -288,3 +288,211 @@
         @apply inline-flex items-center gap-1.5 rounded-full border border-ink-200 bg-surface px-3 py-1 text-xs font-medium text-ink-600;
     }
 }
+
+/* ===================================================================
+   Mobile app shell — phones and tablets (below lg, 1024px). The app is
+   used day-to-day from phones and tabs, and wrapped as an app, so below
+   lg it behaves like one: a bottom tab bar, compact app bar, lists as
+   cards, filters folded away, sheets that slide up from the bottom.
+   =================================================================== */
+
+@layer components {
+    /* Bottom tab bar (<x-bottom-nav>). */
+    .bottom-nav {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    .bottom-nav-tab {
+        @apply flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5 py-2 text-[11px] font-semibold text-ink-500 transition-colors active:scale-95;
+        min-height: 58px;
+    }
+    .bottom-nav-icon {
+        @apply flex h-8 w-14 items-center justify-center rounded-full transition-colors;
+    }
+    .bottom-nav-tab.is-active {
+        @apply text-ink-900;
+    }
+    .bottom-nav-tab.is-active .bottom-nav-icon {
+        @apply bg-accent-500/20 text-accent-700 dark:text-accent-400;
+    }
+
+    /* Filters (<x-filter-panel>): on phones/tablets only the first field
+       (usually search) shows, next to a Filters button that unfolds the
+       rest. From lg up it is the usual one-row panel. */
+    .filter-panel {
+        @apply panel mb-4 flex flex-wrap items-end gap-3 p-3 sm:gap-4 sm:p-4;
+    }
+    .filter-panel > * {
+        order: 2;
+    }
+    .filter-panel > :first-child {
+        order: 0;
+    }
+    .filter-panel > .filter-toggle {
+        order: 1;
+    }
+    @media (max-width: 1023.98px) {
+        .filter-panel > :first-child {
+            @apply min-w-0 flex-1;
+        }
+        .filter-panel:not(.is-open) > :not(:first-child):not(.filter-toggle) {
+            display: none;
+        }
+        .filter-panel.is-open > :not(:first-child):not(.filter-toggle) {
+            flex: 1 1 10rem;
+        }
+        /* Unfolded: search keeps its row (beside the Done button); the
+           other filters flow onto the rows below. */
+        .filter-panel.is-open > :first-child {
+            flex: 1 1 60%;
+        }
+        .filter-panel > .filter-toggle {
+            @apply mb-px;
+        }
+    }
+}
+
+/* Lists as cards on phones (<x-table>; resources/js/mobile.js labels each
+   cell with its column heading). Tablets keep the table — it fits. */
+@media (max-width: 767.98px) {
+    .table-cards thead {
+        display: none;
+    }
+    .table-cards,
+    .table-cards tbody,
+    .table-cards tr {
+        display: block;
+        width: 100%;
+    }
+    .table-cards tbody > tr {
+        position: relative;
+        padding: 0.875rem 1rem;
+        border-bottom: 1px solid rgb(var(--color-ink-100));
+    }
+    .table-cards tbody > tr:last-child {
+        border-bottom: 0;
+    }
+    .table-cards tbody > tr > td {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0.75rem;
+        width: 100%;
+        max-width: none !important;
+        padding: 0.2rem 0 !important;
+        border: 0 !important;
+        text-align: right;
+        white-space: normal !important;
+        font-size: 13px;
+    }
+    .table-cards tbody > tr > td::before {
+        content: attr(data-label);
+        flex-shrink: 0;
+        max-width: 45%;
+        padding-top: 1px;
+        text-align: left;
+        font-size: 11.5px;
+        font-weight: 500;
+        color: rgb(var(--color-ink-500));
+    }
+    /* First column is the card's title: full width, no label. */
+    .table-cards tbody > tr > td:first-child {
+        justify-content: flex-start;
+        padding-right: 3rem !important;
+        padding-bottom: 0.35rem !important;
+        text-align: left;
+        font-size: 15px;
+    }
+    .table-cards tbody > tr > td:first-child::before,
+    .table-cards tbody > tr > td[data-label=""]::before {
+        display: none;
+    }
+    /* Unlabelled cells (row actions, checkboxes) float to the card's corner. */
+    .table-cards tbody > tr > td[data-label=""]:not(:first-child):not([colspan]) {
+        position: absolute;
+        top: 0.6rem;
+        right: 0.6rem;
+        width: auto;
+        padding: 0 !important;
+    }
+    /* Full-width rows (an inline form, an empty state). */
+    .table-cards tbody > tr > td[colspan] {
+        display: block;
+        text-align: left;
+    }
+    .table-cards td > * {
+        min-width: 0;
+    }
+}
+
+/* Record numbers (PRJ-000004, INV-000016…) in a list's first column
+   stay on one line on tablets instead of breaking at the hyphen. */
+@media (min-width: 768px) {
+    .table-base tbody td:first-child > a:first-child {
+        white-space: nowrap;
+    }
+}
+
+/* Grids that are one column on small screens: a cell marked "span 2/3/…
+   columns" must not invent extra columns (it squeezed fields side by
+   side on phones — "Phone" and "Email" overlapping on the lead form, and
+   the same on 75 other screens). Scoped per breakpoint to grids that are
+   still one column at that width. */
+@media (max-width: 639.98px) {
+    .grid-cols-1 > [class*="col-span-"]:not([class*=":col-span-"]) {
+        grid-column: 1 / -1;
+    }
+}
+@media (min-width: 640px) and (max-width: 767.98px) {
+    .grid-cols-1:not([class*="sm:grid-cols-"]) > [class*="col-span-"]:not([class*=":col-span-"]) {
+        grid-column: 1 / -1;
+    }
+}
+@media (min-width: 768px) and (max-width: 1023.98px) {
+    .grid-cols-1:not([class*="sm:grid-cols-"]):not([class*="md:grid-cols-"]) > [class*="col-span-"]:not([class*=":col-span-"]) {
+        grid-column: 1 / -1;
+    }
+    .sm\:grid-cols-2:not([class*="md:grid-cols-"]) > .col-span-3,
+    .sm\:grid-cols-2:not([class*="md:grid-cols-"]) > .col-span-4 {
+        grid-column: 1 / -1;
+    }
+}
+@media (min-width: 1024px) and (max-width: 1279.98px) {
+    .grid-cols-1:not([class*="sm:grid-cols-"]):not([class*="md:grid-cols-"]):not([class*="lg:grid-cols-"]) > [class*="col-span-"]:not([class*=":col-span-"]) {
+        grid-column: 1 / -1;
+    }
+}
+
+/* Never wider than the screen: a select of long project names, a long
+   word (permission names) inside a narrow grid cell. */
+.field-input {
+    max-width: 100%;
+}
+@media (max-width: 767.98px) {
+    /* Item / detail tables that aren't card lists scroll sideways inside
+       their card instead of pushing the page wider than the screen. */
+    main table.table-base:not(.table-cards) {
+        display: block;
+        max-width: 100%;
+        overflow-x: auto;
+    }
+    main label,
+    main .grid > * {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+}
+
+/* Touch polish: no grey tap flash, no rubber-band bounce of the whole
+   app shell, and pop-ups as bottom sheets on phones (<x-modal>). */
+@media (max-width: 1023.98px) {
+    html {
+        -webkit-tap-highlight-color: transparent;
+    }
+    body {
+        overscroll-behavior-y: none;
+    }
+    .page-title {
+        font-size: 22px;
+        line-height: 1.25;
+    }
+}

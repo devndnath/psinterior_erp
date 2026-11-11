@@ -32,7 +32,7 @@
         {{-- Literal black, not bg-ink-900 — a dimming scrim must stay dark
              in both themes, and ink-900 now flips to near-white in dark
              mode (see layouts/admin.blade.php's mobile backdrop). --}}
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+        class="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center sm:p-4"
     >
         <div
             x-show="open"
@@ -40,7 +40,8 @@
             x-transition:enter-start="opacity-0 scale-95"
             x-transition:enter-end="opacity-100 scale-100"
             @click.outside="open = false"
-            {{ $attributes->merge(['class' => 'panel w-full max-w-lg p-6']) }}
+            {{-- Phones: a bottom sheet (full width, rounded top, scrolls inside, clears the home indicator). --}}
+            {{ $attributes->merge(['class' => 'panel w-full max-w-lg p-6 max-sm:max-h-[92vh] max-sm:overflow-y-auto max-sm:rounded-b-none max-sm:pb-[calc(1.5rem+env(safe-area-inset-bottom))]']) }}
         >
             <div class="mb-4 flex items-start justify-between gap-4">
                 @if ($title)

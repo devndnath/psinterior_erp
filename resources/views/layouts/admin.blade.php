@@ -2,7 +2,8 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-paper">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    @include('layouts.partials.app-meta')
     <meta name="csrf-token" content="{{ csrf_token() }}">
     {{-- Dark-mode toggle (components/theme-toggle.blade.php, in <x-topbar>):
          runs synchronously, before any CSS paints, so the page never
@@ -50,7 +51,8 @@
             <x-sidebar />
 
             <main class="min-w-0 flex-1 overflow-y-auto">
-                <div class="mx-auto max-w-[1440px] px-3 pb-10 pt-1 sm:px-4 lg:px-1">
+                {{-- Bottom padding on phones/tablets keeps the last row clear of the bottom tab bar. --}}
+                <div class="mx-auto max-w-[1440px] px-3 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-1 sm:px-4 lg:px-1 lg:pb-10">
                     {{--
                         Phase 16: removed the old fallback <h1> that used
                         to render here from $title (the ['title' => ...]
@@ -74,6 +76,7 @@
         </div>
     </div>
 
+    <x-bottom-nav />
     <x-toast />
     @livewireScripts
 </body>

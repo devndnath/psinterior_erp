@@ -5,7 +5,7 @@
         </x-slot:breadcrumbs>
     </x-page-header>
 
-    <div class="panel mb-4 flex flex-wrap items-end gap-4 p-4">
+    <x-filter-panel>
         <div>
             <x-select label="Product" name="product" wire:model.live="product">
                 <option value="">Any product</option>
@@ -31,7 +31,7 @@
             </x-select>
         </div>
         <x-button variant="secondary" wire:click="resetFilters">Reset</x-button>
-    </div>
+    </x-filter-panel>
 
     @if ($movements->isEmpty())
         <div class="panel overflow-hidden">

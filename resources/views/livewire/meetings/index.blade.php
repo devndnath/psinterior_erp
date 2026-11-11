@@ -12,7 +12,7 @@
 
     <x-meetings-tabs active="meetings" />
 
-    <div class="panel mb-4 flex flex-wrap items-end gap-4 p-4">
+    <x-filter-panel>
         <div>
             <x-select label="Project" name="project" wire:model.live="project">
                 <option value="">Any project</option>
@@ -31,7 +31,7 @@
         </div>
         <x-date-range-inputs label="Meeting" :active="$from || $to" />
         <x-button variant="secondary" wire:click="resetFilters">Reset</x-button>
-    </div>
+    </x-filter-panel>
 
     @if ($meetings->isEmpty())
         <div class="panel overflow-hidden">

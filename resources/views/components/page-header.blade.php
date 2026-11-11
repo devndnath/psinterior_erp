@@ -21,21 +21,21 @@
 
 {{-- Soft-canvas pass: no divider — the title sits on the canvas and the
      rounded cards below carry the structure, as in the reference. --}}
-<div {{ $attributes->merge(['class' => 'mb-6']) }}>
+<div {{ $attributes->merge(['class' => 'mb-4 sm:mb-6']) }}>
     @isset($breadcrumbs)
-        <div class="mb-4">{{ $breadcrumbs }}</div>
+        <div class="mb-1 sm:mb-4">{{ $breadcrumbs }}</div>
     @endisset
 
-    <div class="flex flex-wrap items-start justify-between gap-4">
+    <div class="flex flex-wrap items-start justify-between gap-3 sm:gap-4">
         <div>
             <h1 class="page-title">{{ $title }}</h1>
             @if ($description)
-                <p class="mt-1.5 text-sm text-ink-500">{{ $description }}</p>
+                <p class="mt-1 text-[13px] text-ink-500 max-sm:line-clamp-2 sm:mt-1.5 sm:text-sm">{{ $description }}</p>
             @endif
         </div>
 
         @isset($actions)
-            <div class="flex shrink-0 flex-wrap items-center gap-3">
+            <div class="flex max-w-full shrink-0 flex-wrap items-center gap-2 sm:gap-3">
                 {{ $actions }}
             </div>
         @endisset

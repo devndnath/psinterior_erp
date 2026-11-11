@@ -9,12 +9,15 @@
             @focus="focused = true"
             @click.outside="focused = false"
             placeholder="Search leads, clients, projects, invoices…"
-            class="block w-full rounded-full border border-ink-200/80 bg-surface py-2.5 pl-5 pr-11 text-sm text-ink-800 placeholder:text-ink-400 focus:border-accent-500 focus:ring-2 focus:ring-accent-500/30"
+            class="block w-full rounded-full border border-ink-200/80 bg-surface py-2.5 pl-5 pr-11 text-base text-ink-800 placeholder:text-ink-400 sm:text-sm focus:border-accent-500 focus:ring-2 focus:ring-accent-500/30"
         >
     </div>
 
     <div
-        x-show="focused && {{ strlen(trim($query)) >= 2 ? 'true' : 'false' }}"
+        {{-- Read the query live from $wire: Livewire's DOM update doesn't
+             re-evaluate a changed x-show expression, so a server-rendered
+             true/false here never flipped and the results never showed. --}}
+        x-show="focused && $wire.query.trim().length >= 2"
         x-cloak
         class="absolute left-0 right-0 z-50 mt-2 max-h-96 overflow-y-auto rounded-3xl border border-ink-200/70 bg-surface py-1 shadow-xl shadow-black/[0.06]"
     >

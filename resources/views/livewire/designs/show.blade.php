@@ -1,7 +1,7 @@
 <div>
     <x-breadcrumbs :items="['Designs' => route('designs.index'), $design->design_no => null]" class="mb-4" />
 
-    <div class="mb-6 flex items-start justify-between">
+    <div class="mb-6 flex flex-wrap items-start justify-between gap-3">
         <div>
             <div class="flex items-center gap-3">
                 <h1 class="text-2xl font-semibold text-gray-900">{{ $design->design_no }}</h1>

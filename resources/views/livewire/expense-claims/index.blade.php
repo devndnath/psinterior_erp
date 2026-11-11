@@ -10,7 +10,7 @@
         </x-slot:actions>
     </x-page-header>
 
-    <div class="panel mb-4 flex flex-wrap items-end gap-4 p-4">
+    <x-filter-panel>
         <div>
             <x-select label="Employee" name="employee" wire:model.live="employee">
                 <option value="">Any employee</option>
@@ -28,7 +28,7 @@
             </x-select>
         </div>
         <x-button variant="secondary" wire:click="resetFilters">Reset</x-button>
-    </div>
+    </x-filter-panel>
 
     @if ($claims->isEmpty())
         <div class="panel overflow-hidden">

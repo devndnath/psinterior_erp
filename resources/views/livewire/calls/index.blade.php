@@ -100,7 +100,7 @@
     @endif
 
     {{-- Filters --------------------------------------------------------------- --}}
-    <div class="panel mb-4 flex flex-wrap items-end gap-4 p-4">
+    <x-filter-panel>
         <div class="min-w-[200px] flex-1">
             <x-input label="Search" name="search" wire:model.live.debounce.400ms="search" placeholder="Name, phone, lead/client no, notes…" />
         </div>
@@ -142,7 +142,7 @@
             </x-select>
         </div>
         <x-button variant="secondary" wire:click="resetFilters">Reset</x-button>
-    </div>
+    </x-filter-panel>
 
     @if ($focus)
         <div class="mb-4 flex flex-wrap items-center gap-2 text-sm text-ink-600">

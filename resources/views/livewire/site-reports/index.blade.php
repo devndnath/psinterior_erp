@@ -10,7 +10,7 @@
         </x-slot:actions>
     </x-page-header>
 
-    <div class="panel mb-4 flex flex-wrap items-end gap-4 p-4">
+    <x-filter-panel>
         <div class="min-w-[220px] flex-1">
             <x-input label="Search" name="search" wire:model.live.debounce.400ms="search" placeholder="Work summary, project…" />
         </div>
@@ -23,7 +23,7 @@
             </x-select>
         </div>
         <x-button variant="secondary" wire:click="resetFilters">Reset</x-button>
-    </div>
+    </x-filter-panel>
 
     @if ($reports->isEmpty())
         <div class="panel overflow-hidden">

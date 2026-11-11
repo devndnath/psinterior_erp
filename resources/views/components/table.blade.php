@@ -18,14 +18,19 @@
         </tbody>
     </x-table>
 --}}
-@props(['empty' => false])
+{{-- On phones each row becomes a card (app.css .table-cards; cells are
+     labelled with their column heading by resources/js/mobile.js). Pass
+     :cards="false" for a table that must stay a grid; report tables
+     (class="report-table") always do. --}}
+@props(['empty' => false, 'cards' => true])
+@php($cards = $cards && ! str_contains((string) $attributes->get('class'), 'report-table'))
 
 <div {{ $attributes->merge(['class' => 'panel overflow-hidden']) }}>
     @if ($empty)
         {{ $slot }}
     @else
         <div class="overflow-x-auto">
-            <table class="table-base">
+            <table @class(['table-base', 'table-cards' => $cards])>
                 {{ $slot }}
             </table>
         </div>

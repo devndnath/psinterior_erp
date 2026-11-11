@@ -1,7 +1,7 @@
 <div>
     <x-breadcrumbs :items="['Expenses' => route('expenses.index'), $expense->expense_no => null]" class="mb-4" />
 
-    <div class="mb-6 flex items-start justify-between">
+    <div class="mb-6 flex flex-wrap items-start justify-between gap-3">
         <div>
             <h1 class="text-2xl font-semibold text-gray-900">{{ $expense->expense_no }}</h1>
             <p class="mt-1 text-sm text-gray-500">
@@ -13,7 +13,7 @@
                 @endif
             </p>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex flex-wrap items-center gap-2 sm:gap-3">
             <button type="button" wire:click="downloadPdf" class="btn-secondary">Download PDF</button>
             <a href="{{ route('expenses.pdf', [$expense, 'print' => 1]) }}" target="_blank" class="btn-secondary">Print</a>
             @can('update', $expense)

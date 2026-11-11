@@ -1,7 +1,18 @@
 @props(['items' => []])
+@php
+    // Phones show a single "‹ Parent" back link instead of the trail —
+    // the nearest crumb with a link (none on a top-level list page).
+    $back = collect($items)->filter(fn ($url, $label) => is_string($label) && $url)->keys()->last();
+    $backUrl = $back ? $items[$back] : null;
+@endphp
 
 @if (count($items))
-    <nav {{ $attributes->merge(['class' => 'flex']) }} aria-label="Breadcrumb">
+    @if ($backUrl)
+        <a href="{{ $backUrl }}" wire:navigate class="-ml-1 inline-flex items-center gap-1 py-1 text-sm font-semibold text-ink-600 active:text-ink-900 sm:hidden">
+            {!! \App\Support\Icon::svg('chevron-left', 'h-5 w-5') !!}{{ $back }}
+        </a>
+    @endif
+    <nav {{ $attributes->merge(['class' => 'flex max-sm:hidden']) }} aria-label="Breadcrumb">
         <ol class="flex items-center space-x-2 text-sm text-gray-500">
             <li>
                 <a href="{{ route('dashboard') }}" wire:navigate class="hover:text-gray-700">Dashboard</a>
