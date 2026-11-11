@@ -34,6 +34,7 @@
             <thead>
                 <tr>
                     <th>Project</th>
+                    <th>Project Name</th>
                     <th>Start</th>
                     <th>End</th>
                     <th>Status</th>
@@ -48,6 +49,7 @@
                                 {{ $warranty->project?->project_code }}
                             </a>
                         </td>
+                        <td class="max-w-[240px]"><span class="line-clamp-2" title="{{ $warranty->project?->name }}">{{ $warranty->project?->name ?? '—' }}</span></td>
                         <td>{{ $warranty->start_date->format('d M, Y') }}</td>
                         <td>{{ $warranty->end_date->format('d M, Y') }}</td>
                         <td>

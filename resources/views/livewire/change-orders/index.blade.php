@@ -46,6 +46,7 @@
                 <tr>
                     <th>CO #</th>
                     <th>Project</th>
+                    <th>Project Name</th>
                     <th>Description</th>
                     <th>Cost</th>
                     <th>Status</th>
@@ -65,6 +66,7 @@
                                 —
                             @endif
                         </td>
+                        <td class="max-w-[240px]"><span class="line-clamp-2" title="{{ $changeOrder->project?->name }}">{{ $changeOrder->project?->name ?? '—' }}</span></td>
                         <td>{{ \Illuminate\Support\Str::limit($changeOrder->description, 60) ?: '—' }}</td>
                         <td class="font-medium text-ink-900">{{ number_format($changeOrder->cost, 2) }}</td>
                         <td>

@@ -46,6 +46,7 @@
                 <tr>
                     <th>Quotation #</th>
                     <th>Project</th>
+                    <th>Project Name</th>
                     <th>Client</th>
                     <th>Version</th>
                     <th>Grand Total</th>
@@ -66,6 +67,7 @@
                                 —
                             @endif
                         </td>
+                        <td class="max-w-[240px]"><span class="line-clamp-2" title="{{ $quotation->project?->name }}">{{ $quotation->project?->name ?? '—' }}</span></td>
                         <td>{{ $quotation->client?->name ?? '—' }}</td>
                         <td>v{{ $quotation->version }}</td>
                         <td class="font-medium text-ink-900">{{ number_format($quotation->grand_total, 2) }}</td>

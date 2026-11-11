@@ -47,6 +47,7 @@
                     <th>PO #</th>
                     <th>Vendor</th>
                     <th>Project</th>
+                    <th>Project Name</th>
                     <th>Total</th>
                     <th>Status</th>
                     <th></th>
@@ -66,6 +67,7 @@
                                 —
                             @endif
                         </td>
+                        <td class="max-w-[240px]"><span class="line-clamp-2" title="{{ $po->project?->name }}">{{ $po->project?->name ?? '—' }}</span></td>
                         <td class="font-medium text-ink-900">{{ number_format($po->total, 2) }}</td>
                         <td>
                             <x-status-badge :label="$po->status->label()" :color="$po->status->color()" />

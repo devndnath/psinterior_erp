@@ -45,6 +45,7 @@
                     <th>Title</th>
                     <th>Area</th>
                     <th>Project</th>
+                    <th>Project Name</th>
                     <th>Options</th>
                     <th>Status</th>
                     <th></th>
@@ -61,6 +62,7 @@
                         <td>{{ $board->title }}</td>
                         <td>{{ $board->area ?: '—' }}</td>
                         <td>{{ $board->project?->project_code }}</td>
+                        <td class="max-w-[240px]"><span class="line-clamp-2" title="{{ $board->project?->name }}">{{ $board->project?->name ?? '—' }}</span></td>
                         <td>{{ $board->options_count }}</td>
                         <td>
                             <x-status-badge :label="$board->status->label()" :color="$board->status->color()" />

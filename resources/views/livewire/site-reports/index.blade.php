@@ -38,6 +38,7 @@
                 <tr>
                     <th class="th-sortable" wire:click="sortBy('report_date')">Date</th>
                     <th>Project</th>
+                    <th>Project Name</th>
                     <th>Weather</th>
                     <th>Manpower</th>
                     <th>Reported by</th>
@@ -57,6 +58,7 @@
                                 —
                             @endif
                         </td>
+                        <td class="max-w-[240px]"><span class="line-clamp-2" title="{{ $report->project?->name }}">{{ $report->project?->name ?? '—' }}</span></td>
                         <td>{{ $report->weather ?: '—' }}</td>
                         <td>{{ $report->manpower_count ?? '—' }}</td>
                         <td>{{ $report->reporter?->name ?? '—' }}</td>

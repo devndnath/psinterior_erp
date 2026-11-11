@@ -46,6 +46,7 @@
                 <tr>
                     <th>MR #</th>
                     <th>Project</th>
+                    <th>Project Name</th>
                     <th>Date</th>
                     <th>Status</th>
                     <th></th>
@@ -64,6 +65,7 @@
                                 —
                             @endif
                         </td>
+                        <td class="max-w-[240px]"><span class="line-clamp-2" title="{{ $mr->project?->name }}">{{ $mr->project?->name ?? '—' }}</span></td>
                         <td class="text-ink-500">{{ $mr->date->format('d M, Y') }}</td>
                         <td>
                             <x-status-badge :label="$mr->status->label()" :color="$mr->status->color()" />

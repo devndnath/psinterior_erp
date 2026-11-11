@@ -53,6 +53,7 @@
                     <tr>
                         <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Expense #</th>
                         <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Project</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Project Name</th>
                         <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Category</th>
                         <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Date</th>
                         <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Amount</th>
@@ -72,6 +73,7 @@
                                     <span class="chip">Office</span>
                                 @endif
                             </td>
+                            <td class="px-4 py-3 text-sm text-gray-500 max-w-[240px]"><span class="line-clamp-2" title="{{ $expense->project?->name }}">{{ $expense->project?->name ?? '—' }}</span></td>
                             <td class="px-4 py-3 text-sm text-gray-500">{{ $expense->category?->name ?? '—' }}</td>
                             <td class="px-4 py-3 text-sm text-gray-500">{{ $expense->date?->format('d M, Y') }}</td>
                             <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ number_format($expense->amount, 2) }}</td>

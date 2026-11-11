@@ -33,6 +33,7 @@
                     <th>Date</th>
                     <th>Type</th>
                     <th>Project / Site Visit</th>
+                    <th>Project Name</th>
                     <th class="text-right">Amount</th>
                     <th>Status</th>
                     <th></th>
@@ -46,6 +47,7 @@
                         <td class="text-ink-500">
                             {{ $claim->project?->project_code ?? ($claim->siteVisit?->sv_no ?? '—') }}
                         </td>
+                        <td class="max-w-[240px]"><span class="line-clamp-2" title="{{ $claim->project?->name }}">{{ $claim->project?->name ?? '—' }}</span></td>
                         <td class="text-right font-medium text-ink-900">{{ number_format($claim->amount, 2) }}</td>
                         <td>
                             <x-status-badge :label="$claim->status->label()" :color="$claim->status->color()" />

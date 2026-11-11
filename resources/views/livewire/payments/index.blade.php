@@ -46,6 +46,7 @@
                 <tr>
                     <th>Payment #</th>
                     <th>Project</th>
+                    <th>Project Name</th>
                     <th>Invoice</th>
                     <th>Date</th>
                     <th>Method</th>
@@ -66,6 +67,7 @@
                                 <span class="text-ink-500">Design sale</span>
                             @endif
                         </td>
+                        <td class="max-w-[240px]"><span class="line-clamp-2" title="{{ $payment->project?->name }}">{{ $payment->project?->name ?? '—' }}</span></td>
                         <td>
                             @if ($payment->invoice)
                                 <a href="{{ route('invoices.show', $payment->invoice) }}" wire:navigate class="hover:underline">{{ $payment->invoice->invoice_no }}</a>

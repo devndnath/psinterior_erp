@@ -51,6 +51,7 @@
                 <tr>
                     <th>Snag #</th>
                     <th>Project</th>
+                    <th>Project Name</th>
                     <th>Issue</th>
                     <th>Assigned To</th>
                     <th>Status</th>
@@ -70,6 +71,7 @@
                                 —
                             @endif
                         </td>
+                        <td class="max-w-[240px]"><span class="line-clamp-2" title="{{ $snag->project?->name }}">{{ $snag->project?->name ?? '—' }}</span></td>
                         <td>{{ \Illuminate\Support\Str::limit($snag->issue, 60) }}</td>
                         <td>{{ $snag->assignedTo?->name ?? '—' }}</td>
                         <td>

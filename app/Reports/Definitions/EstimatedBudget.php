@@ -46,7 +46,7 @@ class EstimatedBudget extends Report
             $estimate = $p->estimated_budget !== null ? (float) $p->estimated_budget : null;
             $s = (float) ($spent[$p->id] ?? 0);
             yield [
-                'project' => self::cell($p->project_code, route('projects.show', $p), $p->client?->name),
+                'project' => self::cell($p->project_code, route('projects.show', $p), trim($p->name.' · '.($p->client?->name ?? ''), ' ·')),
                 'status' => $p->status->label(),
                 'estimate' => $estimate,
                 'contract' => $p->contract_value !== null ? (float) $p->contract_value : null,

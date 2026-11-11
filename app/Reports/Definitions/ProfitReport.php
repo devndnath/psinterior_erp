@@ -50,7 +50,7 @@ class ProfitReport extends Report
             $spent = (float) ($m['spent'][$p->id] ?? 0);
             $contract = (float) ($p->contract_value ?? 0);
             yield [
-                'project' => self::cell($p->project_code, route('projects.show', $p), $p->client?->name),
+                'project' => self::cell($p->project_code, route('projects.show', $p), trim($p->name.' · '.($p->client?->name ?? ''), ' ·')),
                 'contract' => $contract,
                 'received' => $received,
                 'spent' => $spent,

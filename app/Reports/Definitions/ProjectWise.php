@@ -48,7 +48,7 @@ class ProjectWise extends Report
             $spent = (float) ($m['spent'][$p->id] ?? 0);
             $invoiced = (float) ($m['invoiced'][$p->id] ?? 0);
             yield [
-                'project' => self::cell($p->project_code, route('projects.show', $p), $p->client?->name),
+                'project' => self::cell($p->project_code, route('projects.show', $p), trim($p->name.' · '.($p->client?->name ?? ''), ' ·')),
                 'status' => $p->status->label(),
                 'budget' => self::budgetOf($p),
                 'invoiced' => $invoiced,

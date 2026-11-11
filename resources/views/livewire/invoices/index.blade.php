@@ -55,6 +55,7 @@
                 <tr>
                     <th>Invoice #</th>
                     <th>Project</th>
+                    <th>Project Name</th>
                     <th>Type</th>
                     <th>Grand Total</th>
                     <th>Outstanding</th>
@@ -75,6 +76,7 @@
                                 <span class="text-ink-500">No project</span>
                             @endif
                         </td>
+                        <td class="max-w-[240px]"><span class="line-clamp-2" title="{{ $invoice->project?->name }}">{{ $invoice->project?->name ?? '—' }}</span></td>
                         <td>{{ $invoice->type->label() }}</td>
                         <td class="font-medium text-ink-900">{{ number_format($invoice->grand_total, 2) }}</td>
                         <td>{{ number_format($invoice->outstandingAmount(), 2) }}</td>

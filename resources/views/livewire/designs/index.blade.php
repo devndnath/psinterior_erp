@@ -137,7 +137,8 @@
                         <td class="max-w-[220px]">
                             @if ($design->project)
                                 <a href="{{ route('projects.show', $design->project) }}" wire:navigate class="font-mono text-sm hover:underline">{{ $design->project->project_code }}</a>
-                                <span class="block truncate text-xs text-ink-500">{{ $design->project->client?->name }}</span>
+                                <span class="block truncate text-xs text-ink-700" title="{{ $design->project->name }}">{{ $design->project->name }}</span>
+                                <span class="block truncate text-[11px] text-ink-500">{{ $design->project->client?->name }}</span>
                             @else
                                 <span class="chip !border-accent-500/40 !bg-accent-500/10 !text-accent-700 dark:!text-accent-400">Sold design</span>
                                 <span class="mt-0.5 block truncate text-xs text-ink-500">{{ $design->client?->name ?? '—' }}</span>

@@ -46,6 +46,7 @@
                 <tr>
                     <th>BOQ #</th>
                     <th>Project</th>
+                    <th>Project Name</th>
                     <th>Version</th>
                     <th>Grand Total</th>
                     <th>Status</th>
@@ -65,6 +66,7 @@
                                 —
                             @endif
                         </td>
+                        <td class="max-w-[240px]"><span class="line-clamp-2" title="{{ $boq->project?->name }}">{{ $boq->project?->name ?? '—' }}</span></td>
                         <td>v{{ $boq->version }}</td>
                         <td class="font-medium text-ink-900">{{ number_format($boq->grand_total, 2) }}</td>
                         <td>

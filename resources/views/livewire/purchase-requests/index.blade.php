@@ -46,6 +46,7 @@
                 <tr>
                     <th>PR #</th>
                     <th>Project</th>
+                    <th>Project Name</th>
                     <th>Status</th>
                     <th></th>
                 </tr>
@@ -63,6 +64,7 @@
                                 —
                             @endif
                         </td>
+                        <td class="max-w-[240px]"><span class="line-clamp-2" title="{{ $pr->project?->name }}">{{ $pr->project?->name ?? '—' }}</span></td>
                         <td>
                             <x-status-badge :label="$pr->status->label()" :color="$pr->status->color()" />
                         </td>

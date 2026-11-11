@@ -43,6 +43,7 @@
                 <tr>
                     <th>Date</th>
                     <th>Project</th>
+                    <th>Project Name</th>
                     <th>Area</th>
                     <th>Result</th>
                     <th></th>
@@ -61,6 +62,7 @@
                                 —
                             @endif
                         </td>
+                        <td class="max-w-[240px]"><span class="line-clamp-2" title="{{ $inspection->project?->name }}">{{ $inspection->project?->name ?? '—' }}</span></td>
                         <td>{{ $inspection->area ?: '—' }}</td>
                         <td>
                             <x-status-badge :label="$inspection->result->label()" :color="$inspection->result->color()" />

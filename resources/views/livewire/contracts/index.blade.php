@@ -46,6 +46,7 @@
                 <tr>
                     <th>Contract #</th>
                     <th>Project</th>
+                    <th>Project Name</th>
                     <th>Client</th>
                     <th>Amount</th>
                     <th>Status</th>
@@ -65,6 +66,7 @@
                                 —
                             @endif
                         </td>
+                        <td class="max-w-[240px]"><span class="line-clamp-2" title="{{ $contract->project?->name }}">{{ $contract->project?->name ?? '—' }}</span></td>
                         <td>{{ $contract->client?->name ?? '—' }}</td>
                         <td class="font-medium text-ink-900">{{ number_format($contract->amount, 2) }}</td>
                         <td>
