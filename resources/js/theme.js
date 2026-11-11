@@ -20,29 +20,39 @@ function isNightNow() {
     return hour < 6 || hour >= 18;
 }
 
-function applyAutoTheme() {
+/** The theme to show: the person's saved choice, else the time of day. */
+function wantsDark() {
     let stored = null;
     try {
         stored = localStorage.getItem('theme');
     } catch (e) {
-        // Private browsing / disabled storage — nothing to defer to,
-        // fall through to the time-of-day default below.
+        // Private browsing / disabled storage — fall back to the clock.
     }
 
-    if (stored) {
-        return;
-    }
+    return stored ? stored === 'dark' : isNightNow();
+}
 
-    const dark = isNightNow();
+function applyTheme() {
+    const dark = wantsDark();
     if (document.documentElement.classList.contains('dark') !== dark) {
         document.documentElement.classList.toggle('dark', dark);
         // Lets <x-theme-toggle>'s own icon state (set once at Alpine init)
-        // re-sync when the auto-switch happens while it's already on screen.
+        // re-sync when the theme changes while it's already on screen.
         window.dispatchEvent(new CustomEvent('theme-changed'));
     }
 }
 
-applyAutoTheme();
+applyTheme();
 // Checked every minute — cheap, and frequent enough that the 6am/6pm
 // crossover is never more than a minute late for a tab left open overnight.
-setInterval(applyAutoTheme, 60 * 1000);
+setInterval(applyTheme, 60 * 1000);
+
+// Moving between pages with wire:navigate copies the new page's <html>
+// attributes over the current ones — class="h-full bg-paper", no "dark" —
+// which threw away the chosen theme on every page change. Re-apply it the
+// moment the new page is swapped in (before it paints, so no flash), and
+// once more after navigation as a backstop.
+document.addEventListener('livewire:navigating', (e) => {
+    e.detail?.onSwap?.(applyTheme);
+});
+document.addEventListener('livewire:navigated', applyTheme);
