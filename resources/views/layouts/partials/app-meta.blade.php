@@ -4,7 +4,9 @@
     the browser/status-bar colour in each theme, and iOS "standalone"
     mode so it opens full-screen from the home screen like an app.
 --}}
-<link rel="manifest" href="{{ route('pwa.manifest') }}">
+{{-- url() not route(): a server still running an old route cache (deployed
+     without `php artisan optimize:clear`) must not 500 every page over this. --}}
+<link rel="manifest" href="{{ url('manifest.webmanifest') }}">
 <meta name="theme-color" content="#EEEDE8" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0F100D" media="(prefers-color-scheme: dark)">
 <meta name="mobile-web-app-capable" content="yes">
