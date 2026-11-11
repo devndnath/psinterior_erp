@@ -2,17 +2,8 @@
 
 namespace App\Livewire\Calendar;
 
-use App\Enums\InvoiceStatus;
-use App\Enums\QuotationStatus;
-use App\Models\Invoice;
-use App\Models\LeadFollowup;
-use App\Models\Meeting;
 use App\Models\Project;
-use App\Models\ProjectMilestone;
-use App\Models\ProjectTask;
-use App\Models\Quotation;
-use App\Models\SiteVisit;
-use App\Models\Warranty;
+use App\Services\CalendarEvents;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -94,162 +85,7 @@ class Index extends Component
         $monthStart = $this->monthStart();
         $monthEnd = $monthStart->endOfMonth();
 
-        $events = collect();
-
-        if ($user->can('view_milestones')) {
-            $events = $events->merge(
-                ProjectMilestone::query()
-                    ->with('project')
-                    ->whereBetween('due_date', [$monthStart->toDateString(), $monthEnd->toDateString()])
-                    ->when($this->project, fn ($q) => $q->where('project_id', $this->project))
-                    ->get()
-                    ->map(fn (ProjectMilestone $m) => $this->event(
-                        $m->due_date->toDateString(),
-                        'Milestone',
-                        $m->name,
-                        $m->project?->project_code,
-                        $m->project ? route('projects.show', $m->project) : null,
-                        'purple',
-                    ))
-            );
-        }
-
-        if ($user->can('view_tasks')) {
-            $events = $events->merge(
-                ProjectTask::query()
-                    ->with('project')
-                    ->whereBetween('due_date', [$monthStart->toDateString(), $monthEnd->toDateString()])
-                    ->when($this->project, fn ($q) => $q->where('project_id', $this->project))
-                    ->get()
-                    ->map(fn (ProjectTask $t) => $this->event(
-                        $t->due_date->toDateString(),
-                        'Task',
-                        $t->name,
-                        $t->project?->project_code,
-                        $t->project ? route('projects.show', $t->project) : null,
-                        'blue',
-                    ))
-            );
-        }
-
-        if ($user->can('view_site_visits')) {
-            $events = $events->merge(
-                SiteVisit::query()
-                    ->with(['project', 'client'])
-                    ->whereBetween('visit_date', [$monthStart->toDateString(), $monthEnd->toDateString()])
-                    ->when($this->project, fn ($q) => $q->where('project_id', $this->project))
-                    ->get()
-                    ->map(fn (SiteVisit $v) => $this->event(
-                        $v->visit_date->toDateString(),
-                        'Site Visit',
-                        $v->client?->name ?? $v->site_address,
-                        $v->project?->project_code,
-                        route('site-visits.show', $v),
-                        'indigo',
-                    ))
-            );
-        }
-
-        if ($user->can('view_meetings')) {
-            $events = $events->merge(
-                Meeting::query()
-                    ->with('project')
-                    ->whereBetween('date', [$monthStart->toDateString(), $monthEnd->toDateString()])
-                    ->when($this->project, fn ($q) => $q->where('project_id', $this->project))
-                    ->get()
-                    ->map(fn (Meeting $m) => $this->event(
-                        $m->date->toDateString(),
-                        'Meeting',
-                        $m->type?->label() ?? 'Meeting',
-                        $m->project?->project_code,
-                        route('meetings.show', $m),
-                        'green',
-                    ))
-            );
-        }
-
-        // Scheduled calls (leads and clients) — not tied to a project, so
-        // hidden while a project filter is on.
-        if (! $this->project && ($user->can('view_leads') || $user->can('view_clients'))) {
-            $events = $events->merge(
-                LeadFollowup::query()->visibleTo($user)->calls()->toMake()
-                    ->with(LeadFollowup::CONTACT_RELATIONS)
-                    ->whereBetween('date', [$monthStart->toDateString(), $monthEnd->toDateString()])
-                    ->get()
-                    ->map(fn (LeadFollowup $c) => $this->event(
-                        $c->date->toDateString(),
-                        'Call',
-                        $c->type->label().' · '.($c->contactName() ?? '—'),
-                        $c->time ? substr($c->time, 0, 5) : $c->contactKind(),
-                        route('calls.index', [$c->client_id ? 'client' : 'lead' => $c->client_id ?: $c->lead_id]),
-                        'teal',
-                    ))
-            );
-        }
-
-        if ($user->can('view_invoices')) {
-            $events = $events->merge(
-                Invoice::query()
-                    ->with('project')
-                    ->whereBetween('due_date', [$monthStart->toDateString(), $monthEnd->toDateString()])
-                    ->whereIn('status', [
-                        InvoiceStatus::Issued->value,
-                        InvoiceStatus::PartiallyPaid->value,
-                        InvoiceStatus::Overdue->value,
-                    ])
-                    ->when($this->project, fn ($q) => $q->where('project_id', $this->project))
-                    ->get()
-                    ->map(fn (Invoice $i) => $this->event(
-                        $i->due_date->toDateString(),
-                        'Invoice Due',
-                        $i->invoice_no,
-                        $i->project?->project_code,
-                        route('invoices.show', $i),
-                        'red',
-                    ))
-            );
-        }
-
-        if ($user->can('view_quotations')) {
-            $events = $events->merge(
-                Quotation::query()
-                    ->with('project')
-                    ->whereBetween('valid_until', [$monthStart->toDateString(), $monthEnd->toDateString()])
-                    ->whereIn('status', [
-                        QuotationStatus::Sent->value,
-                        QuotationStatus::Viewed->value,
-                        QuotationStatus::Negotiation->value,
-                    ])
-                    ->when($this->project, fn ($q) => $q->where('project_id', $this->project))
-                    ->get()
-                    ->map(fn (Quotation $q) => $this->event(
-                        $q->valid_until->toDateString(),
-                        'Quotation Expiry',
-                        $q->quotation_no,
-                        $q->project?->project_code,
-                        route('quotations.show', $q),
-                        'yellow',
-                    ))
-            );
-        }
-
-        if ($user->can('view_warranties')) {
-            $events = $events->merge(
-                Warranty::query()
-                    ->with('project')
-                    ->whereBetween('end_date', [$monthStart->toDateString(), $monthEnd->toDateString()])
-                    ->when($this->project, fn ($q) => $q->where('project_id', $this->project))
-                    ->get()
-                    ->map(fn (Warranty $w) => $this->event(
-                        $w->end_date->toDateString(),
-                        'Warranty Expiry',
-                        $w->project?->project_code ?? 'Warranty',
-                        $w->project?->project_code,
-                        route('warranties.show', $w),
-                        'gray',
-                    ))
-            );
-        }
+        $events = app(CalendarEvents::class)->between($user, $monthStart->toDateString(), $monthEnd->toDateString(), $this->project ? (int) $this->project : null);
 
         /** @var Collection<string, Collection> $eventsByDate */
         $eventsByDate = $events->groupBy('date');
@@ -262,17 +98,5 @@ class Index extends Component
                 ? Project::orderBy('name')->get(['id', 'name', 'project_code'])
                 : collect(),
         ]);
-    }
-
-    protected function event(string $date, string $type, string $title, ?string $subtitle, ?string $url, string $color): array
-    {
-        return [
-            'date' => $date,
-            'type' => $type,
-            'title' => $title,
-            'subtitle' => $subtitle,
-            'url' => $url,
-            'color' => $color,
-        ];
     }
 }

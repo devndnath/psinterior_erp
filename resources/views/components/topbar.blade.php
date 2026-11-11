@@ -43,6 +43,7 @@
             <x-icon name="search" class="h-5 w-5" />
         </button>
         {{-- Phase 11: database-channel notification bell (app/Notifications/*). --}}
+        <livewire:schedule.popup />
         <livewire:notifications.bell />
 
         <div class="relative" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">
