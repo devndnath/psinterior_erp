@@ -22,6 +22,10 @@ class Index extends Component
     #[Url(as: 'q')]
     public string $search = '';
 
+    /** '' all, 'open' = still owed (issued / part-paid / overdue), 'overdue' = owed and past its due date. */
+    #[Url]
+    public string $due = '';
+
     #[Url]
     public string $status = '';
 
@@ -38,14 +42,14 @@ class Index extends Component
 
     public function updating($property): void
     {
-        if (in_array($property, ['search', 'status', 'type', 'project'], true)) {
+        if (in_array($property, ['due', 'search', 'status', 'type', 'project'], true)) {
             $this->resetPage();
         }
     }
 
     public function resetFilters(): void
     {
-        $this->reset(['search', 'status', 'type', 'project']);
+        $this->reset(['search', 'status', 'type', 'project', 'due']);
     }
 
     public function deleteInvoice(int $invoiceId): void
@@ -64,6 +68,8 @@ class Index extends Component
             ->with(['project', 'client'])
             ->when($this->search, fn ($q) => $q->where('invoice_no', 'like', "%{$this->search}%"))
             ->when($this->status, fn ($q) => $q->where('status', $this->status))
+            ->when(in_array($this->due, ['open', 'overdue'], true), fn ($q) => $q->whereIn('status', [InvoiceStatus::Issued->value, InvoiceStatus::PartiallyPaid->value, InvoiceStatus::Overdue->value]))
+            ->when($this->due === 'overdue', fn ($q) => $q->whereDate('due_date', '<', today()->toDateString()))
             ->when($this->type, fn ($q) => $q->where('type', $this->type))
             ->when($this->project, fn ($q) => $q->where('project_id', $this->project))
             ->latest()

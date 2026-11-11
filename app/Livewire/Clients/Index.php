@@ -10,12 +10,14 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
+use App\Livewire\Concerns\WithDateRange;
 use Livewire\WithPagination;
 
 #[Layout('layouts.admin', ['title' => 'Clients'])]
 #[Title('Clients')]
 class Index extends Component
 {
+    use WithDateRange;
     use WithPagination;
 
     #[Url(as: 'q')]
@@ -57,7 +59,7 @@ class Index extends Component
 
     public function resetFilters(): void
     {
-        $this->reset(['search', 'type', 'assignedTo']);
+        $this->reset(['search', 'type', 'assignedTo', 'from', 'to']);
     }
 
     public function deleteClient(int $clientId): void
@@ -73,6 +75,7 @@ class Index extends Component
     public function render()
     {
         $clients = Client::query()
+            ->tap(fn ($q) => $this->applyDateRange($q, 'created_at'))
             ->with(['assignee'])
             ->when($this->search, fn ($q) => $q->where(fn ($q) => $q
                 ->where('name', 'like', "%{$this->search}%")

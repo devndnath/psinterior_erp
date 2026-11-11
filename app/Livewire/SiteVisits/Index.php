@@ -9,12 +9,14 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
+use App\Livewire\Concerns\WithDateRange;
 use Livewire\WithPagination;
 
 #[Layout('layouts.admin', ['title' => 'Site Visits'])]
 #[Title('Site Visits')]
 class Index extends Component
 {
+    use WithDateRange;
     use WithPagination;
 
     #[Url(as: 'q')]
@@ -53,7 +55,7 @@ class Index extends Component
 
     public function resetFilters(): void
     {
-        $this->reset(['search', 'assignedTo']);
+        $this->reset(['search', 'assignedTo', 'from', 'to']);
     }
 
     public function deleteSiteVisit(int $siteVisitId): void
@@ -69,6 +71,7 @@ class Index extends Component
     public function render()
     {
         $visits = SiteVisit::query()
+            ->tap(fn ($q) => $this->applyDateRange($q, 'visit_date'))
             ->with(['client', 'assignee'])
             ->when($this->search, fn ($q) => $q->where(fn ($q) => $q
                 ->where('sv_no', 'like', "%{$this->search}%")

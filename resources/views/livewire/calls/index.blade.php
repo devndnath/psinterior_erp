@@ -19,7 +19,7 @@
         @foreach ([
             'overdue' => ['Overdue', 'calls past their date', 'alert-triangle', 'bg-danger-50 text-danger-600 dark:bg-danger-500/10 dark:text-danger-300'],
             'today' => ['Today', 'calls to make today', 'phone', 'bg-accent-500/15 text-accent-700 dark:text-accent-400'],
-            'upcoming' => ['Next 7 days', 'scheduled this week', 'calendar', 'bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300'],
+            'week' => ['Next 7 days', 'scheduled this week', 'calendar', 'bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300'],
             'history' => ['Logged', 'calls made this month', 'check', 'bg-success-50 text-success-700 dark:bg-success-500/10 dark:text-success-400'],
         ] as $key => [$label, $sub, $icon, $chip])
             <button type="button" wire:click="$set('when', '{{ $key }}')" @class([
@@ -109,7 +109,9 @@
                 <option value="todo">To call now (overdue + today)</option>
                 <option value="overdue">Overdue</option>
                 <option value="today">Today</option>
-                <option value="upcoming">Upcoming</option>
+                <option value="week">Next 7 days</option>
+                <option value="month">Next 30 days</option>
+                <option value="upcoming">All upcoming</option>
                 <option value="history">History (done / missed)</option>
                 <option value="all">Everything</option>
             </x-select>

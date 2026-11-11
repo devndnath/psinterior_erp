@@ -17,6 +17,7 @@
         <div>
             <x-select label="Status" name="status" wire:model.live="status">
                 <option value="">All</option>
+                <option value="open">All open</option>
                 @foreach ($statuses as $value => $label)
                     <option value="{{ $value }}">{{ $label }}</option>
                 @endforeach
@@ -38,6 +39,7 @@
                 @endforeach
             </x-select>
         </div>
+        <x-date-range-inputs :label="$dateOn === 'won' ? 'Won' : 'Created'" :active="$from || $to" />
         <x-button variant="secondary" wire:click="resetFilters">Reset</x-button>
     </div>
 

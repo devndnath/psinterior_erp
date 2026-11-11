@@ -12,6 +12,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
+use App\Livewire\Concerns\WithDateRange;
 use Livewire\WithPagination;
 
 /**
@@ -24,6 +25,7 @@ use Livewire\WithPagination;
 #[Title('Leads')]
 class Index extends Component
 {
+    use WithDateRange;
     use WithPagination;
 
     #[Url(as: 'q')]
@@ -31,6 +33,10 @@ class Index extends Component
 
     #[Url]
     public string $status = '';
+
+    /** Which date From/To filter on: '' = created, 'won' = converted (won) date. */
+    #[Url]
+    public string $dateOn = '';
 
     #[Url]
     public string $priority = '';
@@ -68,7 +74,7 @@ class Index extends Component
 
     public function resetFilters(): void
     {
-        $this->reset(['search', 'status', 'priority', 'assignedTo']);
+        $this->reset(['search', 'status', 'priority', 'assignedTo', 'from', 'to', 'dateOn']);
     }
 
     public function deleteLead(int $leadId): void
@@ -84,6 +90,7 @@ class Index extends Component
     public function render()
     {
         $leads = Lead::query()
+            ->tap(fn ($q) => $this->applyDateRange($q, $this->dateOn === 'won' ? 'converted_at' : 'created_at'))
             ->with(['source', 'assignee'])
             ->when($this->search, fn ($q) => $q->where(fn ($q) => $q
                 ->where('name', 'like', "%{$this->search}%")
@@ -91,7 +98,9 @@ class Index extends Component
                 ->orWhere('email', 'like', "%{$this->search}%")
                 ->orWhere('lead_no', 'like', "%{$this->search}%")
             ))
-            ->when($this->status, fn ($q) => $q->where('status', $this->status))
+            // 'open' = every stage still in play (the CRM overview's "Open leads").
+            ->when($this->status === 'open', fn ($q) => $q->whereIn('status', array_map(fn (LeadStatus $s) => $s->value, array_filter(LeadStatus::cases(), fn (LeadStatus $s) => $s->isOpen()))))
+            ->when($this->status !== '' && $this->status !== 'open', fn ($q) => $q->where('status', $this->status))
             ->when($this->priority, fn ($q) => $q->where('priority', $this->priority))
             ->when($this->assignedTo, fn ($q) => $q->where('assigned_to', $this->assignedTo))
             ->orderBy($this->sort, $this->direction)

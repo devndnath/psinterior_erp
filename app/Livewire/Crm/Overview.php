@@ -99,6 +99,7 @@ class Overview extends Component
         $pipeline = collect(LeadStatus::cases())->map(fn (LeadStatus $s) => [
             'label' => $s->label(),
             'count' => (int) ($byStatus[$s->value] ?? 0),
+            'href' => route('leads.index', ['status' => $s->value]),
         ])->all();
         $monthStart = $today->startOfMonth()->toDateString();
         $leads = [
@@ -117,6 +118,7 @@ class Overview extends Component
                 'active' => Project::whereNotIn('status', [ProjectStatus::Completed->value, ProjectStatus::Cancelled->value])->count(),
                 'rows' => collect(ProjectStatus::cases())->map(fn (ProjectStatus $s) => [
                     'label' => $s->label(), 'count' => (int) ($pByStatus[$s->value] ?? 0),
+                    'href' => route('projects.index', ['status' => $s->value]),
                 ])->all(),
             ];
         }
@@ -146,6 +148,13 @@ class Overview extends Component
             'clients' => $user->can('view_clients')
                 ? $byMonth(Client::whereDate('created_at', '>=', $yearStart->toDateString())->pluck('created_at'))
                 : null,
+            // Where each month's bar leads: that month's new leads / clients.
+            'leadUrls' => collect(range(1, 12))->map(fn ($m) => route('leads.index', [
+                'from' => $yearStart->month($m)->toDateString(), 'to' => $yearStart->month($m)->endOfMonth()->toDateString(),
+            ]))->all(),
+            'clientUrls' => $user->can('view_clients') ? collect(range(1, 12))->map(fn ($m) => route('clients.index', [
+                'from' => $yearStart->month($m)->toDateString(), 'to' => $yearStart->month($m)->endOfMonth()->toDateString(),
+            ]))->all() : [],
         ];
 
         return view('livewire.crm.overview', compact('calls', 'visits', 'meetings', 'pipeline', 'leads', 'projects', 'dues', 'chart') + [

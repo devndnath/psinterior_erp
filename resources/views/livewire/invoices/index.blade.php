@@ -32,6 +32,13 @@
             </x-select>
         </div>
         <div>
+            <x-select label="Payment" name="due" wire:model.live="due">
+                <option value="">Any</option>
+                <option value="open">Outstanding</option>
+                <option value="overdue">Overdue</option>
+            </x-select>
+        </div>
+        <div>
             <x-select label="Status" name="status" wire:model.live="status">
                 <option value="">Any status</option>
                 @foreach ($statuses as $value => $label)

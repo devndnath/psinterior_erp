@@ -11,6 +11,7 @@
 
     `compact` draws one tight row per status (label, thin bar, count) for
     long lists such as the CRM overview's pipeline and project stages.
+    A row with an 'href' becomes a link to those records.
 --}}
 @props(['rows' => [], 'unit' => 'records', 'empty' => 'Nothing recorded yet.', 'href' => null, 'compact' => false])
 
@@ -23,13 +24,16 @@
     @forelse ($rows as $row)
         @php $pct = $total > 0 ? $row['count'] / $total * 100 : 0; @endphp
         @if ($compact)
-            <div class="grid grid-cols-[minmax(0,7.5rem)_1fr_auto] items-center gap-3 text-sm" title="{{ $row['label'] }}: {{ number_format($row['count']) }} {{ $unit }} ({{ round($pct) }}%)">
-                <span class="truncate font-medium text-ink-700">{{ $row['label'] }}</span>
+            <{{ isset($row['href']) ? 'a' : 'div' }} @isset($row['href']) href="{{ $row['href'] }}" wire:navigate @endisset @class([
+                'grid grid-cols-[minmax(0,7.5rem)_1fr_auto] items-center gap-3 text-sm',
+                'group -mx-2 rounded-xl px-2 py-1 transition hover:bg-ink-50' => isset($row['href']),
+            ]) title="{{ $row['label'] }}: {{ number_format($row['count']) }} {{ $unit }} ({{ round($pct) }}%)">
+                <span @class(['truncate font-medium text-ink-700', 'group-hover:text-accent-700 group-hover:underline' => isset($row['href'])])>{{ $row['label'] }}</span>
                 <span class="h-2 overflow-hidden rounded-full bg-ink-100">
                     <span class="block h-full rounded-full bg-accent-500" style="width: {{ max(2, min(100, $pct)) }}%"></span>
                 </span>
                 <span class="w-16 text-right text-xs tabular-nums text-ink-500"><span class="font-semibold text-ink-900">{{ number_format($row['count']) }}</span> · {{ round($pct) }}%</span>
-            </div>
+            </{{ isset($row['href']) ? 'a' : 'div' }}>
             @continue
         @endif
         <div title="{{ $row['label'] }}: {{ number_format($row['count']) }} {{ $unit }} ({{ round($pct) }}%)">

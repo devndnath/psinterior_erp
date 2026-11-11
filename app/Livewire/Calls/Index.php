@@ -33,7 +33,7 @@ class Index extends Component
 {
     use WithPagination;
 
-    /** todo = overdue + today (default), overdue, today, upcoming, history, all */
+    /** todo = overdue + today (default), overdue, today, week (next 7 days), month (next 30), upcoming, history, all */
     #[Url]
     public string $when = 'todo';
 
@@ -235,7 +235,7 @@ class Index extends Component
         $counts = [
             'overdue' => $toMake()->whereDate('date', '<', $d)->count(),
             'today' => $toMake()->whereDate('date', $d)->count(),
-            'upcoming' => $toMake()->whereDate('date', '>', $d)->whereDate('date', '<=', $today->addDays(7)->toDateString())->count(),
+            'week' => $toMake()->whereDate('date', '>', $d)->whereDate('date', '<=', $today->addDays(7)->toDateString())->count(),
             'history' => $this->base()->where('status', '!=', FollowupStatus::Pending->value)
                 ->whereDate('date', '>=', $today->startOfMonth()->toDateString())->count(),
         ];
@@ -243,6 +243,8 @@ class Index extends Component
         $query = match ($this->when) {
             'overdue' => $toMake()->whereDate('date', '<', $d)->orderBy('date')->orderBy('time'),
             'today' => $toMake()->whereDate('date', $d)->orderBy('time'),
+            'week' => $toMake()->whereDate('date', '>', $d)->whereDate('date', '<=', $today->addDays(7)->toDateString())->orderBy('date')->orderBy('time'),
+            'month' => $toMake()->whereDate('date', '>', $d)->whereDate('date', '<=', $today->addDays(30)->toDateString())->orderBy('date')->orderBy('time'),
             'upcoming' => $toMake()->whereDate('date', '>', $d)->orderBy('date')->orderBy('time'),
             'history' => $this->base()->where('status', '!=', FollowupStatus::Pending->value)->orderByDesc('date')->orderByDesc('time'),
             'all' => $this->base()->orderByDesc('date')->orderByDesc('time'),

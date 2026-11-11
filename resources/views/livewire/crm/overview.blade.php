@@ -19,6 +19,18 @@
             'month' => ['label' => 'Next 30 days', 'icon' => 'calendar', 'chip' => 'bg-charcoal text-accent-400 dark:bg-white/10', 'ring' => ''],
         ];
         $user = auth()->user();
+
+        // Every tile, row and bar links to the records behind its number.
+        // Date windows match Overview::buckets(): today; overdue = before
+        // today; next 7 / 30 days = tomorrow up to +7 / +30.
+        $d = fn ($c) => $c->toDateString();
+        $window = fn (string $key) => match ($key) {
+            'today' => ['from' => $d($today), 'to' => $d($today)],
+            'overdue' => ['to' => $d($today->subDay())],
+            'week' => ['from' => $d($today->addDay()), 'to' => $d($today->addDays(7))],
+            'month' => ['from' => $d($today->addDay()), 'to' => $d($today->addDays(30))],
+        };
+        $monthStart = $d($today->startOfMonth());
     @endphp
 
     <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
@@ -40,10 +52,10 @@
     {{-- Lead KPIs --------------------------------------------------- --}}
     <div class="mb-5 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
         @foreach ([
-            ['label' => 'Open leads', 'value' => number_format($leads['open']), 'icon' => 'funnel', 'href' => route('leads.index')],
-            ['label' => 'New this month', 'value' => number_format($leads['newThisMonth']), 'icon' => 'arrow-up-right', 'href' => route('leads.index')],
-            ['label' => 'Won this month', 'value' => number_format($leads['wonThisMonth']), 'icon' => 'check', 'href' => route('leads.index', ['status' => 'won'])],
-            ['label' => 'Win rate', 'value' => $leads['winRate'] !== null ? $leads['winRate'].'%' : '—', 'icon' => 'gauge', 'href' => null, 'hint' => 'won ÷ (won + lost)'],
+            ['label' => 'Open leads', 'value' => number_format($leads['open']), 'icon' => 'funnel', 'href' => route('leads.index', ['status' => 'open'])],
+            ['label' => 'New this month', 'value' => number_format($leads['newThisMonth']), 'icon' => 'arrow-up-right', 'href' => route('leads.index', ['from' => $monthStart])],
+            ['label' => 'Won this month', 'value' => number_format($leads['wonThisMonth']), 'icon' => 'check', 'href' => route('leads.index', ['status' => 'won', 'dateOn' => 'won', 'from' => $monthStart])],
+            ['label' => 'Win rate', 'value' => $leads['winRate'] !== null ? $leads['winRate'].'%' : '—', 'icon' => 'gauge', 'href' => $user->can('view_reports') ? route('reports.sales-funnel') : route('leads.index', ['status' => 'won']), 'hint' => 'won ÷ (won + lost)'],
         ] as $k)
             <a @if ($k['href']) href="{{ $k['href'] }}" wire:navigate @endif class="panel group flex items-center gap-4 p-4 transition hover:-translate-y-0.5 sm:p-5">
                 <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-accent-500/15 text-accent-700 dark:text-accent-400">
@@ -70,13 +82,13 @@
             <div class="grid grid-cols-2 content-start gap-3 xl:col-span-5">
                 @foreach ($calls['counts'] as $key => $n)
                     @php $t = $tones[$key]; @endphp
-                    <div @class(['rounded-3xl border border-ink-200/70 bg-surface p-4 dark:border-white/[0.06]', $t['ring'] => $key === 'overdue' && $n > 0])>
+                    <a href="{{ route('calls.index', ['when' => $key]) }}" wire:navigate @class(['block rounded-3xl border border-ink-200/70 bg-surface p-4 transition hover:-translate-y-0.5 hover:border-ink-300 dark:border-white/[0.06]', $t['ring'] => $key === 'overdue' && $n > 0])>
                         <span class="flex h-9 w-9 items-center justify-center rounded-full {{ $t['chip'] }}">
                             <x-icon :name="$t['icon']" class="h-4 w-4" />
                         </span>
                         <p @class(['mt-3 text-3xl font-bold tracking-tight tabular-nums', 'text-danger-600' => $key === 'overdue' && $n > 0, 'text-ink-900' => ! ($key === 'overdue' && $n > 0)])>{{ number_format($n) }}</p>
                         <p class="text-xs font-medium text-ink-500">{{ $t['label'] }}{{ $key === 'today' ? "'s calls" : ' calls' }}</p>
-                    </div>
+                    </a>
                 @endforeach
             </div>
             <div class="xl:col-span-7">
@@ -121,13 +133,13 @@
                     <div class="grid grid-cols-3 gap-3">
                         @foreach ($block['counts'] as $key => $n)
                             @php $t = $tones[$key]; @endphp
-                            <div class="rounded-3xl border border-ink-200/70 bg-surface p-3.5 dark:border-white/[0.06] sm:p-4">
+                            <a href="{{ route($isVisits ? 'site-visits.index' : 'meetings.index', $window($key)) }}" wire:navigate class="block rounded-3xl border border-ink-200/70 bg-surface p-3.5 transition hover:-translate-y-0.5 hover:border-ink-300 dark:border-white/[0.06] sm:p-4">
                                 <span class="flex h-8 w-8 items-center justify-center rounded-full {{ $t['chip'] }}">
                                     <x-icon :name="$t['icon']" class="h-4 w-4" />
                                 </span>
                                 <p class="mt-2.5 text-2xl font-bold tracking-tight tabular-nums text-ink-900">{{ number_format($n) }}</p>
                                 <p class="truncate text-[11px] font-medium text-ink-500">{{ $t['label'] }}</p>
-                            </div>
+                            </a>
                         @endforeach
                     </div>
                     <p class="mb-1 mt-5 text-xs font-semibold text-ink-500">Coming up</p>
@@ -198,14 +210,16 @@
         @if ($dues)
             <div class="panel flex flex-col p-2 lg:col-span-5">
                 <div class="rounded-[22px] bg-charcoal px-5 py-5 text-white dark:bg-white/[0.06]">
-                    <p class="text-sm font-medium text-white/75">Client dues</p>
-                    <p class="mt-1.5 flex items-baseline gap-1.5">
-                        <span class="text-sm font-semibold text-white/60">{{ $currency }}</span>
-                        <span class="text-3xl font-bold tracking-tight tabular-nums text-accent-400">{{ number_format($dues['total'], 2) }}</span>
-                    </p>
+                    <a href="{{ route('invoices.index', ['due' => 'open']) }}" wire:navigate class="group block">
+                        <p class="text-sm font-medium text-white/75 group-hover:underline">Client dues</p>
+                        <p class="mt-1.5 flex items-baseline gap-1.5">
+                            <span class="text-sm font-semibold text-white/60">{{ $currency }}</span>
+                            <span class="text-3xl font-bold tracking-tight tabular-nums text-accent-400">{{ number_format($dues['total'], 2) }}</span>
+                        </p>
+                    </a>
                     <p class="mt-1 text-xs text-white/65">
                         @if ($dues['overdueCount'])
-                            <span class="font-semibold text-danger-300">{{ number_format($dues['overdue'], 2) }} overdue</span> on {{ $dues['overdueCount'] }} {{ \Illuminate\Support\Str::plural('invoice', $dues['overdueCount']) }}
+                            <a href="{{ route('invoices.index', ['due' => 'overdue']) }}" wire:navigate class="hover:underline"><span class="font-semibold text-danger-300">{{ number_format($dues['overdue'], 2) }} overdue</span> on {{ $dues['overdueCount'] }} {{ \Illuminate\Support\Str::plural('invoice', $dues['overdueCount']) }} →</a>
                         @else
                             Nothing overdue
                         @endif
@@ -238,12 +252,20 @@
                         datasets.push({ label: 'New clients', data: @js($chart['clients']), backgroundColor: t.income, borderRadius: 6, maxBarThickness: 18 });
                     @endif
                     if (! window.Chart) return;
+                    // Click a bar: that month's new leads (or new clients).
+                    const urls = [@js($chart['leadUrls']), @js($chart['clientUrls'])];
                     new window.Chart(this.$refs.clients, {
                         type: 'bar',
                         data: { labels: @js($chart['labels']), datasets },
                         options: {
                             responsive: true, maintainAspectRatio: false,
                             interaction: { mode: 'index', intersect: false },
+                            onHover: (e, els) => { e.native.target.style.cursor = els.length ? 'pointer' : 'default'; },
+                            onClick: (e, els, chart) => {
+                                const hit = chart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, false)[0] ?? els[0];
+                                const url = hit && (urls[hit.datasetIndex] ?? urls[0])?.[hit.index];
+                                if (url) Livewire.navigate(url);
+                            },
                             plugins: {
                                 legend: { display: false },
                                 tooltip: { backgroundColor: t.tooltipBg, titleColor: t.tooltipText, bodyColor: t.tooltipText, padding: 10, cornerRadius: 12, boxPadding: 4, usePointStyle: true },
@@ -260,11 +282,11 @@
                 <div>
                     <p class="section-title">Clients &amp; Leads {{ $year }}</p>
                     <p class="section-sub">
-                        {{ number_format(array_sum($chart['leads'])) }} new leads
+                        <a href="{{ route('leads.index', ['from' => $d($today->startOfYear())]) }}" wire:navigate class="hover:text-accent-700 hover:underline">{{ number_format(array_sum($chart['leads'])) }} new leads</a>
                         @if ($chart['clients'] !== null)
-                            · {{ number_format(array_sum($chart['clients'])) }} new clients
+                            · <a href="{{ route('clients.index', ['from' => $d($today->startOfYear())]) }}" wire:navigate class="hover:text-accent-700 hover:underline">{{ number_format(array_sum($chart['clients'])) }} new clients</a>
                         @endif
-                        this year
+                        this year · click a bar for that month
                     </p>
                 </div>
                 <div class="flex items-center gap-4 text-xs text-ink-600">

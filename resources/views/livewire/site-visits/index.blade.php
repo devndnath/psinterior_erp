@@ -22,6 +22,7 @@
                 @endforeach
             </x-select>
         </div>
+        <x-date-range-inputs label="Visit" :active="$from || $to" />
         <x-button variant="secondary" wire:click="resetFilters">Reset</x-button>
     </div>
 

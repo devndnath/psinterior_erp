@@ -10,12 +10,14 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
+use App\Livewire\Concerns\WithDateRange;
 use Livewire\WithPagination;
 
 #[Layout('layouts.admin', ['title' => 'Meetings'])]
 #[Title('Meetings')]
 class Index extends Component
 {
+    use WithDateRange;
     use WithPagination;
 
     #[Url]
@@ -38,7 +40,7 @@ class Index extends Component
 
     public function resetFilters(): void
     {
-        $this->reset(['type', 'project']);
+        $this->reset(['type', 'project', 'from', 'to']);
     }
 
     public function deleteMeeting(int $meetingId): void
@@ -54,6 +56,7 @@ class Index extends Component
     public function render()
     {
         $meetings = Meeting::query()
+            ->tap(fn ($q) => $this->applyDateRange($q, 'date'))
             ->with('project')
             ->when($this->type, fn ($q) => $q->where('type', $this->type))
             ->when($this->project, fn ($q) => $q->where('project_id', $this->project))
