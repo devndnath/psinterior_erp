@@ -59,11 +59,38 @@ class Registry
     /** Reports in a group the user may open, as menu links. */
     public static function menu(string $group): array
     {
-        $user = auth()->user();
+        return self::visibleMenu()[$group] ?? [];
+    }
 
-        return collect(self::classes())
-            ->filter(fn ($c) => $c::group() === $group && $user?->can('view_reports') && $user->can($c::permission()))
-            ->map(fn ($c) => ['label' => $c::title(), 'route' => 'reports.view', 'params' => ['report' => $c::key()], 'key' => $c::key()])
-            ->values()->all();
+    /**
+     * Every report the signed-in user may open, as menu links grouped by
+     * menu group — worked out once per request (the sidebar asks for each
+     * group on every page; checking all reports' permissions per group
+     * was a large share of the page's render time).
+     */
+    private static function visibleMenu(): array
+    {
+        $user = auth()->user();
+        if (! $user || ! $user->can('view_reports')) {
+            return [];
+        }
+
+        $cache = app()->bound('reports.menu') ? app('reports.menu') : null;
+        if ($cache !== null && $cache['user'] === $user->getAuthIdentifier()) {
+            return $cache['menu'];
+        }
+
+        $allowed = [];
+        $menu = [];
+        foreach (self::classes() as $c) {
+            $permission = $c::permission();
+            if ($allowed[$permission] ??= $user->can($permission)) {
+                $menu[$c::group()][] = ['label' => $c::title(), 'route' => 'reports.view', 'params' => ['report' => $c::key()], 'key' => $c::key()];
+            }
+        }
+
+        app()->instance('reports.menu', ['user' => $user->getAuthIdentifier(), 'menu' => $menu]);
+
+        return $menu;
     }
 }

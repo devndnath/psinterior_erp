@@ -155,7 +155,19 @@
 
     $user = auth()->user();
     // An array 'permission' means any one of them will do.
-    $canSee = fn (array $link) => ! isset($link['permission']) || (bool) $user?->canAny((array) $link['permission']);
+    // Links are gated on permission names only, so instead of a Gate
+    // check per link (50+ per page) read the user's permission set once:
+    // same answer as $user->can() — Super Admin (AuthServiceProvider's
+    // Gate::before) sees everything, everyone else what their roles grant.
+    $superAdmin = (bool) $user?->isStaff() && $user->hasRole('super-admin');
+    $granted = $user ? $user->getAllPermissions()->pluck('name')->flip()->all() : [];
+    $can = fn (string $permission) => $superAdmin || isset($granted[$permission]);
+    $canSee = fn (array $link) => ! isset($link['permission'])
+        || collect((array) $link['permission'])->contains(fn ($p) => $can($p));
+    // Icons are drawn straight from App\Support\Icon here, not with
+    // <x-icon> — there are over a hundred and the component per icon cost
+    // a third of every page's render time.
+    $icon = fn (string $name, string $class, array $attrs = []) => \App\Support\Icon::svg($name, $class, $attrs);
     // Engine report links share one route; they match on its {report} too.
     $isActive = fn (array $link) => isset($link['params'])
         ? request()->routeIs($link['route']) && request()->route('report') === ($link['params']['report'] ?? null)
@@ -294,22 +306,11 @@
                                     ? 'mx-auto h-11 w-11 justify-center {{ $childActive ? '!bg-charcoal !text-white dark:!bg-accent-500 dark:!text-charcoal' : '' }}'
                                     : 'gap-3 px-3.5 py-2.5'"
                             >
-                                <x-icon
-                                    :name="$entry['icon']"
-                                    @class([
-                                        'h-[18px] w-[18px] shrink-0',
-                                        'text-accent-600 dark:text-accent-400' => $childActive,
-                                        'text-ink-400 group-hover/nav:text-ink-700' => ! $childActive,
-                                    ])
-                                    x-bind:class="rail && {{ $childActive ? 'true' : 'false' }} ? '!text-accent-500 dark:!text-charcoal' : ''"
-                                />
+                                {!! $icon($entry['icon'],
+                                    'h-[18px] w-[18px] shrink-0 '.($childActive ? 'text-accent-600 dark:text-accent-400' : 'text-ink-400 group-hover/nav:text-ink-700'),
+                                    $childActive ? ['x-bind:class' => "rail ? '!text-accent-500 dark:!text-charcoal' : ''"] : []) !!}
                                 <span class="flex-1 truncate text-left" x-show="! rail">{{ $entry['label'] }}</span>
-                                <x-icon
-                                    name="chevron-down"
-                                    class="h-4 w-4 shrink-0 text-ink-400 transition-transform duration-150"
-                                    x-show="! rail"
-                                    x-bind:class="open ? 'rotate-180' : ''"
-                                />
+                                {!! $icon('chevron-down', 'h-4 w-4 shrink-0 text-ink-400 transition-transform duration-150', ['x-show' => '! rail', 'x-bind:class' => "open ? 'rotate-180' : ''"]) !!}
                             </button>
 
                             <div x-show="open && ! rail" x-cloak x-collapse.duration.150ms class="relative ml-[22px] mt-1 space-y-0.5 border-l border-ink-200 pl-3 dark:border-white/10">
@@ -317,7 +318,7 @@
                                     @php $active = $isActive($child); @endphp
                                     <a
                                         href="{{ $href($child) }}"
-                                        wire:navigate
+                                        wire:navigate.hover
                                         @if ($active) aria-current="page" @endif
                                         @class([
                                             'group/sub flex items-center gap-2.5 rounded-[18px] px-3 py-2 text-[13px] transition-colors',
@@ -325,14 +326,7 @@
                                             'font-medium text-ink-600 hover:bg-ink-100 hover:text-ink-900' => ! $active,
                                         ])
                                     >
-                                        <x-icon
-                                            :name="$child['icon']"
-                                            @class([
-                                                'h-4 w-4 shrink-0',
-                                                'text-accent-500 dark:text-charcoal' => $active,
-                                                'text-ink-400 group-hover/sub:text-ink-700' => ! $active,
-                                            ])
-                                        />
+                                        {!! $icon($child['icon'], 'h-4 w-4 shrink-0 '.($active ? 'text-accent-500 dark:text-charcoal' : 'text-ink-400 group-hover/sub:text-ink-700')) !!}
                                         <span class="min-w-0 leading-snug">{{ $child['label'] }}</span>
                                     </a>
                                 @endforeach
@@ -342,7 +336,7 @@
                         @php $active = $isActive($entry); @endphp
                         <a
                             href="{{ $href($entry) }}"
-                            wire:navigate
+                            wire:navigate.hover
                             aria-label="{{ $entry['label'] }}"
                             @if ($active) aria-current="page" @endif
                             @mouseenter="showTip($el, @js($entry['label']))"
@@ -354,14 +348,7 @@
                             ])
                             :class="rail ? 'mx-auto h-11 w-11 justify-center' : 'gap-3 px-3.5 py-2.5'"
                         >
-                            <x-icon
-                                :name="$entry['icon']"
-                                @class([
-                                    'h-[18px] w-[18px] shrink-0',
-                                    'text-accent-500 dark:text-charcoal' => $active,
-                                    'text-ink-400 group-hover/nav:text-ink-700' => ! $active,
-                                ])
-                            />
+                            {!! $icon($entry['icon'], 'h-[18px] w-[18px] shrink-0 '.($active ? 'text-accent-500 dark:text-charcoal' : 'text-ink-400 group-hover/nav:text-ink-700')) !!}
                             <span class="truncate" x-show="! rail">{{ $entry['label'] }}</span>
                         </a>
                     @endif

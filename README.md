@@ -149,15 +149,39 @@ See **`TESTING.md`** for the full first-run validation sequence (this is the sin
 ## 11. Production Deployment
 
 1. `composer install --no-dev --optimize-autoloader`
-2. `npm ci && npm run build`
+2. `npm install && npm run build` — rebuild on **every** deploy, or new screens show unstyled
 3. Set `APP_ENV=production`, `APP_DEBUG=false`, a real `APP_KEY`, and strong DB credentials
 4. `php artisan migrate --force`
 5. `php artisan db:seed --force` only on first deploy (or skip and create the super admin manually)
-6. `php artisan config:cache && php artisan route:cache && php artisan view:cache`
+6. `php artisan optimize` (caches config, routes, events and views — re-run after every deploy)
 7. Point the web server's document root at `public/`
 8. Run a queue worker under Supervisor/systemd (see §7)
 9. Add the scheduler crontab entry (see §8)
 10. Serve over HTTPS — `bootstrap/app.php` forces the HTTPS URL scheme in production
+
+### Keeping it fast
+
+- **PHP OPcache on** (`opcache.enable=1`, `opcache.validate_timestamps=0` in production, restart PHP-FPM after a deploy). Without it PHP re-reads every file on every request.
+- **Sessions and cache off the database:** `SESSION_DRIVER=file` and `CACHE_STORE=file` (or `redis` if available) — the `database` drivers add queries to every request.
+- **`APP_DEBUG=false`** and `LOG_LEVEL=warning`.
+- **Compress and cache the built assets.** Files under `public/build/` have a content hash in their name, so browsers can keep them for a year. On Apache add this to `public/.htaccess` (below Laravel's rewrite rules); on nginx use the equivalent `gzip on;` and `location /build/ { expires 1y; add_header Cache-Control "public, immutable"; }`:
+
+  ```apache
+  <IfModule mod_deflate.c>
+      AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+  </IfModule>
+  <IfModule mod_headers.c>
+      # Only the hashed files in public/build/ are .css/.js on disk.
+      <FilesMatch "\.(css|js|woff2?)$">
+          Header set Cache-Control "public, max-age=31536000, immutable"
+      </FilesMatch>
+  </IfModule>
+  <IfModule mod_expires.c>
+      ExpiresActive On
+      ExpiresByType text/css "access plus 1 year"
+      ExpiresByType application/javascript "access plus 1 year"
+  </IfModule>
+  ```
 
 ## 12. Backup
 

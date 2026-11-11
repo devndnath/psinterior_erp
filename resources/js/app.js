@@ -1,4 +1,3 @@
-import './bootstrap';
 import './theme';
 
 // Alpine ships inside Livewire 3 already (window.Alpine), so it is not
@@ -8,13 +7,12 @@ import './theme';
 // dedicated file under resources/js/ as modules are added, and import it
 // here.
 
-// Phase 13: Chart.js was installed (package.json) but never imported or
-// used anywhere — wiring it up here, minimally, so a future Dashboard/
-// Reports redesign phase can do `new Chart(ctx, {...})` from an inline
-// <script> or an Alpine component without any further build-step work.
-// No chart is added to any page in this phase — this is wiring only.
-import Chart from 'chart.js/auto';
-window.Chart = Chart;
+// Chart.js (~200 KB) is only needed by the pages that draw charts (the
+// dashboard and the CRM overview), so it is split into its own file and
+// fetched the first time a chart asks for it, not on every page:
+//     const Chart = await window.loadChart();  new Chart(canvas, {...});
+let chartLoader;
+window.loadChart = () => (chartLoader ??= import('chart.js/auto').then((m) => (window.Chart = m.default)));
 
 // Brand-layout pass: one place for every dashboard/report chart's colors,
 // read at chart-init time so each chart picks the current theme. Series

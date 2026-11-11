@@ -245,16 +245,16 @@
 
         <div @class(['panel flex flex-col p-5 sm:p-6', 'lg:col-span-7' => $dues, 'lg:col-span-12' => ! $dues])
             x-data="{
-                init() {
+                async init() {
                     const t = window.psChartTheme();
                     const datasets = [{ label: 'New leads', data: @js($chart['leads']), backgroundColor: document.documentElement.classList.contains('dark') ? '#3987e5' : '#2a78d6', borderRadius: 6, maxBarThickness: 18 }];
                     @if ($chart['clients'] !== null)
                         datasets.push({ label: 'New clients', data: @js($chart['clients']), backgroundColor: t.income, borderRadius: 6, maxBarThickness: 18 });
                     @endif
-                    if (! window.Chart) return;
+                    const Chart = await window.loadChart();
                     // Click a bar: that month's new leads (or new clients).
                     const urls = [@js($chart['leadUrls']), @js($chart['clientUrls'])];
-                    new window.Chart(this.$refs.clients, {
+                    new Chart(this.$refs.clients, {
                         type: 'bar',
                         data: { labels: @js($chart['labels']), datasets },
                         options: {

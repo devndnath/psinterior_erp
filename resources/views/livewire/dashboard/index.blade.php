@@ -311,7 +311,7 @@
                     @php [$curInt, $curDec] = $money($income['current']); @endphp
                     <div class="panel flex flex-col p-6 lg:col-span-7"
                         x-data="{
-                            init() {
+                            async init() {
                                 const t = window.psChartTheme();
                                 // Dashed guide line under the hovered month (the reference's crosshair).
                                 const guide = {
@@ -336,7 +336,8 @@
                                         pointBackgroundColor: t.expense, pointBorderColor: t.surface, pointBorderWidth: 2, order: 2,
                                     });
                                 @endif
-                                new window.Chart(this.$refs.trend, {
+                                const Chart = await window.loadChart();
+                                new Chart(this.$refs.trend, {
                                     type: 'line',
                                     data: { labels: @js($chartMonths), datasets },
                                     plugins: [guide],
