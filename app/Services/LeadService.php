@@ -84,6 +84,10 @@ class LeadService
                 'converted_at' => now(),
             ]);
 
+            // The lead's call history (and any calls still scheduled)
+            // follows it to the client's page and the client call lists.
+            LeadFollowup::where('lead_id', $lead->id)->update(['client_id' => $client->id]);
+
             // Database-channel notification only (Phase 11) — the lead's
             // own assignee is the one person who already has the context
             // to act on this conversion (e.g. kick off a Project next).

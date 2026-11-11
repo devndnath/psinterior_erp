@@ -16,6 +16,7 @@ use App\Livewire\Boqs\Form as BoqForm;
 use App\Livewire\Boqs\Index as BoqIndex;
 use App\Livewire\Boqs\Show as BoqShow;
 use App\Livewire\Calendar\Index as CalendarIndex;
+use App\Livewire\Calls\Index as CallIndex;
 use App\Livewire\Crm\Overview as CrmOverview;
 use App\Livewire\References\Index as ReferenceIndex;
 use App\Livewire\ChangeOrders\Form as ChangeOrderForm;
@@ -185,6 +186,9 @@ Route::middleware(['auth:web', 'user_type:staff'])->group(function () {
     // CRM overview (the dashboard's CRM card): calls, visits, meetings,
     // pipeline, projects, dues and new clients this year.
     Route::get('/crm', CrmOverview::class)->name('crm.overview')->middleware('can:view_leads');
+    // Calls for leads and clients (Meetings section) — lead calls need
+    // view_leads, client calls view_clients; Calls\Index checks both.
+    Route::get('/calls', CallIndex::class)->name('calls.index');
 
     // References: who introduced each client / lead.
     Route::get('/references', ReferenceIndex::class)->name('references.index')->middleware('can:view_clients');

@@ -169,6 +169,7 @@
                 ['label' => 'New Lead', 'icon' => 'funnel', 'href' => route('leads.create'), 'can' => 'create_leads'],
                 ['label' => 'Site Visit', 'icon' => 'map-pin', 'href' => route('site-visits.create'), 'can' => 'create_site_visits'],
                 ['label' => 'Meeting', 'icon' => 'calendar', 'href' => route('meetings.create'), 'can' => 'create_meetings'],
+                ['label' => 'Calls', 'icon' => 'phone', 'href' => route('calls.index'), 'can' => ['view_leads', 'view_clients']],
                 ['label' => 'Quotation', 'icon' => 'file-text', 'href' => route('quotations.create'), 'can' => 'create_quotations'],
                 ['label' => 'Invoice', 'icon' => 'receipt', 'href' => route('invoices.create'), 'can' => 'create_invoices'],
                 ['label' => 'Design Sale', 'icon' => 'palette', 'href' => route('designs.create', ['for' => 'sold']), 'can' => 'create_designs'],
@@ -178,7 +179,7 @@
                 ['label' => 'Vendor Bills', 'icon' => 'truck', 'href' => route('vendor-invoices.index'), 'can' => 'view_vendor_invoices'],
                 ['label' => 'Contractors', 'icon' => 'hard-hat', 'href' => route('subcontractors.index'), 'can' => 'view_subcontractors'],
                 ['label' => 'Reports', 'icon' => 'bar-chart', 'href' => route('reports.index'), 'can' => 'view_reports'],
-            ], fn ($q) => auth()->user()?->can($q['can'])));
+            ], fn ($q) => (bool) auth()->user()?->canAny((array) $q['can'])));
         @endphp
         @if ($quick)
             <div class="panel mb-5 p-4 sm:p-5">

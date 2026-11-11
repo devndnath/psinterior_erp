@@ -10,6 +10,8 @@
         </x-slot:actions>
     </x-page-header>
 
+    <x-meetings-tabs active="meetings" />
+
     <div class="panel mb-4 flex flex-wrap items-end gap-4 p-4">
         <div>
             <x-select label="Project" name="project" wire:model.live="project">
@@ -44,6 +46,7 @@
                     <th>Date</th>
                     <th>Type</th>
                     <th>Project</th>
+                    <th>Project Name</th>
                     <th>Location</th>
                     <th></th>
                 </tr>
@@ -62,6 +65,7 @@
                                 —
                             @endif
                         </td>
+                        <td class="max-w-[240px]"><span class="line-clamp-2" title="{{ $meeting->project?->name }}">{{ $meeting->project?->name ?? '—' }}</span></td>
                         <td>{{ $meeting->location ?: '—' }}</td>
                         <td class="text-right">
                             {{-- Phase 5 (premium-SaaS redesign): a single "..." action menu instead of several separate text links in every row. --}}

@@ -5,6 +5,7 @@ namespace App\Livewire\Calendar;
 use App\Enums\InvoiceStatus;
 use App\Enums\QuotationStatus;
 use App\Models\Invoice;
+use App\Models\LeadFollowup;
 use App\Models\Meeting;
 use App\Models\Project;
 use App\Models\ProjectMilestone;
@@ -163,6 +164,25 @@ class Index extends Component
                         $m->project?->project_code,
                         route('meetings.show', $m),
                         'green',
+                    ))
+            );
+        }
+
+        // Scheduled calls (leads and clients) — not tied to a project, so
+        // hidden while a project filter is on.
+        if (! $this->project && ($user->can('view_leads') || $user->can('view_clients'))) {
+            $events = $events->merge(
+                LeadFollowup::query()->visibleTo($user)->calls()->toMake()
+                    ->with(LeadFollowup::CONTACT_RELATIONS)
+                    ->whereBetween('date', [$monthStart->toDateString(), $monthEnd->toDateString()])
+                    ->get()
+                    ->map(fn (LeadFollowup $c) => $this->event(
+                        $c->date->toDateString(),
+                        'Call',
+                        $c->type->label().' · '.($c->contactName() ?? '—'),
+                        $c->time ? substr($c->time, 0, 5) : $c->contactKind(),
+                        route('calls.index', [$c->client_id ? 'client' : 'lead' => $c->client_id ?: $c->lead_id]),
+                        'teal',
                     ))
             );
         }

@@ -26,6 +26,7 @@
         'red' => 'bg-danger-100 text-danger-700',
         'purple' => 'bg-purple-100 text-purple-700',
         'indigo' => 'bg-indigo-100 text-indigo-700',
+        'teal' => 'bg-teal-100 text-teal-800 dark:bg-teal-500/15 dark:text-teal-300',
     ];
 @endphp
 

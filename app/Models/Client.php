@@ -55,6 +55,12 @@ class Client extends Model
         return $this->hasMany(Lead::class, 'converted_client_id');
     }
 
+    /** Calls and follow-ups — the client's own and those carried over from its lead. */
+    public function followups(): HasMany
+    {
+        return $this->hasMany(LeadFollowup::class)->orderByDesc('date');
+    }
+
     public function siteVisits(): HasMany
     {
         return $this->hasMany(SiteVisit::class);

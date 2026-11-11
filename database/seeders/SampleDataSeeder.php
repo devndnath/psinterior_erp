@@ -444,6 +444,39 @@ class SampleDataSeeder extends Seeder
             }
         }
 
+        // Client calls: some history, plus calls due (late, today, coming up).
+        $callSvc = app(\App\Services\CallService::class);
+        foreach (array_slice($this->clients, 0, 10) as $k => $client) {
+            $owner = $client->assigned_to ?? $this->pick($owners)->id;
+            $callSvc->log($client, [
+                'date' => $this->today->subDays(mt_rand(3, 40))->toDateString(),
+                'time' => sprintf('%02d:%02d', mt_rand(10, 18), $this->pick([0, 15, 30, 45])),
+                'type' => $this->pick(['call', 'call', 'whatsapp']),
+                'status' => 'done',
+                'outcome' => $this->pick(['talked', 'interested', 'call_back', 'no_answer']),
+                'notes' => $this->pick([
+                    'Confirmed site measurement date.',
+                    'Asked about the payment schedule for the next stage.',
+                    'Wants to see more wardrobe finish options.',
+                    'Shared progress photos; client happy with the false ceiling.',
+                ]),
+                'assigned_to' => $owner,
+            ]);
+            $callSvc->log($client, [
+                'date' => $this->today->addDays([-2, 0, 0, 1, 3, 5, -1, 0, 9, 14][$k] ?? 2)->toDateString(),
+                'time' => $k % 2 ? sprintf('%02d:00', mt_rand(10, 17)) : null,
+                'type' => $this->pick(['call', 'whatsapp']),
+                'status' => 'pending',
+                'notes' => $this->pick([
+                    'Follow up on the pending installment.',
+                    'Confirm material selection for the kitchen.',
+                    'Check availability for the handover walkthrough.',
+                    'Discuss the revised quotation.',
+                ]),
+                'assigned_to' => $owner,
+            ]);
+        }
+
         // Measurement / survey visits, past and upcoming.
         foreach (range(1, 12) as $n) {
             $client = $this->pick($this->clients);

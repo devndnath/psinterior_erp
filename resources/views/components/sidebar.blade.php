@@ -34,6 +34,7 @@
                     ['label' => 'Clients', 'route' => 'clients.index', 'active' => 'clients.*', 'icon' => 'users', 'permission' => 'view_clients'],
                     ['label' => 'References', 'route' => 'references.index', 'icon' => 'git-pull-request', 'permission' => 'view_clients'],
                     ['label' => 'Meetings', 'route' => 'meetings.index', 'active' => 'meetings.*', 'icon' => 'calendar', 'permission' => 'view_meetings'],
+                    ['label' => 'Calls', 'route' => 'calls.index', 'active' => 'calls.*', 'icon' => 'phone', 'permission' => ['view_leads', 'view_clients']],
                     ['label' => 'Quotations', 'route' => 'quotations.index', 'active' => 'quotations.*', 'icon' => 'file-text', 'permission' => 'view_quotations'],
                     ['label' => 'Contracts', 'route' => 'contracts.index', 'active' => 'contracts.*', 'icon' => 'file-signature', 'permission' => 'view_contracts'],
                     ['label' => 'Change Orders', 'route' => 'change-orders.index', 'active' => 'change-orders.*', 'icon' => 'git-pull-request', 'permission' => 'view_change_orders'],
@@ -153,7 +154,8 @@
     ];
 
     $user = auth()->user();
-    $canSee = fn (array $link) => ! isset($link['permission']) || $user?->can($link['permission']);
+    // An array 'permission' means any one of them will do.
+    $canSee = fn (array $link) => ! isset($link['permission']) || (bool) $user?->canAny((array) $link['permission']);
     // Engine report links share one route; they match on its {report} too.
     $isActive = fn (array $link) => isset($link['params'])
         ? request()->routeIs($link['route']) && request()->route('report') === ($link['params']['report'] ?? null)

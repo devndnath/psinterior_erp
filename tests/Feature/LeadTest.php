@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\LeadStatus;
+use App\Livewire\Calls\Panel as CallPanel;
 use App\Livewire\Leads\Form as LeadForm;
 use App\Livewire\Leads\Index as LeadIndex;
 use App\Livewire\Leads\Show as LeadShow;
@@ -66,9 +67,11 @@ class LeadTest extends TestCase
     {
         $lead = Lead::factory()->create(['status' => LeadStatus::New->value, 'assigned_to' => null]);
 
-        Livewire::actingAs($this->staff)->test(LeadShow::class, ['lead' => $lead])
-            ->set('followup_notes', 'Called, interested in a quote.')
-            ->call('addFollowup')
+        // Logged from the lead page's call card (Calls\Panel).
+        Livewire::actingAs($this->staff)->test(CallPanel::class, ['lead' => $lead])
+            ->call('openForm', 'done')
+            ->set('notes', 'Called, interested in a quote.')
+            ->call('save')
             ->assertHasNoErrors();
 
         $this->assertSame(LeadStatus::FollowUp, $lead->fresh()->status);

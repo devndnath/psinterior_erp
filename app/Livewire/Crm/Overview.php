@@ -27,9 +27,9 @@ use Livewire\Component;
  * The layout of the firm's previous system's CRM dashboard, in the
  * soft-canvas style.
  *
- * "Calls" are pending Call/WhatsApp follow-ups on open leads; a pending
- * follow-up's `date` is when it's due (LeadFollowup::isOverdue() uses the
- * same rule). Each section is null when the user can't see its module.
+ * "Calls" are pending Call/WhatsApp follow-ups for open leads and for
+ * clients — the same rows as the Calls page (LeadFollowup::toMake()); a
+ * pending follow-up's `date` is when it's due. Each section is null when the user can't see its module.
  */
 #[Layout('layouts.admin', ['title' => 'CRM Overview'])]
 #[Title('CRM Overview')]
@@ -60,17 +60,16 @@ class Overview extends Component
         $openStatuses = array_map(fn (LeadStatus $s) => $s->value, array_filter(LeadStatus::cases(), fn (LeadStatus $s) => $s->isOpen()));
 
         // Calls -------------------------------------------------------
-        $callQuery = LeadFollowup::query()
-            ->where('status', FollowupStatus::Pending->value)
-            ->whereIn('type', [FollowupType::Call->value, FollowupType::WhatsApp->value])
-            ->whereHas('lead', fn ($q) => $q->whereIn('status', $openStatuses));
+        // Same rows and rules as the Calls page: pending calls & WhatsApp
+        // for open leads and for clients.
+        $callQuery = LeadFollowup::query()->visibleTo($user)->calls()->toMake();
 
         $calls = [
             'counts' => $this->buckets($callQuery, 'date', $today, true),
             // Overdue and today's first, oldest first — the call list.
             'due' => (clone $callQuery)->whereDate('date', '<=', $today->toDateString())
-                ->with(['lead:id,lead_no,name,phone,company_name', 'assignee:id,name'])
-                ->orderBy('date')->limit(8)->get(),
+                ->with([...LeadFollowup::CONTACT_RELATIONS, 'assignee:id,name'])
+                ->orderBy('date')->orderBy('time')->limit(8)->get(),
         ];
 
         // Client visits -------------------------------------------------

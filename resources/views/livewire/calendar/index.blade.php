@@ -38,6 +38,7 @@
             ['label' => 'Task', 'color' => 'blue'],
             ['label' => 'Site Visit', 'color' => 'indigo'],
             ['label' => 'Meeting', 'color' => 'green'],
+            ['label' => 'Call', 'color' => 'teal'],
             ['label' => 'Invoice Due', 'color' => 'red'],
             ['label' => 'Quotation Expiry', 'color' => 'yellow'],
             ['label' => 'Warranty Expiry', 'color' => 'gray'],
@@ -97,6 +98,7 @@
                                     'green' => 'bg-success-100 text-success-700',
                                     'red' => 'bg-danger-100 text-danger-700',
                                     'yellow' => 'bg-warning-100 text-warning-800',
+                                    'teal' => 'bg-teal-100 text-teal-800 dark:bg-teal-500/15 dark:text-teal-300',
                                     default => 'bg-ink-100 text-ink-700',
                                 } }}" title="{{ $event['type'] }}: {{ $event['title'] }}{{ $event['subtitle'] ? ' ('.$event['subtitle'].')' : '' }}">
                                     {{ $event['title'] }}

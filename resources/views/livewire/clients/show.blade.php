@@ -33,7 +33,7 @@
             <div class="panel p-6">
                 <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Client details</h2>
                 <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                    <div><dt class="text-ink-500">Phone</dt><dd class="font-medium text-ink-900">{{ $client->phone ?: '—' }}</dd></div>
+                    <div><dt class="text-ink-500">Phone</dt><dd class="flex items-center gap-2 font-medium text-ink-900">{{ $client->phone ?: '—' }} <x-call-actions :phone="$client->phone" /></dd></div>
                     <div><dt class="text-ink-500">Email</dt><dd class="font-medium text-ink-900">{{ $client->email ?: '—' }}</dd></div>
                     <div><dt class="text-ink-500">Company</dt><dd class="font-medium text-ink-900">{{ $client->company_name ?: '—' }}</dd></div>
                     <div><dt class="text-ink-500">Tax ID</dt><dd class="font-medium text-ink-900">{{ $client->tax_id ?: '—' }}</dd></div>
@@ -75,6 +75,8 @@
                     <div class="col-span-2"><dt class="text-ink-500">Notes</dt><dd class="whitespace-pre-line font-medium text-ink-900">{{ $client->notes ?: '—' }}</dd></div>
                 </dl>
             </div>
+
+            <livewire:calls.panel :client="$client" :key="'calls-client-'.$client->id" />
 
             <div class="panel p-6">
                 <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-ink-500">Leads</h2>
@@ -235,9 +237,6 @@
                 </div>
             @endcan
 
-            <div class="panel p-6 text-sm text-ink-400">
-                Meetings will appear here once that module ships (Phase 7+).
-            </div>
         </div>
 
         <div>

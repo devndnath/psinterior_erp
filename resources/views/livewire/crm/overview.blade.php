@@ -62,9 +62,9 @@
         <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
             <div>
                 <p class="section-title">Call Overview</p>
-                <p class="section-sub">Pending call &amp; WhatsApp follow-ups on open leads</p>
+                <p class="section-sub">Pending call &amp; WhatsApp follow-ups for leads and clients</p>
             </div>
-            <a href="{{ route('leads.index') }}" wire:navigate class="text-sm font-medium text-accent-600 hover:underline">All leads</a>
+            <a href="{{ route('calls.index') }}" wire:navigate class="text-sm font-medium text-accent-600 hover:underline">All calls</a>
         </div>
         <div class="grid grid-cols-1 gap-5 xl:grid-cols-12">
             <div class="grid grid-cols-2 content-start gap-3 xl:col-span-5">
@@ -83,22 +83,21 @@
                 <p class="mb-2 text-xs font-semibold text-ink-500">Calls to make now — overdue and today</p>
                 @forelse ($calls['due'] as $f)
                     @php $late = $f->date->lt($today); @endphp
-                    <a href="{{ route('leads.show', $f->lead_id) }}" wire:navigate class="flex items-center gap-3 border-b border-ink-100 py-2.5 last:border-0 hover:bg-ink-50/60">
-                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ink-100 text-xs font-bold text-ink-700">
-                            {{ \Illuminate\Support\Str::of($f->lead?->name ?? '?')->explode(' ')->map(fn ($w) => mb_substr($w, 0, 1))->take(2)->implode('') }}
-                        </span>
-                        <span class="min-w-0 flex-1">
-                            <span class="block truncate text-sm font-semibold text-ink-900">{{ $f->lead?->name }}</span>
-                            <span class="block truncate text-xs text-ink-500">{{ $f->type->label() }} · {{ $f->lead?->phone ?? 'no phone' }}{{ $f->assignee ? ' · '.$f->assignee->name : '' }}</span>
-                        </span>
+                    <div class="flex items-center gap-3 border-b border-ink-100 py-2.5 last:border-0">
                         <span @class([
-                            'shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold',
-                            'bg-danger-50 text-danger-700 dark:bg-danger-500/10 dark:text-danger-300' => $late,
-                            'bg-success-50 text-success-700 dark:bg-success-500/10 dark:text-success-400' => ! $late,
+                            'flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold',
+                            'bg-success-50 text-success-700 dark:bg-success-500/10 dark:text-success-400' => $f->client_id,
+                            'bg-ink-100 text-ink-700' => ! $f->client_id,
                         ])>
-                            {{ $late ? $f->date->diffForHumans($today, ['syntax' => \Carbon\CarbonInterface::DIFF_ABSOLUTE]).' late' : 'Today' }}
+                            {{ \Illuminate\Support\Str::of($f->contactName() ?? '?')->explode(' ')->map(fn ($w) => mb_substr($w, 0, 1))->take(2)->implode('') }}
                         </span>
-                    </a>
+                        <a href="{{ $f->contactUrl() }}" wire:navigate class="group min-w-0 flex-1">
+                            <span class="block truncate text-sm font-semibold text-ink-900 group-hover:underline">{{ $f->contactName() }} <span class="ml-1 text-[10px] font-semibold uppercase tracking-wide text-ink-400">{{ $f->contactKind() }}</span></span>
+                            <span class="block truncate text-xs text-ink-500">{{ $f->type->label() }} · {{ $f->contactPhone() ?? 'no phone' }}{{ $f->assignee ? ' · '.$f->assignee->name : '' }}</span>
+                        </a>
+                        <x-call-due :call="$f" class="hidden sm:inline-flex" />
+                        <x-call-actions :phone="$f->contactPhone()" />
+                    </div>
                 @empty
                     <p class="rounded-2xl border border-dashed border-ink-200 py-8 text-center text-sm text-ink-500">No calls due — you're all caught up.</p>
                 @endforelse

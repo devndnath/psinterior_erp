@@ -23,6 +23,19 @@ enum FollowupType: string
         };
     }
 
+    /** Icon name for <x-icon>. */
+    public function icon(): string
+    {
+        return match ($this) {
+            self::Call => 'phone',
+            self::WhatsApp => 'message-circle',
+            self::Email => 'mail',
+            self::Meeting => 'calendar',
+            self::SiteVisit => 'map-pin',
+            self::Other => 'list',
+        };
+    }
+
     /**
      * value => label map, the shape every dropdown in the views expects
      * (`@foreach ($options as $value => $label)`).
